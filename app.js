@@ -14,7 +14,7 @@ const app = express();
 
 // ใช้ body-parser สำหรับการรับข้อมูลจากฟอร์ม
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ตั้งค่าให้ Express ใช้ EJS
 app.set("view engine", "ejs");
@@ -81,7 +81,6 @@ app.get("/index", (req, res) => {
   res.render("index", { title: "PTN-X-P", user: req.user }); // ส่งข้อมูลผู้ใช้ไปที่หน้า index
 });
 
-
 // Route สำหรับหน้าแรก (login)
 app.get("/", (req, res) => {
   res.redirect("/login"); // เปลี่ยนหน้าแรกให้ไปที่หน้า login ทันที
@@ -116,15 +115,21 @@ app.get("/logout", (req, res) => {
 // ฟังก์ชันการตรวจสอบสิทธิ์
 function checkRole(role) {
   return function (req, res, next) {
-    if (req.isAuthenticated() && req.user.role === role) {
-      return next();
+    if (req.isAuthenticated()) {
+      // ตรวจสอบว่าเป็นผู้ที่ล็อกอินแล้ว
+      return next(); // ถ้าเป็นผู้ที่ล็อกอินแล้ว ให้ทำงานต่อไป
     }
-    res.redirect("/login"); // ถ้าไม่ใช่ผู้ที่มีสิทธิ์จะให้ไปหน้า login
+    res.redirect("/login"); // ถ้าไม่ได้ล็อกอิน ให้ไปหน้า login
   };
 }
 
+// Route สำหรับหน้า Dashboard
+app.get("/dashboard", checkRole("user"), (req, res) => {
+  res.render("dashboard", { title: "Dashboard", user: req.user });
+});
+
 // หน้าแสดงข้อมูลผู้ป่วย
-app.get("/patients", (req, res) => {
+app.get("/patients", checkRole("user"), (req, res) => {
   const searchTerm = req.query.search || ""; // ค่าค้นหาจากฟอร์ม
   const searchType = req.query.searchType || "name"; // ค่าประเภทการค้นหาจากฟอร์ม (default = 'name')
 
@@ -143,7 +148,7 @@ app.get("/patients", (req, res) => {
 });
 
 // หน้าอัปเดตข้อมูลผู้ป่วย
-app.get("/patients/update/:id", (req, res) => {
+app.get("/patients/update/:id", checkRole("user"), (req, res) => {
   const patientId = req.params.id;
 
   patientModel.getPatientById(patientId, (err, patient) => {
@@ -159,7 +164,7 @@ app.get("/patients/update/:id", (req, res) => {
 });
 
 // อัปเดตข้อมูลผู้ป่วย
-app.post("/patients/update/:id", (req, res) => {
+app.post("/patients/update/:id", checkRole("user"), (req, res) => {
   const patientId = req.params.id;
   const { height, weight, bmi, blood_pressure, treatment_history } = req.body;
 

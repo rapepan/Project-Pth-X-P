@@ -77,8 +77,8 @@ passport.deserializeUser((id, done) => {
 });
 
 // หน้า index
-app.get("/index", (req, res) => {
-  res.render("index", { title: "PTN-X-P", user: req.user }); // ส่งข้อมูลผู้ใช้ไปที่หน้า index
+app.get("/index", checkRole('user'), (req, res) => {
+  res.render("index", { title: "PTN-X-P", user: req.user });
 });
 
 // Route สำหรับหน้าแรก (login)
@@ -94,16 +94,8 @@ app.get("/login", (req, res) => {
 // รับข้อมูลจากฟอร์มเข้าสู่ระบบ
 app.post("/login", userController.loginUser); // ใช้ userController ในการจัดการการล็อกอิน
 
-// เส้นทางสำหรับหน้า Dashboard
-app.get("/dashboard", (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect("/login"); // ถ้ายังไม่ได้ล็อกอิน จะส่งไปหน้า login
-  }
-  res.render("dashboard", { title: "Dashboard", user: req.user }); // ส่งข้อมูลผู้ใช้ไปที่หน้า dashboard
-});
-
 // ระบบออกจากระบบ
-app.get("/logout", (req, res) => {
+app.get("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) {
       return next(err);
@@ -126,6 +118,14 @@ function checkRole(role) {
 // Route สำหรับหน้า Dashboard
 app.get("/dashboard", checkRole("user"), (req, res) => {
   res.render("dashboard", { title: "Dashboard", user: req.user });
+});
+
+// เส้นทางสำหรับหน้า Dashboard
+app.get("/dashboard", checkRole('user'),(req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/login"); // ถ้ายังไม่ได้ล็อกอิน จะส่งไปหน้า login
+  }
+  res.render("dashboard", { title: "Dashboard", user: req.user }); // ส่งข้อมูลผู้ใช้ไปที่หน้า dashboard
 });
 
 // หน้าแสดงข้อมูลผู้ป่วย

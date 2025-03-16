@@ -181,6 +181,54 @@ app.post("/patients/update/:id", checkRole("user"), (req, res) => {
   );
 });
 
+// หน้าแสดงฟอร์มสำหรับเพิ่มข้อมูลผู้ป่วยใหม่
+app.get("/patients/add", checkRole('user'), (req, res) => {
+  res.render("patientForm"); // แสดงหน้า patientForm.ejs
+});
+
+// เส้นทางสำหรับรับข้อมูลจากฟอร์มและบันทึกข้อมูลผู้ป่วยใหม่
+app.post("/patients/add", checkRole('user'), (req, res) => {
+  const { name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history } = req.body;
+
+  // สร้าง HN ใหม่ (คุณอาจใช้วิธีการสร้าง HN ตามที่ได้กล่าวไว้ก่อนหน้านี้)
+  generateHN((err, newHN) => {
+    if (err) {
+      return res.status(500).send("ไม่สามารถสร้าง HN ได้");
+    }
+
+    // บันทึกข้อมูลลงฐานข้อมูล
+    const query = "INSERT INTO patient (HN, name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const values = [newHN, name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        return res.status(500).send("ไม่สามารถบันทึกข้อมูลผู้ป่วยได้");
+      }
+      res.redirect("/patients"); // หลังจากบันทึกแล้วให้กลับไปที่หน้าแสดงข้อมูลผู้ป่วย
+    });
+  });
+});
+
+// ฟังก์ชันสำหรับสร้าง HN ใหม่
+function generateHN(callback) {
+  const query = "SELECT MAX(CAST(SUBSTRING(HN, 3) AS UNSIGNED)) AS maxHN FROM patient";
+
+  db.query(query, (err, result) => {
+    if (err) {
+      return callback(err);
+    }
+
+    let newHN = "HN0001";  // กำหนดค่าเริ่มต้นเป็น HN0001 ถ้าไม่มีข้อมูลในฐานข้อมูล
+    if (result[0].maxHN) {
+      // เพิ่มเลข 1 ไปที่ HN ที่สูงสุดที่ดึงมา
+      newHN = "HN" + String(result[0].maxHN + 1).padStart(4, "0");
+    }
+
+    callback(null, newHN);
+  });
+}
+
+
 // ตั้งค่า port ที่จะใช้งาน
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

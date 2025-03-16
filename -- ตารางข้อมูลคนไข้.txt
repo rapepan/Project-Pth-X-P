@@ -26,12 +26,12 @@ CREATE TABLE treatment_history (
     FOREIGN KEY (HN) REFERENCES patient(HN)  			-- เชื่อมโยงกับตารางข้อมูลคนไข้โดยใช้ HN
 );
 
--- ตารางประวัติการใช้ยา (เก็บข้อมูลเก่าและอัปเดตข้อมูลได้)
+-- ตารางประวัติการแพ้ยา (เก็บข้อมูลเก่าและอัปเดตข้อมูลได้)
 CREATE TABLE medication_history (
     id INT AUTO_INCREMENT PRIMARY KEY,         			-- id PRIMARY Key
     HN VARCHAR(20),                            			-- รหัสคนไข้
     name VARCHAR(100),                         			-- ชื่อ
-    record TEXT,                               			-- ประวัติการใช้ยา
+    record TEXT,                               			-- ประวัติการแพ้ยา
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 		-- เวลาที่บันทึกข้อมูล
     FOREIGN KEY (HN) REFERENCES patient(HN)  			-- เชื่อมโยงกับตารางข้อมูลคนไข้โดยใช้ HN
 );

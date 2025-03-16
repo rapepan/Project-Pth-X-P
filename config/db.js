@@ -3,9 +3,9 @@ const mysql = require("mysql2");
 
 // สร้างการเชื่อมต่อกับฐานข้อมูล MySQL
 const connection = mysql.createConnection({
-  host: "localhost", // สำหรับ XAMPP ใช้ localhost
+  host: "10.104.22.34", // สำหรับ XAMPP ใช้ localhost
   user: "root", // ชื่อผู้ใช้ MySQL
-  password: "1234", // รหัสผ่าน (ถ้าไม่มีให้เว้นว่าง)
+  password: "BPYodv23927", // รหัสผ่าน (ถ้าไม่มีให้เว้นว่าง)
   database: "pth-x-p", // ชื่อฐานข้อมูล
 });
 

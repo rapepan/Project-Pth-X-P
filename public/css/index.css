@@ -1,0 +1,45 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
+    color: #333;
+}
+
+header {
+    background-color: #0056b3;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 32px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ส่วนของเนื้อหาหลัก */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-btn {
+    background-color: #007bff; /* สีฟ้าของปุ่ม */
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    width: 15%; /* ให้ปุ่มเต็มความกว้าง */
+    max-width: 300px; /* จำกัดความกว้างสูงสุด */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 10px 0; /* เพิ่มระยะห่างระหว่างปุ่ม */
+}
+
+.menu-btn:hover {
+    background-color: #0056b3; /* เปลี่ยนสีเมื่อ hover */
+}

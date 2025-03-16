@@ -1,0 +1,46 @@
+Pth-X-P/
+│
+├── config/
+│   └── db.js                  # ฟังก์ชันสำหรับการเชื่อมต่อกับฐานข้อมูล MySQL
+│   └── passportConfig.js      # การตั้งค่า Passport.js สำหรับการจัดการ Authentication (เช่น การลงทะเบียนและการล็อกอิน)
+│
+├── controllers/ 
+│   ├── patientController.js    # Controller ที่จัดการกับคำขอที่เกี่ยวข้องกับผู้ป่วย เช่น การเพิ่มข้อมูลและการดึงข้อมูล
+│   ├── userController.js       # Controller ที่จัดการกับคำขอที่เกี่ยวข้องกับผู้ใช้งาน
+│   └── authController.js       # Controller ที่จัดการกับคำขอที่เกี่ยวข้องกับการ Authentication (การลงทะเบียน, การล็อกอิน)    
+│
+├── models/ 
+│   ├── patientModel.js         # โมเดลที่ใช้ในการจัดการข้อมูลผู้ป่วย
+│   ├── medicationModel.js      # โมเดลที่ใช้ในการจัดการข้อมูลยา
+│   ├── treatmentModel.js       # โมเดลที่ใช้ในการจัดการข้อมูลการรักษา
+│   └── userModel.js            # โมเดลที่ใช้ในการจัดการข้อมูลผู้ใช้งาน (สำหรับ Authentication)
+│
+├── node_modules/               # โฟลเดอร์เก็บ dependencies ต่างๆ ที่ติดตั้งจาก npm
+│
+├── public/
+│    ├── css/                   # โฟลเดอร์เก็บไฟล์ CSS สำหรับการตกแต่งหน้าต่างๆ
+│    │   ├── dashboard.css      # CSS สำหรับหน้าแดชบอร์ด
+│    │   ├── index.css          # CSS สำหรับหน้าแรก
+│    │   ├── login.css          # CSS สำหรับหน้าเข้าสู่ระบบ
+│    │   ├── patients.css       # CSS สำหรับหน้าแสดงข้อมูลผู้ป่วย
+│    │   ├── register.css       # CSS สำหรับหน้าลงทะเบียน
+│    │   └── updatePatient.css  # CSS สำหรับหน้าอัปเดตข้อมูลผู้ป่วย
+│    └── js/                    # โฟลเดอร์เก็บไฟล์ JavaScript สำหรับการทำงานหน้าเว็บ
+│
+├── routes/
+│   ├── patientRoutes.js        # Route ที่จัดการคำขอเกี่ยวกับข้อมูลผู้ป่วย เช่น การเพิ่มและดึงข้อมูล
+│   ├── authRoutes.js           # Route สำหรับการจัดการ Authentication (การลงทะเบียนและการล็อกอิน)
+│   └── userRoutes.js           # Route สำหรับคำขอที่เกี่ยวข้องกับผู้ใช้งาน
+│
+├── views/
+│   ├── dashboard.ejs           # หน้าแดชบอร์ดที่แสดงข้อมูลผู้ป่วยและข้อมูลอื่นๆ
+│   ├── index.ejs               # หน้าแรกของเว็บไซต์
+│   ├── login.ejs               # หน้าเข้าสู่ระบบ
+│   ├── patient.ejs             # หน้าแสดงข้อมูลของผู้ป่วย
+│   ├── register.ejs            # หน้าให้ผู้ใช้ลงทะเบียน
+│   └── updatePatient.ejs       # หน้าให้ผู้ใช้สามารถอัปเดตข้อมูลของผู้ป่วย
+│
+├── .env                        # ไฟล์สำหรับเก็บค่าคอนฟิกที่เป็นความลับ เช่น การเชื่อมต่อฐานข้อมูล, คีย์ API
+├── app.js                      # ไฟล์หลักในการตั้งค่าการทำงานของแอปพลิเคชัน เช่น Express, Passport.js, Routing
+├── package.json                # ไฟล์ที่ใช้จัดการ dependencies และ scripts ต่างๆ ของโปรเจ็กต์
+├── package-lock.json           # ไฟล์ที่ล็อกเวอร์ชันของ dependencies ที่ใช้ในโปรเจ็กต์

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/css/patients.css"> <!-- ใช้ CSS เฉพาะหน้า Patients -->
+</head>
+
+<body>
+    <header>
+        <h1>
+            <%= title %>
+        </h1>
+    </header>
+
+    <nav>
+        <a href="/index">หน้าหลัก</a>
+        <a href="/patients">ข้อมูลผู้ป่วย</a>
+    </nav>
+
+    <div class="container">
+        <h2>ค้นหาผู้ป่วย</h2>
+        <!-- ฟอร์มค้นหาผู้ป่วย -->
+        <form class="search-bar" action="/patients" method="GET">
+            <select name="searchType">
+                <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาตามรหัสคนไข้</option>
+                <option value="name" <%=searchType==='name' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
+                <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน
+                </option>
+            </select>
+            <input type="text" name="search" placeholder="ค้นหาผู้ป่วย..." value="<%= searchTerm %>">
+            <button type="submit">ค้นหา</button>
+        </form>
+
+        <% if (patients.length> 0 && searchTerm) { %>
+            <h3>ผลการค้นหา</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ชื่อ</th>
+                        <th>รหัสประจำตัวประชาชน</th>
+                        <th>อายุ</th>
+                        <th>เพศ</th>
+                        <th>ที่อยู่</th>
+                        <th>ส่วนสูง</th>
+                        <th>น้ำหนัก</th>
+                        <th>BMI</th>
+                        <th>ความดันโลหิต</th>
+                        <th>โรคประจำตัว</th>
+                        <th>สาเหตุที่มารพ.</th>
+                        <th>ประวัติการรักษา</th>
+                        <th>อัปเดตข้อมูล</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% patients.forEach(function(patient) { %>
+                        <tr>
+                            <td>
+                                <%= patient.name %>
+                            </td>
+                            <td>
+                                <%= patient.national_id %>
+                            </td>
+                            <td>
+                                <%= patient.age %>
+                            </td>
+                            <td>
+                                <%= patient.gender %>
+                            </td>
+                            <td>
+                                <%= patient.address %>
+                            </td>
+                            <td>
+                                <%= patient.height %>
+                            </td>
+                            <td>
+                                <%= patient.weight %>
+                            </td>
+                            <td>
+                                <%= patient.bmi %>
+                            </td>
+                            <td>
+                                <%= patient.blood_pressure %>
+                            </td>
+                            <td>
+                                <%= patient.chronic_diseases %>
+                            </td>
+                            <td>
+                                <%= patient.reason_for_visit %>
+                            </td>
+                            <td>
+                                <%= patient.treatment_history %>
+                            </td>
+                            <td>
+                                <a href="/patients/update/<%= patient.id %>">อัปเดต</a>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+            <% } else if (searchTerm) { %>
+                <p>ไม่พบข้อมูลผู้ป่วยที่ตรงกับคำค้นหา</p>
+                <% } %>
+    </div>
+</body>
+
+</html>

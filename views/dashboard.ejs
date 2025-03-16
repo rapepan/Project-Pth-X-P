@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- ใช้ CSS ส่วนกลาง -->
+    <link rel="stylesheet" href="/css/dashboard.css"> <!-- ใช้ CSS เฉพาะหน้า Dashboard -->
+</head>
+
+<body>
+    <header>
+
+    </header>
+
+    <div class="container">
+        <h2>ยินดีต้อนรับ, <%= user.username %>!</h2>
+        <a href="/index" class="menu-btn">หน้าหลัก</a>
+        <a href="/logout" class="menu-btn">ออกจากระบบ</a>
+    </div>
+</body>
+
+</html>

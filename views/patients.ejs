@@ -20,6 +20,7 @@
     <nav>
         <a href="/index">หน้าหลัก</a>
         <a href="/patients">ข้อมูลผู้ป่วย</a>
+        <a href="/patients/add">บันทึกข้อมูลผู้ป่วยใหม่</a>
     </nav>
 
     <div class="container">
@@ -27,88 +28,84 @@
         <!-- ฟอร์มค้นหาผู้ป่วย -->
         <form class="search-bar" action="/patients" method="GET">
             <select name="searchType">
-                <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาตามรหัสคนไข้</option>
+                <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาด้วย HN</option>
                 <option value="name" <%=searchType==='name' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
-                <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน
-                </option>
+                <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน</option>
             </select>
-            <input type="text" name="search" placeholder="ค้นหาผู้ป่วย..." value="<%= searchTerm %>">
+            <input type="text" name="search" placeholder="ค้นหาผู้ป่วย" value="<%= searchTerm %>">
             <button type="submit">ค้นหา</button>
         </form>
 
-        <% if (patients.length> 0 && searchTerm) { %>
+        <% if (patients.length > 0 && searchTerm) { %>
             <h3>ผลการค้นหา</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>HN</th>
-                        <th>ชื่อ</th>
-                        <th>รหัสประจำตัวประชาชน</th>
-                        <th>อายุ</th>
-                        <th>เพศ</th>
-                        <th>ที่อยู่</th>
-                        <th>ส่วนสูง</th>
-                        <th>น้ำหนัก</th>
-                        <th>BMI</th>
-                        <th>ความดันโลหิต</th>
-                        <th>โรคประจำตัว</th>
-                        <th>สาเหตุที่มารพ.</th>
-                        <th>ประวัติการรักษา</th>
-                        <th>อัปเดตข้อมูล</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% patients.forEach(function(patient) { %>
-                        <tr>
-                            <td>
-                                <%= patient.HN %>
-                            </td>
-                            <td>
-                                <%= patient.name %>
-                            </td>
-                            <td>
-                                <%= patient.national_id %>
-                            </td>
-                            <td>
-                                <%= patient.age %>
-                            </td>
-                            <td>
-                                <%= patient.gender %>
-                            </td>
-                            <td>
-                                <%= patient.address %>
-                            </td>
-                            <td>
-                                <%= patient.height %>
-                            </td>
-                            <td>
-                                <%= patient.weight %>
-                            </td>
-                            <td>
-                                <%= patient.bmi %>
-                            </td>
-                            <td>
-                                <%= patient.blood_pressure %>
-                            </td>
-                            <td>
-                                <%= patient.chronic_diseases %>
-                            </td>
-                            <td>
-                                <%= patient.reason_for_visit %>
-                            </td>
-                            <td>
-                                <%= patient.treatment_history %>
-                            </td>
-                            <td>
-                                <a href="/patients/update/<%= patient.id %>">อัปเดต</a>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
-            <% } else if (searchTerm) { %>
-                <p>ไม่พบข้อมูลผู้ป่วยที่ตรงกับคำค้นหา</p>
-                <% } %>
+            <!-- แสดงข้อมูลผู้ป่วยในรูปแบบฟอร์ม -->
+            <div class="patient-list">
+                <% patients.forEach(function(patient) { %>
+                    <div class="patient-entry">
+                        <div class="patient-row">
+                            <div class="patient-label">HN:</div>
+                            <div class="patient-value"><%= patient.HN %></div>
+
+                            <div class="patient-label">ชื่อ:</div>
+                            <div class="patient-value"><%= patient.name %></div>
+                        </div>
+                        
+                        <div class="patient-row">
+                            <div class="patient-label">รหัสประจำตัวประชาชน:</div>
+                            <div class="patient-value"><%= patient.national_id %></div>
+
+                            <div class="patient-label">อายุ:</div>
+                            <div class="patient-value"><%= patient.age %></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">เพศ:</div>
+                            <div class="patient-value"><%= patient.gender %></div>
+
+                            <div class="patient-label">ที่อยู่:</div>
+                            <div class="patient-value"><%= patient.address %></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">ส่วนสูง:</div>
+                            <div class="patient-value"><%= patient.height %></div>
+
+                            <div class="patient-label">น้ำหนัก:</div>
+                            <div class="patient-value"><%= patient.weight %></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">BMI:</div>
+                            <div class="patient-value"><%= patient.bmi %></div>
+
+                            <div class="patient-label">ความดันโลหิต:</div>
+                            <div class="patient-value"><%= patient.blood_pressure %></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">โรคประจำตัว:</div>
+                            <div class="patient-value"><%= patient.chronic_diseases %></div>
+                            
+                            <div class="patient-label">สาเหตุที่มาพบแพทย์:</div>
+                            <div class="patient-value"><%= patient.reason_for_visit %></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">ประวัติการรักษา:</div>
+                            <div class="patient-value"><%= patient.treatment_history %></div>
+                        </div>
+
+                        <div>
+                            <a href="/patients/update/<%= patient.id %>" class="update-link">อัปเดตข้อมูล</a>
+                            <a href="/patients/history/<%= patient.id %>">ดูประวัติการรักษา</a>
+                        </div>
+                        
+                    </div>
+                <% }); %>
+            </div>
+        <% } else if (searchTerm) { %>
+            <p>ไม่พบข้อมูลผู้ป่วยที่ตรงกับคำค้นหา</p>
+        <% } %>
     </div>
 </body>
 

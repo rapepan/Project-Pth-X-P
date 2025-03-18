@@ -8,8 +8,7 @@ body {
     /* จัดกลางแนวนอน */
     align-items: center;
     /* จัดกลางแนวตั้ง */
-    background-color: #f4f4f9;
-    /* สีพื้นหลังเบาๆ */
+    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
 }
 
 /* ฟอร์ม */

@@ -5,52 +5,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เพิ่มข้อมูลผู้ป่วยใหม่</title>
+    <link rel="stylesheet" href="/css/patientForm.css">
 </head>
 
 <body>
-    <h1>เพิ่มข้อมูลผู้ป่วยใหม่</h1>
-    <form action="/patients/add" method="POST">
-        <label for="name">ชื่อ:</label>
-        <input type="text" id="name" name="name" required><br><br>
+    <div class="container">
+        <h1>เพิ่มข้อมูลผู้ป่วยใหม่</h1>
+        <form action="/patients/add" method="POST">
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="text" id="name" name="name" placeholder="ชื่อ" required>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="national_id" name="national_id" placeholder="รหัสประจำตัวประชาชน" required>
+                </div>
+            </div>
 
-        <label for="national_id">รหัสประจำตัวประชาชน:</label>
-        <input type="text" id="national_id" name="national_id" required><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="number" id="age" name="age" placeholder="อายุ" required>
+                </div>
+                <div class="input-container">
+                    <select id="gender" name="gender" required>
+                        <option value="" disabled selected>เพศ</option>
+                        <option value="ชาย">ชาย</option>
+                        <option value="หญิง">หญิง</option>
+                    </select>
+                </div>
+            </div>
 
-        <label for="age">อายุ:</label>
-        <input type="number" id="age" name="age" required><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <textarea id="address" name="address" placeholder="ที่อยู่" required></textarea>
+                </div>
+            </div>
 
-        <label for="gender">เพศ:</label>
-        <select id="gender" name="gender" required>
-            <option value="ชาย">ชาย</option>
-            <option value="หญิง">หญิง</option>
-        </select><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="number" id="height" name="height" placeholder="ส่วนสูง" required>
+                </div>
+                <div class="input-container">
+                    <input type="number" id="weight" name="weight" placeholder="น้ำหนัก" required>
+                </div>
+            </div>
 
-        <label for="address">ที่อยู่:</label>
-        <textarea id="address" name="address" required></textarea><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="number" id="bmi" name="bmi" placeholder="BMI" required>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="blood_pressure" name="blood_pressure" placeholder="ความดันโลหิต" required>
+                </div>
+            </div>
 
-        <label for="height">ส่วนสูง:</label>
-        <input type="number" step="0.01" id="height" name="height" required><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <textarea id="chronic_diseases" name="chronic_diseases" placeholder="โรคประจำตัว"></textarea>
+                </div>
+                <div class="input-container">
+                    <textarea id="treatment_history" name="treatment_history" placeholder="ประวัติการรักษา"></textarea>
+                </div>
+            </div>
 
-        <label for="weight">น้ำหนัก:</label>
-        <input type="number" step="0.01" id="weight" name="weight" required><br><br>
+            <div class="form-row">
+                <div class="input-container">
+                    <textarea id="reason_for_visit" name="reason_for_visit" placeholder="สาเหตุที่มาพบแพทย์"></textarea>
+                </div>
+            </div>
 
-        <label for="bmi">BMI:</label>
-        <input type="number" step="0.01" id="bmi" name="bmi" required><br><br>
-
-        <label for="blood_pressure">ความดันโลหิต:</label>
-        <input type="text" id="blood_pressure" name="blood_pressure" required><br><br>
-
-        <label for="chronic_diseases">โรคประจำตัว:</label>
-        <textarea id="chronic_diseases" name="chronic_diseases"></textarea><br><br>
-
-        <label for="reason_for_visit">เหตุผลที่มาคลินิก:</label>
-        <textarea id="reason_for_visit" name="reason_for_visit"></textarea><br><br>
-
-        <label for="treatment_history">ประวัติการรักษา:</label>
-        <textarea id="treatment_history" name="treatment_history"></textarea><br><br>
-
-        <button type="submit">บันทึกข้อมูล</button>
-    </form>
+            <button type="submit">บันทึกข้อมูล</button><br><br>
+            <button class="button2" onclick="goBack()">ย้อนกลับ</button>
+        </form>
+    </div>
+    
 </body>
+
+<script>
+    function goBack() {
+    window.history.back(); // หรือใช้ window.history.go(-1);
+}
+</script>
 
 </html>

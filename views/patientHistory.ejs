@@ -1,0 +1,83 @@
+<!-- patientHistory.ejs -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/patientHistory.css">
+</head>
+<body>
+  <h1><%= title %></h1>
+
+  <h2>ข้อมูลผู้ป่วยล่าสุด</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>HN</th>
+        <th>ชื่อ</th>
+        <th>ส่วนสูง</th>
+        <th>น้ำหนัก</th>
+        <th>BMI</th>
+        <th>ความดันโลหิต</th>
+        <th>โรคประจำตัว</th>
+        <th>ประวัติการรักษา</th>
+        <th>สาเหตุที่มาพบแพทย์</th>
+        <th>วันที่อัปเดตล่าสุด</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= patient.HN %></td>
+        <td><%= patient.name %></td>
+        <td><%= patient.height %></td>
+        <td><%= patient.weight %></td>
+        <td><%= patient.bmi %></td>
+        <td><%= patient.blood_pressure %></td>
+        <td><%= patient.chronic_diseases %></td>
+        <td><%= patient.treatment_history %></td>
+        <td><%= patient.reason_for_visit %></td>
+        <!-- ใช้ JavaScript เพื่อแปลงวันที่ -->
+        <td><%= new Date(patient.updated_at).toLocaleString() %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <h2>ประวัติการรักษาเก่าของผู้ป่วย</h2>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>HN</th>
+        <th>ชื่อ</th>
+        <th>ส่วนสูง</th>
+        <th>น้ำหนัก</th>
+        <th>BMI</th>
+        <th>ความดันโลหิต</th>
+        <th>โรคประจำตัว</th>
+        <th>ประวัติการรักษา</th>
+        <th>สาเหตุที่มาพบแพทย์</th>
+        <th>วันที่อัปเดตล่าสุด</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% history.forEach(function(h) { %>
+        <tr>
+          <td><%= h.HN %></td>
+          <td><%= h.name %></td>
+          <td><%= h.height %></td>
+          <td><%= h.weight %></td>
+          <td><%= h.bmi %></td>
+          <td><%= h.blood_pressure %></td>
+          <td><%= h.chronic_diseases %></td>
+          <td><%= h.treatment_history %></td>
+          <td><%= h.reason_for_visit %></td>
+          <!-- แปลงวันที่ใน history -->
+          <td><%= new Date(h.updated_at).toLocaleString() %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -7,7 +7,7 @@ body {
 }
 
 header {
-    background-color: #0056b3;
+    background-color: #27445D;
     color: white;
     text-align: center;
     padding: 15px 0;
@@ -27,11 +27,10 @@ header {
 }
 
 .menu-btn {
-    background-color: #007bff; /* สีฟ้าของปุ่ม */
+    background-color: #493D9E; /* สีฟ้าของปุ่ม */
     color: white;
     padding: 14px 28px;
     border: none;
-    font-size: 18px;
     cursor: pointer;
     width: 15%; /* ให้ปุ่มเต็มความกว้าง */
     max-width: 300px; /* จำกัดความกว้างสูงสุด */
@@ -41,5 +40,5 @@ header {
 }
 
 .menu-btn:hover {
-    background-color: #0056b3; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #B2A5FF; /* เปลี่ยนสีเมื่อ hover */
 }

@@ -1,0 +1,14 @@
+# Node modules folder
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+
+# IDE files
+.idea/           # JetBrains IDEs
+.vscode/         # VS Code

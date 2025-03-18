@@ -8,6 +8,9 @@ const searchPatients = (searchTerm, searchType, callback) => {
 
   let query = "";
   switch (searchType) {
+    case "HN":
+      query = `SELECT * FROM patient WHERE HN LIKE ?`; // ค้นหาตามชื่อ
+      break;
     case "name":
       query = `SELECT * FROM patient WHERE name LIKE ?`; // ค้นหาตามชื่อ
       break;
@@ -15,7 +18,7 @@ const searchPatients = (searchTerm, searchType, callback) => {
       query = `SELECT * FROM patient WHERE national_id LIKE ?`; // ค้นหาตามรหัสประจำตัวประชาชน
       break;
     default:
-      query = `SELECT * FROM patient WHERE name LIKE ?`; // ค้นหาตามชื่อเป็นค่าเริ่มต้น
+      query = `SELECT * FROM patient WHERE HN LIKE ?`; // ค้นหาตามชื่อเป็นค่าเริ่มต้น
       break;
   }
 

@@ -290,7 +290,7 @@ function generateHN(callback) {
   const month = (now.getMonth() + 1).toString().padStart(2, '0'); // เดือนต้องเป็นสองหลัก
   const day = now.getDate().toString().padStart(2, '0'); // วันต้องเป็นสองหลัก
 
-  const datePart = year + month + day; // ปีเดือนวัน เช่น "250318"
+  const datePart = year + month + day; // ปีเดือนวัน เช่น "250319"
 
   // สร้าง query เพื่อหาค่า HN ที่สูงสุดจากฐานข้อมูลในวันที่เดียวกัน
   const query = `SELECT MAX(CAST(SUBSTRING(HN, 7) AS UNSIGNED)) AS maxHN FROM patient WHERE HN LIKE '${datePart}%'`;

@@ -292,6 +292,7 @@ function generateHN(callback) {
 
   const datePart = year + month + day; // ปีเดือนวัน เช่น "250318"
 
+  // สร้าง query เพื่อหาค่า HN ที่สูงสุดจากฐานข้อมูลในวันที่เดียวกัน
   const query = `SELECT MAX(CAST(SUBSTRING(HN, 7) AS UNSIGNED)) AS maxHN FROM patient WHERE HN LIKE '${datePart}%'`;
 
   db.query(query, (err, result) => {
@@ -308,7 +309,7 @@ function generateHN(callback) {
       newHN = datePart + String(result[0].maxHN + 1).padStart(2, "0");
     }
 
-    callback(null, newHN);
+    callback(null, newHN); // ส่งค่า HN ที่สร้างไปยัง callback
   });
 }
 

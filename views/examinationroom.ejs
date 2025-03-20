@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/examinationroom.css">
+</head>
+
+<body>
+    <header>
+        <h1><%= title %></h1>
+    </header>
+
+    <nav>
+        <a href="/index">หน้าหลัก</a>
+        <!-- <a href="/patientHistory">ซักประวัติ</a> -->
+        <a href="">การวินิฉัย</a>
+        <a href="">หัตการ</a>
+        <a href="">ข้อมูลทางกายภาพบำบัด</a>
+        <a href="">สรุปค่าใช้จ่าย</a>
+    </nav>
+
+    <div class="container">
+        <h2>ซักประวัติ</h2>
+        <% if (patient) { %>
+            <div class="patient-list"> 
+                    <div class="patient-row">
+                        <div class="patient-label">ชื่อ:</div>
+                        <div class="patient-value"><a href="/medicalHistory/<%= patient.id %>"><%= patient.fname %> <%= patient.lname %></a></div>
+                    </div>
+            </div><br><br>
+
+            <button class="button" onclick="window.location.href='/patientHistory/<%= patient.id %>'">ดูประวัติผู้ป่วย</button>
+        <% } else { %>
+            <p>ไม่พบข้อมูลผู้ป่วย</p>
+        <% } %>
+    </div>
+
+</body>
+
+</html>

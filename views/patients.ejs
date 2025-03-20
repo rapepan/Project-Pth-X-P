@@ -19,8 +19,7 @@
 
     <nav>
         <a href="/index">หน้าหลัก</a>
-        <a href="/patients">ข้อมูลผู้ป่วย</a>
-        <a href="/patients/add">บันทึกข้อมูลผู้ป่วยใหม่</a>
+        <a href="/patients">ค้นหาข้อมูลผู้ป่วย</a>
     </nav>
 
     <div class="container">
@@ -38,75 +37,114 @@
 
         <% if (patients.length > 0 && searchTerm) { %>
             <h3>ผลการค้นหา</h3>
-            <!-- แสดงข้อมูลผู้ป่วยในรูปแบบฟอร์ม -->
             <div class="patient-list">
                 <% patients.forEach(function(patient) { %>
                     <div class="patient-entry">
+                        <h4>ข้อมูลส่วนตัว</h4>
                         <div class="patient-row">
                             <div class="patient-label">HN:</div>
                             <div class="patient-value"><%= patient.HN %></div>
 
                             <div class="patient-label">ชื่อ:</div>
-                            <div class="patient-value"><%= patient.name %></div>
+                            <div class="patient-value"><%= patient.fname %></div>
+
+                            <div class="patient-label">นามสกุล:</div>
+                            <div class="patient-value"><%= patient.lname %></div>
                         </div>
                         
                         <div class="patient-row">
                             <div class="patient-label">รหัสประจำตัวประชาชน:</div>
                             <div class="patient-value"><%= patient.national_id %></div>
 
-                            <div class="patient-label">อายุ:</div>
-                            <div class="patient-value"><%= patient.age %></div>
-                        </div>
-
-                        <div class="patient-row">
                             <div class="patient-label">เพศ:</div>
                             <div class="patient-value"><%= patient.gender %></div>
 
-                            <div class="patient-label">ที่อยู่:</div>
-                            <div class="patient-value"><%= patient.address %></div>
+                            <div class="patient-label">เบอร์ติดต่อ:</div>
+                            <div class="patient-value"><%= patient.phone %></div>
                         </div>
 
                         <div class="patient-row">
-                            <div class="patient-label">ส่วนสูง:</div>
-                            <div class="patient-value"><%= patient.height %></div>
+                            <div class="patient-label">อายุ:</div>
+                            <div class="patient-value"><%= patient.age %></div>
 
-                            <div class="patient-label">น้ำหนัก:</div>
-                            <div class="patient-value"><%= patient.weight %></div>
-                        </div>
+                            <div class="patient-label">วันเดือนปีเกิด:</div>
+                            <div class="patient-value">
+                                <%= new Date(patient.dob).toLocaleDateString('th-TH') %>
+                            </div>
 
-                        <div class="patient-row">
-                            <div class="patient-label">BMI:</div>
-                            <div class="patient-value"><%= patient.bmi %></div>
-
-                            <div class="patient-label">ความดันโลหิต:</div>
-                            <div class="patient-value"><%= patient.blood_pressure %></div>
-                        </div>
-
-                        <div class="patient-row">
                             <div class="patient-label">โรคประจำตัว:</div>
                             <div class="patient-value"><%= patient.chronic_diseases %></div>
-                            
-                            <div class="patient-label">สาเหตุที่มาพบแพทย์:</div>
-                            <div class="patient-value"><%= patient.reason_for_visit %></div>
                         </div>
 
                         <div class="patient-row">
-                            <div class="patient-label">ประวัติการรักษา:</div>
-                            <div class="patient-value"><%= patient.treatment_history %></div>
+                            <div class="patient-label">ประวัติการแพ้ยา:</div>
+                            <div class="patient-value2"><%= patient.allergy_history %></div>
                         </div>
 
-                        <div>
-                            <a href="/patients/update/<%= patient.id %>" class="update-link">อัปเดตข้อมูล</a>
-                            <a href="/patients/history/<%= patient.id %>">ดูประวัติการรักษา</a>
+                        <h4>ที่อยู่ปัจุบัน</h4>
+                        <div class="patient-row">
+                            <div class="patient-label">เลขที่:</div>
+                            <div class="patient-value"><%= patient.housenumber %></div>
+
+                            <div class="patient-label">หมู่:</div>
+                            <div class="patient-value"><%= patient.moo %></div>
+
+                            <div class="patient-label">ซอย:</div>
+                            <div class="patient-value"><%= patient.soi %></div>
                         </div>
-                        
+
+                        <div class="patient-row">
+                            <div class="patient-label">ตำบล/แขวง:</div>
+                            <div class="patient-value"><%= patient.subdistrict %></div>
+                            
+                            <div class="patient-label">อำเภอ/เขต:</div>
+                            <div class="patient-value"><%= patient.district %></div>
+
+                            <div class="patient-label">จังหวัด:</div>
+                            <div class="patient-value"><%= patient.province %></div>
+
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">รหัสไปรษณีย์:</div>
+                            <div class="patient-value2"><%= patient.postcode %></div>
+                        </div>
+
+                        <h4>ข้อมูลติดต่อกรณีฉุกเฉิน</h4>
+                        <div class="patient-row">
+                            <div class="patient-label">ชื่อ:</div>
+                            <div class="patient-value"><%= patient.emergency_fname %></div>
+
+                            <div class="patient-label">นามสกุล:</div>
+                            <div class="patient-value"><%= patient.emergency_lname %></div>
+
+                            <div class="patient-label"></div>
+                            <div class="patient-value"></div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div class="patient-label">เบอร์ติดต่อ:</div>
+                            <div class="patient-value"><%= patient.emergency_phone %></div>
+
+                            <div class="patient-label">ความสัมพันธ์:</div>
+                            <div class="patient-value"><%= patient.relationships %></div>
+
+                            <div class="patient-label"></div>
+                            <div class="patient-value"></div>
+                        </div>
                     </div>
+                    <div>
+                        <a href="/examinationroom/<%= patient.id %>" class="menu-btn">ยืนยันมารับบริการ</a>
+                    </div>                                   
+                    
                 <% }); %>
             </div>
         <% } else if (searchTerm) { %>
             <p>ไม่พบข้อมูลผู้ป่วยที่ตรงกับคำค้นหา</p>
         <% } %>
+        
     </div>
+    
 </body>
 
 </html>

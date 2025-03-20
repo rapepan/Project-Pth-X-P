@@ -93,7 +93,6 @@ nav a:hover {
     border: 1px solid #ddd; /* เพิ่มกรอบให้กับข้อมูลแต่ละรายการ */
 }
 
-/* เพิ่มการจัดระเบียบแถว */
 .patient-row {
     display: flex;
     justify-content: space-between;
@@ -111,15 +110,29 @@ nav a:hover {
 
 .patient-value {
     color: #555;
-    width: 55%; /* ทำให้ช่อง Value กว้างกว่า */
+    width: 45%; /* ทำให้ช่อง Value กว้างกว่า */
 }
 
-.update-link {
-    color: #28a745;
-    text-decoration: none;
-    font-weight: bold;
+.patient-value2 {
+    color: #555;
+    width: 215%; /* ทำให้ช่อง Value กว้างกว่า */
 }
 
-.update-link:hover {
-    text-decoration: underline;
+.menu-btn {
+    background-color: #3A7D44; /* สีฟ้าของปุ่ม */
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    cursor: pointer;
+    width: 9.5%; /* ให้ปุ่มเต็มความกว้าง */
+    max-width: 300px; /* จำกัดความกว้างสูงสุด */
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin: 10px auto; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    text-decoration: none; /* ยกเลิกขีดเส้นใต้ */
+    display: block; /* ให้ปุ่มเป็น block element เพื่อให้จัดกลางได้ */
+}
+
+.menu-btn:hover {
+    background-color: #9DC08B; /* เปลี่ยนสีเมื่อ hover */
 }

@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const patientController = require("../controllers/patientController");
+const patientController = require("../controllers/patientController"); // เชื่อมกับ patientController
 
-// Route สำหรับดึงข้อมูลผู้ป่วย
-router.get("/", patientController.getPatients);
+// หน้าแสดงข้อมูลผู้ป่วย
+router.get("/patients", checkRole("user"), patientController.showPatients);
 
-// Route สำหรับเพิ่มข้อมูลผู้ป่วย
-router.get("/add", (req, res) => {
-  res.render("add", { title: "เพิ่มข้อมูลผู้ป่วย" });
+// หน้าแสดงฟอร์มสำหรับเพิ่มข้อมูลผู้ป่วยใหม่
+router.get("/patients/add", checkRole('user'), (req, res) => {
+  res.render("patientForm");
 });
 
-router.post("/add", patientController.addPatient);
+router.post("/patients/add", checkRole('user'), patientController.addPatient);
 
 module.exports = router;

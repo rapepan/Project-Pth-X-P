@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
-const passportConfig = require("./config/passportConfig"); // ใช้ passportConfig.js สำหรับตั้งค่า Passport
 const userController = require("./controllers/userController"); // เรียกใช้งาน userController.js
 const userRoutes = require("./routes/userRoutes"); // เรียกใช้งาน userRoutes.js
 const patientModel = require("./models/patientModel"); // นำเข้า patientModel เพื่อใช้งาน
@@ -137,121 +136,9 @@ app.get("/patients", checkRole("user"), (req, res) => {
     if (err) {
       res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
     } else {
-      res.render("patients", {
-        title: "ข้อมูลผู้ป่วย",
-        patients: results,
-        searchTerm: searchTerm,
-        searchType: searchType,
+      res.render("patients", { title: "ค้นหาผู้ป่วย", patients: results, searchTerm: searchTerm, searchType: searchType,
       });
     }
-  });
-});
-
-// หน้าแสดงประวัติการรักษาของผู้ป่วย
-app.get("/patients/history/:id", checkRole("user"), (req, res) => {
-  const patientId = req.params.id;
-
-  // ดึงข้อมูลล่าสุดจาก patient (is_active = true)
-  const query = "SELECT * FROM patient WHERE id = ? AND is_active = true";
-  db.query(query, [patientId], (err, result) => {
-    if (err) {
-      res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยล่าสุดได้");
-      return;
-    }
-
-    // ดึงข้อมูลเก่าจาก patient_history (is_active = false)
-    const historyQuery = "SELECT * FROM patient_history WHERE patient_id = ? AND is_active = false ORDER BY updated_at DESC";
-    db.query(historyQuery, [patientId], (err, historyResults) => {
-      if (err) {
-        res.status(500).send("ไม่สามารถดึงข้อมูลประวัติได้");
-        return;
-      }
-
-      res.render("patientHistory", {
-        title: "ประวัติการรักษาผู้ป่วย",
-        patient: result[0],  // ข้อมูลล่าสุดจาก patient
-        history: historyResults  // ข้อมูลเก่าจาก patient_history
-      });
-    });
-  });
-});
-
-// หน้าอัปเดตข้อมูลผู้ป่วย
-app.get("/patients/update/:id", checkRole("user"), (req, res) => {
-  const patientId = req.params.id;
-
-  patientModel.getPatientById(patientId, (err, patient) => {
-    if (err) {
-      res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
-    } else {
-      res.render("updatePatient", {
-        title: "อัปเดตข้อมูลผู้ป่วย",
-        patient: patient,
-      });
-    }
-  });
-});
-
-// อัปเดตข้อมูลผู้ป่วยและเก็บประวัติการอัปเดต
-app.post("/patients/update/:id", checkRole("user"), (req, res) => {
-  const patientId = req.params.id;
-  const { height, weight, bmi, blood_pressure, treatment_history } = req.body;
-
-  // ดึงข้อมูลเก่าจากฐานข้อมูล
-  const query = "SELECT * FROM patient WHERE id = ?";
-  
-  db.query(query, [patientId], (err, result) => {
-    if (err) {
-      res.status(500).send("ไม่สามารถดึงข้อมูลได้");
-      return; 
-    }
-    if (result.length === 0) {
-      res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
-      return;
-    }
-
-    const patient = result[0]; // ข้อมูลผู้ป่วยเก่า
-
-    // บันทึกข้อมูลที่มีการเปลี่ยนแปลงใน patient_history
-    const historyQuery = `
-      INSERT INTO patient_history (patient_id, HN, name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history, is_active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const historyValues = [
-      patientId,
-      patient.HN,
-      patient.name,
-      patient.national_id,
-      patient.age,
-      patient.gender,
-      patient.address,
-      patient.height,
-      patient.weight,
-      patient.bmi,
-      patient.blood_pressure,
-      patient.chronic_diseases,
-      patient.reason_for_visit,
-      patient.treatment_history,
-      false // สถานะข้อมูลเก่า
-    ];
-
-    // อัปเดตข้อมูลใน patients
-    const updateQuery = "UPDATE patient SET height = ?, weight = ?, bmi = ?, blood_pressure = ?, treatment_history = ?, is_active = TRUE WHERE id = ?";
-    db.query(updateQuery, [height, weight, bmi, blood_pressure, treatment_history, patientId], (err, result) => {
-      if (err) {
-        res.status(500).send("ไม่สามารถอัปเดตข้อมูลได้");
-      } else {
-        // บันทึกประวัติการอัปเดต
-        db.query(historyQuery, historyValues, (err, result) => {
-          if (err) {
-            res.status(500).send("ไม่สามารถบันทึกประวัติได้");
-          } else {
-            res.redirect("/patients");
-          }
-        });
-      }
-    });
   });
 });
 
@@ -260,40 +147,166 @@ app.get("/patients/add", checkRole('user'), (req, res) => {
   res.render("patientForm"); // แสดงหน้า patientForm.ejs
 });
 
-// เส้นทางสำหรับรับข้อมูลจากฟอร์มและบันทึกข้อมูลผู้ป่วยใหม่
 app.post("/patients/add", checkRole('user'), (req, res) => {
-  const { name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history } = req.body;
+  const { fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode, 
+          emergency_fname, emergency_lname, emergency_phone, relationships } = req.body;
 
-// สร้าง HN ใหม่ (คุณอาจใช้วิธีการสร้าง HN ตามที่ได้กล่าวไว้ก่อนหน้านี้)
-generateHN((err, newHN) => {
-  if (err) {
-    return res.status(500).send("ไม่สามารถสร้าง HN ได้");
-  }
-
-  // บันทึกข้อมูลลงฐานข้อมูล
-  const query = "INSERT INTO patient (HN, name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  const values = [newHN, name, national_id, age, gender, address, height, weight, bmi, blood_pressure, chronic_diseases, reason_for_visit, treatment_history];
-
-  db.query(query, values, (err, result) => {
+  // สร้าง HN ใหม่
+  generateHN((err, newHN) => {
     if (err) {
-      return res.status(500).send("ไม่สามารถบันทึกข้อมูลผู้ป่วยได้");
+      console.error("Error generating HN:", err);
+      return res.status(500).send("ไม่สามารถสร้าง HN ได้");
     }
-    res.redirect("/patients"); // หลังจากบันทึกแล้วให้กลับไปที่หน้าแสดงข้อมูลผู้ป่วย
+
+    // บันทึกข้อมูลลงฐานข้อมูล
+    const query = "INSERT INTO patient (HN, fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    const values = [
+      newHN, fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode,
+      emergency_fname, emergency_lname, emergency_phone, relationships
+    ];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error during insert:", err);
+        return res.status(500).send("ไม่สามารถบันทึกข้อมูลผู้ป่วยได้");
+      }
+      res.redirect("/patients"); // หลังจากบันทึกแล้วให้กลับไปที่หน้าแสดงข้อมูลผู้ป่วย
+    });
   });
 });
+
+// เส้นทางสำหรับหน้าแสดงห้องตรวจ
+app.get("/examinationroom/:id?", checkRole("user"), (req, res) => {
+  const patientId = req.params.id;
+
+  if (patientId) {
+    // ถ้ามี patientId ใน URL
+    const query = "SELECT * FROM patient WHERE id = ?";
+    db.query(query, [patientId], (err, result) => {
+      if (err) {
+        return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+      }
+
+      if (result.length === 0) {
+        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+      }
+
+      // ส่งข้อมูล patient ไปยังหน้า examinationroom
+      res.render("examinationroom", { title: "ห้องตรวจ", patient: result[0], user: req.user });
+    });
+  } else {
+    // ถ้าไม่มี patientId ใน URL ส่งค่า default ไป
+    res.render("examinationroom", { title: "ห้องตรวจ", patient: null, user: req.user });
+  }
 });
 
-// ฟังก์ชันสำหรับสร้าง HN 
+// เส้นทางสำหรับแสดงข้อมูลการซักประวัติ
+app.get("/medicalHistory", checkRole("user"), (req, res) => {
+  res.render("medicalHistory", { title: "ซักประวัติ", user: req.user });
+});
+
+// เส้นทางสำหรับหน้า medicalHistory โดยการรับ id ของผู้ป่วย
+app.get("/medicalHistory/:id", checkRole("user"), (req, res) => {
+  const patientId = req.params.id; // รับ id จาก URL
+
+  // ดึงข้อมูลผู้ป่วยจากฐานข้อมูล
+  const query = "SELECT * FROM patient WHERE id = ?";
+  db.query(query, [patientId], (err, result) => {
+    if (err) {
+      return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+    }
+
+    if (result.length === 0) {
+      return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+    }
+
+    // ส่งข้อมูลผู้ป่วยไปยัง medicalHistory.ejs
+    res.render("medicalHistory", { title: "ซักประวัติ", patient: result[0], user: req.user,});
+  });
+});
+
+// Route สำหรับการบันทึกข้อมูลการซักประวัติผู้ป่วย
+app.post("/medicalHistory/:id", checkRole("user"), (req, res) => {
+  const patientId = req.params.id;
+  const { 
+    weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory 
+  } = req.body;
+
+  // ดึงข้อมูลชื่อและนามสกุลจากตาราง patient
+  const queryPatient = "SELECT fname, lname FROM patient WHERE id = ?";
+  db.query(queryPatient, [patientId], (err, result) => {
+    if (err) {
+      console.error("Error fetching patient data:", err);
+      return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+    }
+
+    if (result.length === 0) {
+      return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+    }
+
+    // ดึงชื่อและนามสกุล
+    const fname = result[0].fname;
+    const lname = result[0].lname;
+
+    // query สำหรับบันทึกข้อมูลการซักประวัติ
+    const query = `
+      INSERT INTO medical_history (patient_id, fname, lname, weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      patientId, fname, lname, weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory
+    ];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Error during insert:", err);
+        return res.status(500).send("ไม่สามารถบันทึกข้อมูลการซักประวัติได้");
+      }
+      res.redirect(`/examinationroom/${patientId}`); // หลังจากบันทึกเสร็จจะกลับไปที่หน้าข้อมูลผู้ป่วย
+    });
+  });
+});
+
+app.get("/patientHistory/:id", checkRole("user"), (req, res) => {
+  const patientId = req.params.id;
+
+  // ดึงข้อมูลจากตาราง patient
+  const patientQuery = "SELECT * FROM patient WHERE id = ?";
+  
+  db.query(patientQuery, [patientId], (err, patientResult) => {
+    if (err) {
+      return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+    }
+
+    if (patientResult.length === 0) {
+      return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+    }
+
+    // ดึงข้อมูลจากตาราง medical_history
+    const medicalHistoryQuery = "SELECT * FROM medical_history WHERE patient_id = ?";
+
+    db.query(medicalHistoryQuery, [patientId], (err, medicalHistoryResult) => {
+      if (err) {
+        return res.status(500).send("ไม่สามารถดึงข้อมูลการซักประวัติได้");
+      }
+
+      // ส่งข้อมูลผู้ป่วยและการซักประวัติเข้าไปที่หน้า patientHistory.ejs
+      res.render("patientHistory", { title: "ประวัติผู้ป่วย", patient: patientResult[0], medical_history: medicalHistoryResult[0] 
+      });
+    });
+  });
+});
+
+// ฟังก์ชันสำหรับสร้าง HN โดยใช้แค่ปี
 function generateHN(callback) {
   const now = new Date();
-  const year = now.getFullYear().toString().slice(-2); // เอาแค่ 2 หลักสุดท้ายของปี
-  const month = (now.getMonth() + 1).toString().padStart(2, '0'); // เดือนต้องเป็นสองหลัก
-  const day = now.getDate().toString().padStart(2, '0'); // วันต้องเป็นสองหลัก
+  const year = (now.getFullYear() + 543).toString().slice(-2); // ใช้ปี พ.ศ. และตัดเอาแค่ 2 หลักสุดท้าย เช่น ปี 2568 เป็น 68
 
-  const datePart = year + month + day; // ปีเดือนวัน เช่น "250319"
+  const yearPart = year; // ปีเป็น 2 หลัก เช่น "68"
 
-  // สร้าง query เพื่อหาค่า HN ที่สูงสุดจากฐานข้อมูลในวันที่เดียวกัน
-  const query = `SELECT MAX(CAST(SUBSTRING(HN, 7) AS UNSIGNED)) AS maxHN FROM patient WHERE HN LIKE '${datePart}%'`;
+  const query = `SELECT MAX(CAST(SUBSTRING(HN, 3) AS UNSIGNED)) AS maxHN FROM patient WHERE HN LIKE '${yearPart}%'`;
 
   db.query(query, (err, result) => {
     if (err) {
@@ -301,15 +314,13 @@ function generateHN(callback) {
       return callback(err);
     }
 
-    console.log("SQL result:", result); // แสดงผลลัพธ์จาก query
-
-    let newHN = datePart + "01";  // กำหนดค่าเริ่มต้นเป็น "01" หากไม่พบข้อมูลในฐานข้อมูล
+    let newHN = yearPart + "0001";  // กำหนดค่าเริ่มต้นเป็น "0001" หากไม่พบข้อมูลในฐานข้อมูล
     if (result[0].maxHN !== null) {
-      // เพิ่มเลข 1 ไปที่ HN ที่สูงสุดที่ดึงมา
-      newHN = datePart + String(result[0].maxHN + 1).padStart(2, "0");
+      // เพิ่มเลข 1 ไปที่ HN ที่สูงสุดที่ดึงมา และเพิ่มเลขลำดับที่เป็น 3 หลัก
+      newHN = yearPart + String(result[0].maxHN + 1).padStart(3, "0");
     }
 
-    callback(null, newHN); // ส่งค่า HN ที่สร้างไปยัง callback
+    callback(null, newHN);
   });
 }
 

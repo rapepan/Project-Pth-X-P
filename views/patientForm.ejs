@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มข้อมูลผู้ป่วยใหม่</title>
+    <title>ลงทะเบียนผู้ป่วยใหม่</title>
     <link rel="stylesheet" href="/css/patientForm.css">
 </head>
-
 <body>
     <div class="container">
-        <h1>เพิ่มข้อมูลผู้ป่วยใหม่</h1>
+        <h1>ลงทะเบียนผู้ป่วยใหม่</h1>
         <form action="/patients/add" method="POST">
+            <h4>ข้อมูลส่วนตัว</h4>
             <div class="form-row">
                 <div class="input-container">
-                    <input type="text" id="name" name="name" placeholder="ชื่อ" required>
+                    <input type="text" id="fname" name="fname" placeholder="ชื่อ" required>
                 </div>
                 <div class="input-container">
-                    <input type="text" id="national_id" name="national_id" placeholder="รหัสประจำตัวประชาชน" required>
+                    <input type="text" id="lname" name="lname" placeholder="นามสกุล" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-container">
-                    <input type="number" id="age" name="age" placeholder="อายุ" required>
+                    <input type="text" id="national_id" name="national_id" placeholder="เลขบัตรประจำตัวประชาชน" required>                   
                 </div>
                 <div class="input-container">
                     <select id="gender" name="gender" required>
@@ -36,40 +35,78 @@
 
             <div class="form-row">
                 <div class="input-container">
-                    <textarea id="address" name="address" placeholder="ที่อยู่" required></textarea>
+                    <input type="number" id="phone" name="phone" placeholder="เบอร์ติดต่อ" required>
+                </div>
+                <div class="input-container">
+                    <input type="number" id="age" name="age" placeholder="อายุ" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="date" id="dob" name="dob" placeholder="วันเดือนปีเกิด" required>
+                </div>                              
+                <div class="input-container">
+                    <input type="text" id="chronic_diseases" name="chronic_diseases" placeholder="โรคประจำตัว (ถ้ามี)" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-container">
-                    <input type="number" id="height" name="height" placeholder="ส่วนสูง" required>
+                    <input type="text" id="allergy_history" name="allergy_history" placeholder="ประวัติการแพ้ยา (ถ้ามี)" required>
+                </div>
+            </div>
+
+            <h4>ที่อยู่ปัจุบัน</h4>
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="text" id="housenumber" name="housenumber" placeholder="เลขที่" required>
                 </div>
                 <div class="input-container">
-                    <input type="number" id="weight" name="weight" placeholder="น้ำหนัก" required>
+                    <input type="text" id="moo" name="moo" placeholder="หมู่" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-container">
-                    <input type="number" id="bmi" name="bmi" placeholder="BMI" required>
+                    <input type="text" id="soi" name="soi" placeholder="ซอย" required>
                 </div>
                 <div class="input-container">
-                    <input type="text" id="blood_pressure" name="blood_pressure" placeholder="ความดันโลหิต" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="input-container">
-                    <textarea id="chronic_diseases" name="chronic_diseases" placeholder="โรคประจำตัว"></textarea>
-                </div>
-                <div class="input-container">
-                    <textarea id="treatment_history" name="treatment_history" placeholder="ประวัติการรักษา"></textarea>
+                    <input type="text" id="subdistrict" name="subdistrict" placeholder="ตำบล/แขวง" required>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-container">
-                    <textarea id="reason_for_visit" name="reason_for_visit" placeholder="สาเหตุที่มาพบแพทย์"></textarea>
+                    <input type="text" id="district" name="district" placeholder="อำเภอ/เขต" required>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="province" name="province" placeholder="จังหวัด" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="number" id="postcode" name="postcode" placeholder="รหัสไปรษณีย์" required>
+                </div>
+            </div>
+            
+            <h4>ข้อมูลติดต่อกรณีฉุกเฉิน</h4>
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="text" id="emergency_fname" name="emergency_fname" placeholder="ชื่อ" required>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="emergency_lname" name="emergency_lname" placeholder="นามสกุล" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-container">
+                    <input type="number" id="emergency_phone" name="emergency_phone" placeholder="เบอร์ติดต่อ" required>
+                </div>
+                <div class="input-container">
+                    <input type="text" id="relationships" name="relationships" placeholder="ความสัมพันธ์" required>
                 </div>
             </div>
 
@@ -77,13 +114,13 @@
             <button class="button2" onclick="goBack()">ย้อนกลับ</button>
         </form>
     </div>
-    
 </body>
 
 <script>
     function goBack() {
     window.history.back(); // หรือใช้ window.history.go(-1);
 }
+
 </script>
 
 </html>

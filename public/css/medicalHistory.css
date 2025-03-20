@@ -34,6 +34,29 @@ h3{
 
 .input-container {
     width:48%;
+    position: relative; 
+}
+
+.input-container input {
+    width: 100%;
+    padding-right: 50px; 
+}
+
+.input-container .unit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #555;
+}
+
+.input-container2 {
+    width: 100%;
+}
+
+.input-container2 {
+    width:100%;
 }
 
 input[type="text"],
@@ -52,7 +75,7 @@ select {
 
 textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 140px;
 }
 
 select {
@@ -105,4 +128,44 @@ textarea::placeholder,
 input[type="date"]::placeholder,
 select::placeholder {
     color: #9b9a9a;
+}
+
+/* ฟอร์มแสดงข้อมูลผู้ป่วย */
+.patient-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.patient-entry {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* เพิ่มกรอบให้กับข้อมูลแต่ละรายการ */
+}
+
+.patient-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.patient-label {
+    font-weight: bold;
+    color: #333;
+    width: 40%; /* ทำให้ช่อง Label กว้างกว่า */
+}
+
+.patient-value {
+    color: #555;
+    width: 45%; /* ทำให้ช่อง Value กว้างกว่า */
+}
+
+.patient-value2 {
+    color: #555;
+    width: 215%; /* ทำให้ช่อง Value กว้างกว่า */
 }

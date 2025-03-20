@@ -1,83 +1,123 @@
-<!-- patientHistory.ejs -->
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/patientHistory.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/patientHistory.css">
 </head>
+
 <body>
-  <h1><%= title %></h1>
+    <header>
+        <h1><%= title %></h1>
+    </header>
 
-  <h2>ข้อมูลผู้ป่วยล่าสุด</h2>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>HN</th>
-        <th>ชื่อ</th>
-        <th>ส่วนสูง</th>
-        <th>น้ำหนัก</th>
-        <th>BMI</th>
-        <th>ความดันโลหิต</th>
-        <th>โรคประจำตัว</th>
-        <th>ประวัติการรักษา</th>
-        <th>สาเหตุที่มาพบแพทย์</th>
-        <th>วันที่อัปเดตล่าสุด</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><%= patient.HN %></td>
-        <td><%= patient.name %></td>
-        <td><%= patient.height %></td>
-        <td><%= patient.weight %></td>
-        <td><%= patient.bmi %></td>
-        <td><%= patient.blood_pressure %></td>
-        <td><%= patient.chronic_diseases %></td>
-        <td><%= patient.treatment_history %></td>
-        <td><%= patient.reason_for_visit %></td>
-        <!-- ใช้ JavaScript เพื่อแปลงวันที่ -->
-        <td><%= new Date(patient.updated_at).toLocaleString() %></td>
-      </tr>
-    </tbody>
-  </table>
+    <nav>
+        <a href="/index">หน้าหลัก</a>
+        <a href="/patientHistory/<%= patient.id %>">ประวัติการซักประวัติ</a>
+        <a href="/examinationroom/<%= patient.id %>">ห้องตรวจ</a>
+        <a href="/patients">ข้อมูลผู้ป่วย</a>
+    </nav>
 
-  <hr>
+    <div class="container">
+        <% if (patient) { %>
+            <div class="patient-list">
+                <div class="patient-entry">
+                    <h3>ประวัติผู้ป่วย</h3>
+                    <div class="patient-row">
+                        <div class="patient-label">HN:</div>
+                        <div class="patient-value"><%= patient.HN %></div>
 
-  <h2>ประวัติการรักษาเก่าของผู้ป่วย</h2>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>HN</th>
-        <th>ชื่อ</th>
-        <th>ส่วนสูง</th>
-        <th>น้ำหนัก</th>
-        <th>BMI</th>
-        <th>ความดันโลหิต</th>
-        <th>โรคประจำตัว</th>
-        <th>ประวัติการรักษา</th>
-        <th>สาเหตุที่มาพบแพทย์</th>
-        <th>วันที่อัปเดตล่าสุด</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% history.forEach(function(h) { %>
-        <tr>
-          <td><%= h.HN %></td>
-          <td><%= h.name %></td>
-          <td><%= h.height %></td>
-          <td><%= h.weight %></td>
-          <td><%= h.bmi %></td>
-          <td><%= h.blood_pressure %></td>
-          <td><%= h.chronic_diseases %></td>
-          <td><%= h.treatment_history %></td>
-          <td><%= h.reason_for_visit %></td>
-          <!-- แปลงวันที่ใน history -->
-          <td><%= new Date(h.updated_at).toLocaleString() %></td>
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
+                        <div class="patient-label">ชื่อ:</div>
+                        <div class="patient-value"><%= patient.fname %></div>
+
+                        <div class="patient-label">นามสกุล:</div>
+                        <div class="patient-value"><%= patient.lname %></div>
+                    </div>
+
+                    <div class="patient-row">
+                        <div class="patient-label">น้ำหนัก:</div>
+                        <div class="patient-value"><%= medical_history.weight %></div>
+
+                        <div class="patient-label">ส่วนสูง:</div>
+                        <div class="patient-value"><%= medical_history.height %></div>
+
+                        <div class="patient-label">ความดันโลหิต:</div>
+                        <div class="patient-value"><%= medical_history.bloodPressure %></div>
+                    </div>
+
+                    
+                    <div class="patient-row">
+                        <div class="patient-label">ชีพจร:</div>
+                        <div class="patient-value"><%= medical_history.pulse %></div>
+
+                        <div class="patient-label">O2Sat:</div>
+                        <div class="patient-value"><%= medical_history.o2Sat %></div>
+
+                        <div class="patient-label">อัตราการหายใจ:</div>
+                        <div class="patient-value"><%= medical_history.respiratoryRate %></div>
+                    </div>
+
+                    <div class="patient-row">
+                        <div class="patient-label">BMI:</div>
+                        <div class="patient-value"><%= medical_history.bmi %></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+                    </div>
+
+                    <div class="patient-row2">
+                        <div class="patient-label2">อาการสำคัญ:</div>
+                        <div class="patient-value2"><%= medical_history.symptoms %></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+                    </div>
+
+                    <div class="patient-row2">
+                        <div class="patient-label2">ประวัติปัจจุบัน:</div>
+                        <div class="patient-value2"><%= medical_history.currentHistory %></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+                    </div>
+
+                    <div class="patient-row2">
+                        <div class="patient-label2">ประวัติอดีต:</div>
+                        <div class="patient-value2"><%= medical_history.pastHistory %></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+
+                        <div class="patient-label"></div>
+                        <div class="patient-value"></div>
+                    </div>
+                </div>
+            </div> <br><br>
+
+        <% } else { %>
+            <p>ไม่พบข้อมูลผู้ป่วย</p>
+        <% } %>
+        <button class="button2" onclick="goBack()">ย้อนกลับ</button>
+    </div>
+
 </body>
+
+<script>
+    function goBack() {
+    window.history.back(); // หรือใช้ window.history.go(-1);
+}
+
+</script>
+
 </html>

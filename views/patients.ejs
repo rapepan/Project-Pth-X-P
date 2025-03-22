@@ -28,7 +28,7 @@
         <form class="search-bar" action="/patients" method="GET">
             <select name="searchType">
                 <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาด้วย HN</option>
-                <option value="name" <%=searchType==='name' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
+                <option value="fname" <%=searchType==='fname' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
                 <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน</option>
             </select>
             <input type="text" name="search" placeholder="ค้นหาผู้ป่วย" value="<%= searchTerm %>">

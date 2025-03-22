@@ -132,15 +132,32 @@ app.get("/patients", checkRole("user"), (req, res) => {
   const searchTerm = req.query.search || ""; // ค่าค้นหาจากฟอร์ม
   const searchType = req.query.searchType || "HN"; // ค่าประเภทการค้นหาจากฟอร์ม (default = 'name')
 
-  patientModel.searchPatients(searchTerm, searchType, (err, results) => {
+  let query = "SELECT * FROM patient";
+  let queryParams = [];
+
+  // ตรวจสอบประเภทการค้นหา (HN, fname, national_id)
+  if (searchTerm) {
+    if (searchType === "HN") {
+      query += " WHERE HN LIKE ?";
+      queryParams.push(`%${searchTerm}%`);
+    } else if (searchType === "fname") {
+      query += " WHERE fname LIKE ?";
+      queryParams.push(`%${searchTerm}%`);
+    } else if (searchType === "national_id") {
+      query += " WHERE national_id LIKE ?";
+      queryParams.push(`%${searchTerm}%`);
+    }
+  }
+
+  db.query(query, queryParams, (err, results) => {
     if (err) {
       res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
     } else {
-      res.render("patients", { title: "ค้นหาผู้ป่วย", patients: results, searchTerm: searchTerm, searchType: searchType,
-      });
+      res.render("patients", { title: "ค้นหาผู้ป่วย", patients: results, searchTerm: searchTerm, searchType: searchType, });
     }
   });
 });
+
 
 // หน้าแสดงฟอร์มสำหรับเพิ่มข้อมูลผู้ป่วยใหม่
 app.get("/patients/add", checkRole('user'), (req, res) => {
@@ -391,7 +408,7 @@ function generateHN(callback) {
     let newHN = yearPart + "0001";  // กำหนดค่าเริ่มต้นเป็น "0001" หากไม่พบข้อมูลในฐานข้อมูล
     if (result[0].maxHN !== null) {
       // เพิ่มเลข 1 ไปที่ HN ที่สูงสุดที่ดึงมา และเพิ่มเลขลำดับที่เป็น 3 หลัก
-      newHN = yearPart + String(result[0].maxHN + 1).padStart(3, "0");
+      newHN = yearPart + String(result[0].maxHN + 1).padStart(4, "0");
     }
 
     callback(null, newHN);

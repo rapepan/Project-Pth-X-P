@@ -4,13 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link rel="stylesheet" href="/css/examinationroom.css">
 </head>
 
 <body>
     <header>
-        <h1><%= title %></h1>
+        <h1>
+            <%= title %>
+        </h1>
     </header>
 
     <nav>
@@ -24,18 +28,24 @@
 
     <div class="container">
         <h2>ซักประวัติ</h2>
+        <!-- แสดงข้อมูลผู้ป่วยและลิงก์ไปยังหน้า medicalFrom -->
         <% if (patient) { %>
-            <div class="patient-list"> 
-                    <div class="patient-row">
-                        <div class="patient-label">ชื่อ:</div>
-                        <div class="patient-value"><a href="/medicalHistory/<%= patient.id %>"><%= patient.fname %> <%= patient.lname %></a></div>
-                    </div>
+            <div class="patient-list">
+                <div class="patient-row">
+                    <div class="patient-label">ชื่อ:</div>
+                    <div class="patient-value"><a href="/medicalFrom/<%= patient.id %>">
+                            <%= patient.fname %>
+                                <%= patient.lname %>
+                        </a></div>
+                </div>
             </div><br><br>
 
-            <button class="button" onclick="window.location.href='/patientHistory/<%= patient.id %>'">ดูประวัติผู้ป่วย</button>
-        <% } else { %>
-            <p>ไม่พบข้อมูลผู้ป่วย</p>
-        <% } %>
+            <!-- ปุ่มไปที่หน้า medicalFrom -->
+            <button class="button"
+                onclick="window.location.href='/medicalHistory/<%= patient.id %>'">ดูประวัติผู้ป่วย</button>
+            <% } else { %>
+                <p>ไม่พบข้อมูลผู้ป่วย</p>
+                <% } %>
     </div>
 
 </body>

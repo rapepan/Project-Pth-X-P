@@ -1,0 +1,171 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
+    padding: 30px;
+}
+
+.container {
+    background-color: white;
+    padding: 30px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+h1{
+    text-align: center;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+h3{
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.input-container {
+    width:48%;
+    position: relative; 
+}
+
+.input-container input {
+    width: 100%;
+    padding-right: 50px; 
+}
+
+.input-container .unit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #555;
+}
+
+.input-container2 {
+    width: 100%;
+}
+
+.input-container2 {
+    width:100%;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 140px;
+}
+
+select {
+    height: 44px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #3A7D44;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #9DC08B;
+}
+
+.button2 {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff4b5c;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button2:hover {
+    background-color: #ff787f;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+input::placeholder,
+textarea::placeholder,
+input[type="date"]::placeholder,
+select::placeholder {
+    color: #9b9a9a;
+}
+
+/* ฟอร์มแสดงข้อมูลผู้ป่วย */
+.patient-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.patient-entry {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* เพิ่มกรอบให้กับข้อมูลแต่ละรายการ */
+}
+
+.patient-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.patient-label {
+    font-weight: bold;
+    color: #333;
+    width: 40%; /* ทำให้ช่อง Label กว้างกว่า */
+}
+
+.patient-value {
+    color: #555;
+    width: 45%; /* ทำให้ช่อง Value กว้างกว่า */
+}
+
+.patient-value2 {
+    color: #555;
+    width: 215%; /* ทำให้ช่อง Value กว้างกว่า */
+}

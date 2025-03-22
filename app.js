@@ -202,12 +202,12 @@ app.get("/examinationroom/:id?", checkRole("user"), (req, res) => {
 });
 
 // เส้นทางสำหรับแสดงข้อมูลการซักประวัติ
-app.get("/medicalHistory", checkRole("user"), (req, res) => {
-  res.render("medicalHistory", { title: "ซักประวัติ", user: req.user });
+app.get("/medicalFrom", checkRole("user"), (req, res) => {
+  res.render("medicalFrom", { title: "ซักประวัติ", user: req.user });
 });
 
-// เส้นทางสำหรับหน้า medicalHistory โดยการรับ id ของผู้ป่วย
-app.get("/medicalHistory/:id", checkRole("user"), (req, res) => {
+// เส้นทางสำหรับหน้า medicalFrom โดยการรับ id ของผู้ป่วย
+app.get("/medicalFrom/:id", checkRole("user"), (req, res) => {
   const patientId = req.params.id; // รับ id จาก URL
 
   // ดึงข้อมูลผู้ป่วยจากฐานข้อมูล
@@ -221,13 +221,13 @@ app.get("/medicalHistory/:id", checkRole("user"), (req, res) => {
       return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
     }
 
-    // ส่งข้อมูลผู้ป่วยไปยัง medicalHistory.ejs
-    res.render("medicalHistory", { title: "ซักประวัติ", patient: result[0], user: req.user,});
+    // ส่งข้อมูลผู้ป่วยไปยัง medicalFrom.ejs
+    res.render("medicalFrom", { title: "ซักประวัติ", patient: result[0], user: req.user,});
   });
 });
 
 // Route สำหรับการบันทึกข้อมูลการซักประวัติผู้ป่วย
-app.post("/medicalHistory/:id", checkRole("user"), (req, res) => {
+app.post("/medicalFrom/:id", checkRole("user"), (req, res) => {
   const patientId = req.params.id;
   const { 
     weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory 
@@ -251,7 +251,7 @@ app.post("/medicalHistory/:id", checkRole("user"), (req, res) => {
 
     // query สำหรับบันทึกข้อมูลการซักประวัติ
     const query = `
-      INSERT INTO medical_history (patient_id, fname, lname, weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory) 
+      INSERT INTO medicalfrom (patient_id, fname, lname, weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -269,12 +269,17 @@ app.post("/medicalHistory/:id", checkRole("user"), (req, res) => {
   });
 });
 
-app.get("/patientHistory/:id", checkRole("user"), (req, res) => {
+// Route สำหรับแสดงข้อมูลการซักประวัติ
+app.get("/medicalHistory/:id?", checkRole("user"), (req, res) => {
   const patientId = req.params.id;
+
+  // ถ้าไม่พบ patientId, ไม่ต้องดึงข้อมูลจากฐานข้อมูล
+  if (!patientId) {
+    return res.render("medicaHistory", { title: "ประวัติผู้ป่วย" });
+  }
 
   // ดึงข้อมูลจากตาราง patient
   const patientQuery = "SELECT * FROM patient WHERE id = ?";
-  
   db.query(patientQuery, [patientId], (err, patientResult) => {
     if (err) {
       return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
@@ -284,18 +289,87 @@ app.get("/patientHistory/:id", checkRole("user"), (req, res) => {
       return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
     }
 
-    // ดึงข้อมูลจากตาราง medical_history
-    const medicalHistoryQuery = "SELECT * FROM medical_history WHERE patient_id = ?";
-
+    // ดึงข้อมูลจากตาราง medicalfrom
+    const medicalHistoryQuery = "SELECT * FROM medicalfrom WHERE patient_id = ?";
     db.query(medicalHistoryQuery, [patientId], (err, medicalHistoryResult) => {
       if (err) {
         return res.status(500).send("ไม่สามารถดึงข้อมูลการซักประวัติได้");
       }
 
-      // ส่งข้อมูลผู้ป่วยและการซักประวัติเข้าไปที่หน้า patientHistory.ejs
-      res.render("patientHistory", { title: "ประวัติผู้ป่วย", patient: patientResult[0], medical_history: medicalHistoryResult[0] 
-      });
+      // ส่งข้อมูลผู้ป่วยและการซักประวัติเข้าไปที่หน้า medicalHistory.ejs
+      res.render("medicaHistory", { title: "ประวัติผู้ป่วย", patient: patientResult[0], medicalfrom: medicalHistoryResult[0] });
     });
+  });
+});
+
+// Route สำหรับหน้าแก้ไขข้อมูลการซักประวัติ
+app.get("/medicalHistory/edit/:patientId", checkRole("user"), (req, res) => {
+  const patientId = req.params.patientId;
+
+  // ดึงข้อมูลการซักประวัติจากฐานข้อมูล
+  const queryMedicalHistory = "SELECT * FROM medicalfrom WHERE patient_id = ?";
+  db.query(queryMedicalHistory, [patientId], (err, medicalHistoryResult) => {
+    if (err) {
+      return res.status(500).send("ไม่สามารถดึงข้อมูลการซักประวัติได้");
+    }
+
+    if (medicalHistoryResult.length === 0) {
+      return res.status(404).send("ไม่พบข้อมูลการซักประวัติ");
+    }
+
+    // ดึงข้อมูลผู้ป่วยจากฐานข้อมูล
+    const queryPatient = "SELECT * FROM patient WHERE id = ?";
+    db.query(queryPatient, [patientId], (err, patientResult) => {
+      if (err) {
+        return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+      }
+
+      if (patientResult.length === 0) {
+        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+      }
+
+      // ส่งข้อมูลไปยังฟอร์มสำหรับการแก้ไข
+      res.render("editMedicalHistory", { title: "แก้ไขข้อมูลการซักประวัติ", medicalHistory: medicalHistoryResult[0], patient: patientResult[0], patientId: patientId });
+    });
+  });
+});
+
+// Route สำหรับบันทึกการแก้ไขข้อมูลการซักประวัติ
+app.post("/medicalHistory/edit/:patientId", checkRole("user"), (req, res) => {
+  const patientId = req.params.patientId;
+  const { weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory } = req.body;
+
+  // query สำหรับอัพเดตข้อมูลการซักประวัติ
+  const query = `
+    UPDATE medicalfrom SET weight = ?, height = ?, bloodPressure = ?, pulse = ?, o2Sat = ?, respiratoryRate = ?, bmi = ?, 
+           symptoms = ?, currentHistory = ?, pastHistory = ? WHERE patient_id = ?
+  `;
+
+  const values = [weight, height, bloodPressure, pulse, o2Sat, respiratoryRate, bmi, symptoms, currentHistory, pastHistory, patientId];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error during update:", err);
+      return res.status(500).send("ไม่สามารถอัพเดตข้อมูลการซักประวัติได้");
+    }
+    res.redirect(`/medicalHistory/${patientId}`); // หลังจากอัพเดตแล้วให้กลับไปที่หน้าประวัติการซักประวัติ
+  });
+});
+
+// Route สำหรับลบข้อมูลการซักประวัติ
+app.get("/medicalHistory/delete/:patientId", checkRole("user"), (req, res) => {
+  const patientId = req.params.patientId;
+
+  // query สำหรับลบข้อมูลการซักประวัติ
+  const query = "DELETE FROM medicalfrom WHERE patient_id = ?";
+
+  db.query(query, [patientId], (err, result) => {
+    if (err) {
+      console.error("Error during delete:", err);
+      return res.status(500).send("ไม่สามารถลบข้อมูลการซักประวัติได้");
+    }
+
+    res.redirect(`/patients`); // หลังจากลบเสร็จจะกลับไปที่หน้าข้อมูลผู้ป่วย
   });
 });
 

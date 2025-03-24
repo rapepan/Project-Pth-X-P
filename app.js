@@ -346,7 +346,7 @@ app.get("/medicalHistory/edit/:patientId", checkRole("user"), (req, res) => {
       }
 
       // ส่งข้อมูลไปยังฟอร์มสำหรับการแก้ไข
-      res.render("editMedicalHistory", { title: "แก้ไขข้อมูลการซักประวัติ", medicalHistory: medicalHistoryResult[0], patient: patientResult[0], patientId: patientId });
+      res.render("editmedicalHistory", { title: "แก้ไขข้อมูลการซักประวัติ", medicalHistory: medicalHistoryResult[0], patient: patientResult[0], patientId: patientId });
     });
   });
 });

@@ -369,7 +369,7 @@ app.post("/medicalHistory/edit/:patientId", checkRole("user"), (req, res) => {
       console.error("Error during update:", err);
       return res.status(500).send("ไม่สามารถอัพเดตข้อมูลการซักประวัติได้");
     }
-    res.redirect(`/medicalHistory/${patientId}`); // หลังจากอัพเดตแล้วให้กลับไปที่หน้าประวัติการซักประวัติ
+    res.redirect(`/medicalHistory/${patientId}`);
   });
 });
 
@@ -386,7 +386,7 @@ app.get("/medicalHistory/delete/:patientId", checkRole("user"), (req, res) => {
       return res.status(500).send("ไม่สามารถลบข้อมูลการซักประวัติได้");
     }
 
-    res.redirect(`/patients`); // หลังจากลบเสร็จจะกลับไปที่หน้าข้อมูลผู้ป่วย
+    res.redirect(`/patients`);
   });
 });
 

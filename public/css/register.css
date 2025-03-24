@@ -57,7 +57,7 @@ select {
 
 /* ปรับสไตล์ให้กับปุ่ม */
 button {
-    background-color: #007bff;
+    background-color: #493D9E;
     /* สีฟ้าของปุ่ม */
     color: white;
     padding: 12px 20px;
@@ -71,7 +71,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #B2A5FF;
     /* เปลี่ยนสีเมื่อ hover */
 }
 

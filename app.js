@@ -158,7 +158,6 @@ app.get("/patients", checkRole("user"), (req, res) => {
   });
 });
 
-
 // หน้าแสดงฟอร์มสำหรับเพิ่มข้อมูลผู้ป่วยใหม่
 app.get("/patients/add", checkRole('user'), (req, res) => {
   res.render("patientForm"); // แสดงหน้า patientForm.ejs

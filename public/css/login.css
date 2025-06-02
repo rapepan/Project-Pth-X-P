@@ -8,7 +8,7 @@ body {
     /* จัดกลางแนวนอน */
     align-items: center;
     /* จัดกลางแนวตั้ง */
-    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
+    background-color: #F0FFF0; /* พื้นหลังสีอ่อน สบายตา */
 }
 
 /* ฟอร์ม */
@@ -46,7 +46,7 @@ input {
 
 /* ปรับสไตล์ให้กับปุ่ม */
 button {
-    background-color: #493D9E;
+    background-color: #3A7D44;
     /* สีฟ้าของปุ่ม */
     color: white;
     padding: 12px 20px;
@@ -60,7 +60,7 @@ button {
 }
 
 button:hover {
-    background-color: #B2A5FF;
+    background-color: #9DC08B;
     /* เปลี่ยนสีเมื่อ hover */
 }
 

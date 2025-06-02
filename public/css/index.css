@@ -2,13 +2,13 @@ body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
+    background-color: #F0FFF0; /* พื้นหลังสีอ่อน สบายตา */
     color: #333;
 }
 
 header {
-    background-color: #27445D;
-    color: white;
+    background-color: #ACE1AF;
+    color: rgb(255, 255, 255);
     text-align: center;
     padding: 15px 0;
     font-size: 32px;
@@ -16,23 +16,42 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.logout-form {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 30px;
+    margin-top: 10px;
+}
+
+.menu-btn2 {
+    background-color: #ACE1AF; /* เขียวเข้ม */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.menu-btn2:hover {
+    background-color: #ff878c;
+}
+
 /* ส่วนของเนื้อหาหลัก */
 .container {
     max-width: 1200px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 0 20px; /* <-- ตรงนี้คือจุดสำคัญ: padding ซ้าย-ขวา */
 }
 
 .menu-btn {
-    background-color: #493D9E; /* สีฟ้าของปุ่ม */
+    background-color: #3A7D44; /* สีฟ้าของปุ่ม */
     color: white;
     padding: 14px 28px;
     border: none;
     cursor: pointer;
-    width: 15%; /* ให้ปุ่มเต็มความกว้าง */
+    width: 20%; /* ให้ปุ่มเต็มความกว้าง */
     max-width: 300px; /* จำกัดความกว้างสูงสุด */
     border-radius: 5px;
     transition: background-color 0.3s;
@@ -40,5 +59,5 @@ header {
 }
 
 .menu-btn:hover {
-    background-color: #B2A5FF; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #9DC08B; /* เปลี่ยนสีเมื่อ hover */
 }

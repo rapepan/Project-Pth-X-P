@@ -12,17 +12,19 @@
 
 <body>
     <header>
-        <h1>
-            <%= title %>
-        </h1>
+        <h1><%= title %></h1>
+        <div class="logout-form">
+            <a href="/logout" class="menu-btn2">Logout</a>
+        </div>
     </header>
+    
 
     <div class="container">
         <!-- ปุ่มข้อมูลผู้ป่วย -->
         <button class="menu-btn menu-btn-large" onclick="window.location.href='/patients/add'">ลงทะเบียนผู้ป่วยใหม่</button>
         <button class="menu-btn menu-btn-large" onclick="window.location.href='/patients'">ค้นหาข้อมูลผู้ป่วย</button>
         <button class="menu-btn menu-btn-large" onclick="window.location.href='/examinationroom'">ห้องตรวจ</button>
-        <button class="menu-btn menu-btn-large" onclick="window.location.href=''">ประวัติการรักษา</button>
+        <button class="menu-btn menu-btn-large" onclick="window.location.href='/medicaHistorydate'">ประวัติการรักษา</button>
     </div>
 
 </body>

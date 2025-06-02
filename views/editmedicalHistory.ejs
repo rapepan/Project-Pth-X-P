@@ -15,94 +15,86 @@
     <div class="container">
         <h1>แก้การซักประวัติ</h1>
         <% if (patient) { %>
-            <div class="patient-row">
-                <div class="patient-label">HN:</div>
-                <div class="patient-value">
-                    <%= patient.HN %>
-                </div>
+        <div class="patient-row">
+            <div class="patient-label">HN:</div>
+            <div class="patient-value"><%= patient.HN %></div>
+    
+            <div class="patient-label">ชื่อ:</div>
+            <div class="patient-value"><%= patient.fname %></div>
+    
+            <div class="patient-label">นามสกุล:</div>
+            <div class="patient-value"><%= patient.lname %></div>
+        </div>
+        <% } else { %>
+            <!-- ถ้าไม่มีข้อมูลผู้ป่วย (เมื่อไม่มี id ใน URL) -->
+        <% } %>
 
-                <div class="patient-label">ชื่อ:</div>
-                <div class="patient-value">
-                    <%= patient.fname %>
+        <form action="/medicalHistory/edit/<%= patientId %>" method="POST">
+            <div class="form-row">
+                <div class="input-container">
+                    <label for="weight">น้ำหนัก:</label>
+                    <input type="text" name="weight" value="<%= medicalHistory.weight %>" required>
                 </div>
-
-                <div class="patient-label">นามสกุล:</div>
-                <div class="patient-value">
-                    <%= patient.lname %>
+                <div class="input-container">
+                    <label for="height">ส่วนสูง:</label>
+                    <input type="text" name="height" value="<%= medicalHistory.height %>" required>
                 </div>
             </div>
-            <% } else { %>
-                <!-- ถ้าไม่มีข้อมูลผู้ป่วย (เมื่อไม่มี id ใน URL) -->
-                <% } %>
 
-                    <form action="/medicalHistory/edit/<%= patientId %>" method="POST">
-                        <div class="form-row">
-                            <div class="input-container">
-                                <label for="weight">น้ำหนัก:</label>
-                                <input type="text" name="weight" value="<%= medicalHistory.weight %>" required>
-                            </div>
-                            <div class="input-container">
-                                <label for="height">ส่วนสูง:</label>
-                                <input type="text" name="height" value="<%= medicalHistory.height %>" required>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container">
+                    <label for="bloodPressure">ความดันโลหิต:</label>
+                    <input type="text" name="bloodPressure" value="<%= medicalHistory.bloodPressure %>" required>
+                </div>
+                <div class="input-container">
+                    <label for="pulse">ชีพจร:</label>
+                    <input type="text" name="pulse" value="<%= medicalHistory.pulse %>" required>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container">
-                                <label for="bloodPressure">ความดันโลหิต:</label>
-                                <input type="text" name="bloodPressure" value="<%= medicalHistory.bloodPressure %>"
-                                    required>
-                            </div>
-                            <div class="input-container">
-                                <label for="pulse">ชีพจร:</label>
-                                <input type="text" name="pulse" value="<%= medicalHistory.pulse %>" required>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container">
+                    <label for="o2Sat">O2Sat:</label>
+                    <input type="text" name="o2Sat" value="<%= medicalHistory.o2Sat %>" required>
+                </div>
+                <div class="input-container">
+                    <label for="respiratoryRate">อัตราการหายใจ:</label>
+                    <input type="text" name="respiratoryRate" value="<%= medicalHistory.respiratoryRate %>" required>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container">
-                                <label for="o2Sat">O2Sat:</label>
-                                <input type="text" name="o2Sat" value="<%= medicalHistory.o2Sat %>" required>
-                            </div>
-                            <div class="input-container">
-                                <label for="respiratoryRate">อัตราการหายใจ:</label>
-                                <input type="text" name="respiratoryRate" value="<%= medicalHistory.respiratoryRate %>"
-                                    required>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container">
+                    <label for="bmi">BMI:</label>
+                    <input type="text" name="bmi" value="<%= medicalHistory.bmi %>" required>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container">
-                                <label for="bmi">BMI:</label>
-                                <input type="text" name="bmi" value="<%= medicalHistory.bmi %>" required>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container2">
+                    <label for="symptoms">อาการสำคัญ:</label>
+                    <textarea name="symptoms" required><%= medicalHistory.symptoms %></textarea>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container2">
-                                <label for="symptoms">อาการสำคัญ:</label>
-                                <textarea name="symptoms" required><%= medicalHistory.symptoms %></textarea>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container2">
+                    <label for="currentHistory">ประวัติปัจจุบัน:</label>
+                    <textarea name="currentHistory" required><%= medicalHistory.currentHistory %></textarea>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container2">
-                                <label for="currentHistory">ประวัติปัจจุบัน:</label>
-                                <textarea name="currentHistory" required><%= medicalHistory.currentHistory %></textarea>
-                            </div>
-                        </div>
+            <div class="form-row">
+                <div class="input-container2">
+                    <label for="pastHistory">ประวัติอดีต:</label>
+                    <textarea name="pastHistory" required><%= medicalHistory.pastHistory %></textarea>
+                </div>
+            </div>
 
-                        <div class="form-row">
-                            <div class="input-container2">
-                                <label for="pastHistory">ประวัติอดีต:</label>
-                                <textarea name="pastHistory" required><%= medicalHistory.pastHistory %></textarea>
-                            </div>
-                        </div>
-
-                        <button type="submit">บันทึกการแก้ไข</button><br><br>
-                        <button class="button2" onclick="goBack()">ย้อนกลับ</button>
-
-                    </form>
+            <button type="submit">บันทึกการแก้ไข</button><br><br>
+            <button class="button2" onclick="goBack()">ย้อนกลับ</button>
+            
+        </form>
     </div>
 
 </body>

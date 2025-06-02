@@ -15,7 +15,7 @@
 
     <nav>
         <a href="/index">หน้าหลัก</a>
-        <a href="/patientHistory/<%= patient ? patient.id : '' %>">ประวัติการซักประวัติ</a>
+        <!-- <a href="/patientHistory/<%= patient ? patient.id : '' %>">ประวัติการซักประวัติ</a> -->
         <a href="/examinationroom/<%= patient ? patient.id : '' %>">ห้องตรวจ</a>
         <a href="/patients">ข้อมูลผู้ป่วย</a>
     </nav>
@@ -108,9 +108,9 @@
                 <a href="/medicalHistory/edit/<%= patient.id %>" style="text-decoration: none; color: white;">แก้ไขข้อมูลการซักประวัติ</a>
             </button><br><br>
 
-            <button class="button2">
+            <!-- <button class="button2">
                 <a href="/medicalHistory/delete/<%= patient.id %>" style="text-decoration: none; color: white;">ลบข้อมูลการซักประวัติ</a>
-            </button><br><br>
+            </button><br><br>  -->
         <% } else { %>
             <p>ไม่พบข้อมูลผู้ป่วย</p>
         <% } %>

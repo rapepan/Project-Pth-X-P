@@ -2,7 +2,7 @@ body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f7fc; /* พื้นหลังสีอ่อน สบายตา */
+    background-color: #F0FFF0; /* พื้นหลังสีอ่อน สบายตา */
     color: #333;
     display: flex; /* ใช้ Flexbox */
     justify-content: center; /* จัดกลางแนวนอน */
@@ -12,7 +12,7 @@ body {
 
 /* ส่วนของส่วนหัว */
 header {
-    background-color: #27445D; /* สีน้ำเงินเข้มที่ดูทางการ */
+    background-color: #ACE1AF; /* สีน้ำเงินเข้มที่ดูทางการ */
     color: white;
     text-align: center;
     padding: 15px 0;
@@ -38,7 +38,7 @@ header {
 
 /* ปรับปุ่ม */
 .menu-btn {
-    background-color: #493D9E; /* สีฟ้าของปุ่ม */
+    background-color: #3A7D44; /* สีฟ้าของปุ่ม */
     color: white;
     padding: 14px 28px;
     border: none;
@@ -53,7 +53,7 @@ header {
 }
 
 .menu-btn:hover {
-    background-color: #B2A5FF; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #9DC08B; /* เปลี่ยนสีเมื่อ hover */
 }
 
 .menu-btn2 {

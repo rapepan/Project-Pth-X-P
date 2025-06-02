@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/medicaHistorydate.css" />
+</head>
+
+<body>
+  <header>
+    <h1><%= title %></h1>
+  </header>
+
+  <nav>
+    <a href="/index">หน้าหลัก</a>
+    <a href="/medicaHistorydate">ประวัติการรักษา</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- ฟอร์มค้นหา -->
+    <form method="GET" action="/medicaHistorydate" class="search-bar" autocomplete="off">
+      <label for="hn" class="bold-label">HN:</label>
+      <input type="text" id="hn" name="hn" value="<%= filters.hn || '' %>" placeholder="กรอก HN คนไข้" required />
+
+      <label for="date" class="bold-label">วันที่ตรวจ:</label>
+      <select id="date" name="date">
+        <option value="">-- เลือกวันที่ --</option>
+        <% availableDates.forEach(function(d) { %>
+          <option value="<%= d %>" <%= (filters.date === d) ? 'selected' : '' %>>
+            <%= new Date(d).toLocaleDateString('th-TH') %>
+          </option>
+        <% }); %>
+      </select>
+
+      <button type="submit">ค้นหา</button>
+    </form>
+
+    <!-- แสดงชื่อคนไข้ -->
+    <% if (patient) { %>
+      <h2>ประวัติการรักษาของ <%= patient.fname + " " + patient.lname %> (HN: <%= patient.HN %>)</h2>
+    <% } else { %>
+      <p class="bold-label">กรุณากรอก HN เพื่อค้นหาประวัติ</p>
+    <% } %>
+
+    <!-- แสดงประวัติการรักษา -->
+    <% if (medicalHistory && medicalHistory.length > 0) { %>
+      <% medicalHistory.forEach(function(record) { %>
+        <div class="patient-entry">
+          <div class="patient-row">
+            <div class="patient-label">วันที่บันทึก:</div>
+            <div class="patient-value"><%= new Date(record.created_at || record.date || record.id).toLocaleDateString('th-TH') %></div>
+
+            <div class="patient-label"></div>
+            <div class="patient-value"></div>
+            
+            <div class="patient-label"></div>
+            <div class="patient-value"></div>
+          </div>
+
+          <div class="patient-row">
+            <div class="patient-label">น้ำหนัก:</div>
+            <div class="patient-value"><%= record.weight || "-" %></div>
+
+            <div class="patient-label">ส่วนสูง:</div>
+            <div class="patient-value"><%= record.height || "-" %></div>
+
+            <div class="patient-label">ความดันโลหิต:</div>
+            <div class="patient-value"><%= record.bloodPressure || "-" %></div>
+          </div>
+
+          <div class="patient-row">
+            <div class="patient-label">ชีพจร:</div>
+            <div class="patient-value"><%= record.pulse || "-" %></div>
+
+            <div class="patient-label">O2Sat:</div>
+            <div class="patient-value"><%= record.o2Sat || "-" %></div>
+
+            <div class="patient-label">อัตราการหายใจ:</div>
+            <div class="patient-value"><%= record.respiratoryRate || "-" %></div>
+          </div>
+
+          <div class="patient-row">
+            <div class="patient-label">BMI:</div>
+            <div class="patient-value"><%= record.bmi || "-" %></div>
+            
+            <div class="patient-label"></div>
+            <div class="patient-value"></div>
+            
+            <div class="patient-label"></div>
+            <div class="patient-value"></div>
+          </div>
+
+          <div class="patient-row2">
+            <div class="patient-label2">อาการสำคัญ:</div>
+            <div class="patient-value2"><%= record.symptoms || "-" %></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+
+          </div>
+
+          <div class="patient-row2">
+            <div class="patient-label2">ประวัติปัจจุบัน:</div>
+            <div class="patient-value2"><%= record.currentHistory || "-" %></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+          </div>
+
+          <div class="patient-row2">
+            <div class="patient-label2">ประวัติอดีต:</div>
+            <div class="patient-value2"><%= record.pastHistory || "-" %></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+
+            <div class="patient-label2"></div>
+            <div class="patient-value2"></div>
+          </div>
+
+        </div>
+      <% }); %>
+    <% } else if (patient) { %>
+      <p class="notice">ไม่พบข้อมูลประวัติในช่วงวันที่เลือก</p>
+    <% } %>
+
+  </div>
+</body>
+
+</html>

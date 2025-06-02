@@ -289,12 +289,10 @@ app.post("/medicalFrom/:id", checkRole("user"), (req, res) => {
 app.get("/medicalHistory/:id?", checkRole("user"), (req, res) => {
   const patientId = req.params.id;
 
-  // ถ้าไม่พบ patientId, ไม่ต้องดึงข้อมูลจากฐานข้อมูล
   if (!patientId) {
     return res.render("medicaHistory", { title: "ประวัติผู้ป่วย" });
   }
 
-  // ดึงข้อมูลจากตาราง patient
   const patientQuery = "SELECT * FROM patient WHERE id = ?";
   db.query(patientQuery, [patientId], (err, patientResult) => {
     if (err) {
@@ -305,14 +303,13 @@ app.get("/medicalHistory/:id?", checkRole("user"), (req, res) => {
       return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
     }
 
-    // ดึงข้อมูลจากตาราง medicalfrom
-    const medicalHistoryQuery = "SELECT * FROM medicalfrom WHERE patient_id = ?";
+    // ดึงข้อมูล medicalfrom ล่าสุด
+    const medicalHistoryQuery = "SELECT * FROM medicalfrom WHERE patient_id = ? ORDER BY id DESC LIMIT 1";
     db.query(medicalHistoryQuery, [patientId], (err, medicalHistoryResult) => {
       if (err) {
         return res.status(500).send("ไม่สามารถดึงข้อมูลการซักประวัติได้");
       }
 
-      // ส่งข้อมูลผู้ป่วยและการซักประวัติเข้าไปที่หน้า medicalHistory.ejs
       res.render("medicaHistory", { title: "ประวัติผู้ป่วย", patient: patientResult[0], medicalfrom: medicalHistoryResult[0] });
     });
   });
@@ -368,7 +365,79 @@ app.post("/medicalHistory/edit/:patientId", checkRole("user"), (req, res) => {
       console.error("Error during update:", err);
       return res.status(500).send("ไม่สามารถอัพเดตข้อมูลการซักประวัติได้");
     }
-    res.redirect(`/medicalHistory/${patientId}`);
+    res.redirect(`/medicalHistory/${patientId}`); // หลังจากอัพเดตแล้วให้กลับไปที่หน้าประวัติการซักประวัติ
+  });
+});
+
+// ประวัติการรักษา
+app.get("/medicaHistorydate", checkRole("user"), (req, res) => {
+  const { hn, date } = req.query;
+
+  if (!hn) {
+    // ยังไม่กรอก HN แสดงหน้าเปล่า
+    return res.render("medicaHistorydate", { title: "ค้นหาประวัติผู้ป่วย", patient: null, medicalHistory: [], availableDates: [], filters: {} });
+  }
+
+  const patientQuery = "SELECT * FROM patient WHERE HN = ?";
+  db.query(patientQuery, [hn], (err, patientResult) => {
+    if (err) return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+
+    if (patientResult.length === 0) {
+      return res.render("medicaHistorydate", {
+        title: "ค้นหาประวัติผู้ป่วย",
+        patient: null,
+        medicalHistory: [],
+        availableDates: [],
+        filters: { hn, date },
+        message: "ไม่พบผู้ป่วยที่ HN นี้",
+      });
+    }
+
+    const patient = patientResult[0];
+
+    // ดึงวันที่ที่มีประวัติการรักษา (distinct) ของคนไข้คนนี้
+    const datesQuery = `
+      SELECT DISTINCT DATE(created_at) as visitDate
+      FROM medicalfrom
+      WHERE patient_id = ?
+      ORDER BY visitDate DESC
+    `;
+
+    db.query(datesQuery, [patient.id], (err, datesResult) => {
+      if (err) return res.status(500).send("ไม่สามารถดึงวันที่การรักษาได้");
+
+      const availableDates = datesResult.map(r => {
+        const d = new Date(r.visitDate);
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      });
+
+      // ถ้าเลือกวันที่ ดึงประวัติวันนั้น, ถ้าไม่เลือก ให้ดึงประวัติครั้งล่าสุดแถวเดียว
+      let historyQuery;
+      let params;
+
+      if (date) {
+        historyQuery = "SELECT * FROM medicalfrom WHERE patient_id = ? AND DATE(created_at) = ? ORDER BY created_at DESC";
+        params = [patient.id, date];
+      } else {
+        historyQuery = "SELECT * FROM medicalfrom WHERE patient_id = ? ORDER BY created_at DESC LIMIT 1";
+        params = [patient.id];
+      }
+
+      db.query(historyQuery, params, (err, medicalHistoryResult) => {
+        if (err) return res.status(500).send("ไม่สามารถดึงข้อมูลการรักษาได้");
+
+        res.render("medicaHistorydate", {
+          title: "ค้นหาประวัติผู้ป่วย",
+          patient,
+          medicalHistory: medicalHistoryResult,
+          availableDates,
+          filters: { hn, date },
+        });
+      });
+    });
   });
 });
 
@@ -385,7 +454,7 @@ app.get("/medicalHistory/delete/:patientId", checkRole("user"), (req, res) => {
       return res.status(500).send("ไม่สามารถลบข้อมูลการซักประวัติได้");
     }
 
-    res.redirect(`/patients`);
+    res.redirect(`/patients`); // หลังจากลบเสร็จจะกลับไปที่หน้าข้อมูลผู้ป่วย
   });
 });
 
@@ -415,7 +484,7 @@ function generateHN(callback) {
 }
 
 // ตั้งค่า port ที่จะใช้งาน
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3306;
 app.listen(PORT, () => {
   console.log(`Server is running 🚀`);
 });

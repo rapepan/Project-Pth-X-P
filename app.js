@@ -484,7 +484,7 @@ function generateHN(callback) {
 }
 
 // ตั้งค่า port ที่จะใช้งาน
-const PORT = process.env.PORT || 3306;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running 🚀`);
 });

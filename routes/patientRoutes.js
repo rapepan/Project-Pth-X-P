@@ -1,15 +1,24 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const patientController = require("../controllers/patientController"); // เชื่อมกับ patientController
+const PatientController = require('../controllers/patientController');
 
-// หน้าแสดงข้อมูลผู้ป่วย
-router.get("/patients", checkRole("user"), patientController.showPatients);
+// Middleware for role checking
+function checkRole(role) {
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect("/login");
+  };
+}
 
-// หน้าแสดงฟอร์มสำหรับเพิ่มข้อมูลผู้ป่วยใหม่
-router.get("/patients/add", checkRole('user'), (req, res) => {
-  res.render("patientForm");
-});
-
-router.post("/patients/add", checkRole('user'), patientController.addPatient);
+// Patient routes
+router.get("/", checkRole("user"), PatientController.searchPage);
+router.get("/add", checkRole("user"), PatientController.showAddForm);
+router.post("/add", checkRole("user"), PatientController.addPatient);
+router.get("/:HN", checkRole("user"), PatientController.viewPatient);
+router.get("/:HN/edit", checkRole("user"), PatientController.showEditForm);
+router.put("/:HN", checkRole("user"), PatientController.updatePatient);
+router.delete("/:HN", checkRole("user"), PatientController.deletePatient);
 
 module.exports = router;

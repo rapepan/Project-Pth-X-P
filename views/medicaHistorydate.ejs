@@ -1,139 +1,182 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/medicaHistorydate.css" />
 </head>
-
 <body>
-  <header>
-    <h1><%= title %></h1>
-  </header>
+    <header>
+        <h1><i class="fas fa-calendar-check"></i> <%= title %></h1>
+    </header>
 
-  <nav>
-    <a href="/index">หน้าหลัก</a>
-    <a href="/medicaHistorydate">ประวัติการรักษา</a>
-  </nav>
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/medicaHistorydate"><i class="fas fa-history"></i> ประวัติการรักษา</a>
+    </nav>
 
-  <div class="container">
+    <div class="container">
+        <!-- ฟอร์มค้นหา -->
+        <form method="GET" action="/medicaHistorydate" class="search-bar" autocomplete="off">
+            <div class="form-group">
+                <label for="hn" class="bold-label">
+                    <i class="fas fa-id-badge"></i> HN:
+                </label>
+                <input type="text" id="hn" name="hn" value="<%= filters.hn || '' %>" placeholder="กรอก HN คนไข้" required />
+            </div>
 
-    <!-- ฟอร์มค้นหา -->
-    <form method="GET" action="/medicaHistorydate" class="search-bar" autocomplete="off">
-      <label for="hn" class="bold-label">HN:</label>
-      <input type="text" id="hn" name="hn" value="<%= filters.hn || '' %>" placeholder="กรอก HN คนไข้" required />
+            <div class="form-group">
+                <label for="date" class="bold-label">
+                    <i class="fas fa-calendar-day"></i> วันที่ตรวจ:
+                </label>
+                <select id="date" name="date">
+                    <option value="">-- เลือกวันที่ --</option>
+                    <% availableDates.forEach(function(d) { %>
+                        <option value="<%= d %>" <%= (filters.date === d) ? 'selected' : '' %>>
+                            <% 
+                                const dateObj = new Date(d + 'T00:00:00');
+                                const day = dateObj.getDate();
+                                const month = dateObj.getMonth() + 1;
+                                const year = dateObj.getFullYear() + 543;
+                            %>
+                            <%= day %>/<%= month %>/<%= year %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
 
-      <label for="date" class="bold-label">วันที่ตรวจ:</label>
-      <select id="date" name="date">
-        <option value="">-- เลือกวันที่ --</option>
-        <% availableDates.forEach(function(d) { %>
-          <option value="<%= d %>" <%= (filters.date === d) ? 'selected' : '' %>>
-            <%= new Date(d).toLocaleDateString('th-TH') %>
-          </option>
-        <% }); %>
-      </select>
+            <button type="submit">
+                <i class="fas fa-search"></i> ค้นหา
+            </button>
+        </form>
 
-      <button type="submit">ค้นหา</button>
-    </form>
+        <!-- แสดงชื่อคนไข้ -->
+        <% if (patient) { %>
+            <div class="patient-header">
+                <h2>
+                    <i class="fas fa-user-injured"></i> 
+                    ประวัติการรักษาของ <%= patient.fname + " " + patient.lname %> 
+                    <span>(HN: <%= patient.HN %>)</span>
+                </h2>
+            </div>
+        <% } else { %>
+            <div class="notice info">
+                <i class="fas fa-info-circle"></i> กรุณากรอก HN เพื่อค้นหาประวัติ
+            </div>
+        <% } %>
 
-    <!-- แสดงชื่อคนไข้ -->
-    <% if (patient) { %>
-      <h2>ประวัติการรักษาของ <%= patient.fname + " " + patient.lname %> (HN: <%= patient.HN %>)</h2>
-    <% } else { %>
-      <p class="bold-label">กรุณากรอก HN เพื่อค้นหาประวัติ</p>
-    <% } %>
+        <!-- แสดงประวัติการรักษา -->
+        <% if (medicalHistory && medicalHistory.length > 0) { %>
+            <% medicalHistory.forEach(function(record) { %>
+                <div class="patient-entry">
+                    <h4>
+                        <i class="fas fa-clipboard-list"></i> บันทึกการตรวจ
+                    </h4>
+                    
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-calendar"></i> วันที่บันทึก:
+                            </div>
+                            <div class="patient-value">
+                                <% 
+                                    const recordDate = new Date(record.created_at || record.date || record.id);
+                                    const recordDay = recordDate.getDate();
+                                    const recordMonth = recordDate.getMonth() + 1;
+                                    const recordYear = recordDate.getFullYear() + 543;
+                                %>
+                                <%= recordDay %>/<%= recordMonth %>/<%= recordYear %>
+                            </div>
+                        </div>
 
-    <!-- แสดงประวัติการรักษา -->
-    <% if (medicalHistory && medicalHistory.length > 0) { %>
-      <% medicalHistory.forEach(function(record) { %>
-        <div class="patient-entry">
-          <div class="patient-row">
-            <div class="patient-label">วันที่บันทึก:</div>
-            <div class="patient-value"><%= new Date(record.created_at || record.date || record.id).toLocaleDateString('th-TH') %></div>
+                    </div>
 
-            <div class="patient-label"></div>
-            <div class="patient-value"></div>
-            
-            <div class="patient-label"></div>
-            <div class="patient-value"></div>
-          </div>
+                    <h4>
+                        <i class="fas fa-weight"></i> ข้อมูลร่างกาย
+                    </h4>
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">น้ำหนัก:</div>
+                            <div class="patient-value"><%= record.weight || "-" %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">ส่วนสูง:</div>
+                            <div class="patient-value"><%= record.height || "-" %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">BMI:</div>
+                            <div class="patient-value"><%= record.bmi || "-" %></div>
+                        </div>
+                    </div>
 
-          <div class="patient-row">
-            <div class="patient-label">น้ำหนัก:</div>
-            <div class="patient-value"><%= record.weight || "-" %></div>
+                    <h4>
+                        <i class="fas fa-heartbeat"></i> สัญญาณชีพ
+                    </h4>
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">ความดันโลหิต:</div>
+                            <div class="patient-value"><%= record.bloodPressure || "-" %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">ชีพจร:</div>
+                            <div class="patient-value"><%= record.pulse || "-" %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">O2Sat:</div>
+                            <div class="patient-value"><%= record.o2Sat || "-" %></div>
+                        </div>
+                    </div>
 
-            <div class="patient-label">ส่วนสูง:</div>
-            <div class="patient-value"><%= record.height || "-" %></div>
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">อัตราการหายใจ:</div>
+                            <div class="patient-value"><%= record.respiratoryRate || "-" %></div>
+                        </div>
+                    </div>
 
-            <div class="patient-label">ความดันโลหิต:</div>
-            <div class="patient-value"><%= record.bloodPressure || "-" %></div>
-          </div>
+                    <h4>
+                        <i class="fas fa-notes-medical"></i> ประวัติการเจ็บป่วย
+                    </h4>
+                    <div class="patient-row2">
+                        <div>
+                            <div class="patient-label2">อาการสำคัญ:</div>
+                            <div class="patient-value2"><%= record.symptoms || "-" %></div>
+                        </div>
+                    </div>
 
-          <div class="patient-row">
-            <div class="patient-label">ชีพจร:</div>
-            <div class="patient-value"><%= record.pulse || "-" %></div>
+                    <div class="patient-row2">
+                        <div>
+                            <div class="patient-label2">ประวัติปัจจุบัน:</div>
+                            <div class="patient-value2"><%= record.currentHistory || "-" %></div>
+                        </div>
+                    </div>
 
-            <div class="patient-label">O2Sat:</div>
-            <div class="patient-value"><%= record.o2Sat || "-" %></div>
+                    <div class="patient-row2">
+                        <div>
+                            <div class="patient-label2">ประวัติอดีต:</div>
+                            <div class="patient-value2"><%= record.pastHistory || "-" %></div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else if (patient) { %>
+            <div class="notice warning">
+                <i class="fas fa-exclamation-triangle"></i> ไม่พบข้อมูลประวัติในช่วงวันที่เลือก
+            </div>
+        <% } %>
+    </div>
 
-            <div class="patient-label">อัตราการหายใจ:</div>
-            <div class="patient-value"><%= record.respiratoryRate || "-" %></div>
-          </div>
-
-          <div class="patient-row">
-            <div class="patient-label">BMI:</div>
-            <div class="patient-value"><%= record.bmi || "-" %></div>
-            
-            <div class="patient-label"></div>
-            <div class="patient-value"></div>
-            
-            <div class="patient-label"></div>
-            <div class="patient-value"></div>
-          </div>
-
-          <div class="patient-row2">
-            <div class="patient-label2">อาการสำคัญ:</div>
-            <div class="patient-value2"><%= record.symptoms || "-" %></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-
-          </div>
-
-          <div class="patient-row2">
-            <div class="patient-label2">ประวัติปัจจุบัน:</div>
-            <div class="patient-value2"><%= record.currentHistory || "-" %></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-          </div>
-
-          <div class="patient-row2">
-            <div class="patient-label2">ประวัติอดีต:</div>
-            <div class="patient-value2"><%= record.pastHistory || "-" %></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-
-            <div class="patient-label2"></div>
-            <div class="patient-value2"></div>
-          </div>
-
-        </div>
-      <% }); %>
-    <% } else if (patient) { %>
-      <p class="notice">ไม่พบข้อมูลประวัติในช่วงวันที่เลือก</p>
-    <% } %>
-
-  </div>
+    <script>
+        // ส่งฟอร์มอัตโนมัติเมื่อเปลี่ยนวันที่
+        document.getElementById('date').addEventListener('change', function() {
+            const hnInput = document.getElementById('hn');
+            if (hnInput.value.trim() !== '') {
+                this.form.submit();
+            }
+        });
+    </script>
 </body>
-
 </html>

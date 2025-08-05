@@ -1,72 +1,179 @@
-const db = require("../config/db"); // เชื่อมต่อกับฐานข้อมูล
+const db = require('../config/db');
 
-// ฟังก์ชันค้นหาผู้ป่วย
-const searchPatients = (searchTerm, searchType, callback) => {
-  if (!searchTerm) {
-    return callback(null, []); // ถ้าไม่มีคำค้นหาก็ไม่ต้องส่งข้อมูล
-  }
-
-  let query = "";
-  switch (searchType) {
-    case "HN":
-      query = `SELECT * FROM patient WHERE HN LIKE ?`; // ค้นหาตามชื่อ
-      break;
-    case "name":
-      query = `SELECT * FROM patient WHERE name LIKE ?`; // ค้นหาตามชื่อ
-      break;
-    case "national_id":
-      query = `SELECT * FROM patient WHERE national_id LIKE ?`; // ค้นหาตามรหัสประจำตัวประชาชน
-      break;
-    default:
-      query = `SELECT * FROM patient WHERE HN LIKE ?`; // ค้นหาตามชื่อเป็นค่าเริ่มต้น
-      break;
-  }
-
-  db.query(query, [`%${searchTerm}%`], (err, results) => {
-    if (err) {
-      callback(err, null);
-    } else {
-      callback(null, results);
-    }
-  });
-};
-
-// ฟังก์ชันดึงข้อมูลผู้ป่วยจาก ID
-const getPatientById = (id, callback) => {
-  const query = "SELECT * FROM patient WHERE id = ?";
-  db.query(query, [id], (err, results) => {
-    if (err) {
-      callback(err, null);
-    } else {
-      callback(null, results[0]);
-    }
-  });
-};
-
-// ฟังก์ชันอัปเดตข้อมูลผู้ป่วย
-const updatePatient = (id, updatedData, callback) => {
-  const query = `
-    UPDATE patient 
-    SET height = ?, weight = ?, bmi = ?, blood_pressure = ?, treatment_history = ? 
-    WHERE id = ?`;
-  const { height, weight, bmi, blood_pressure, treatment_history } =
-    updatedData;
-
-  db.query(
-    query,
-    [height, weight, bmi, blood_pressure, treatment_history, id],
-    (err, results) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        callback(null, results);
+class PatientModel {
+  // ค้นหาผู้ป่วยทั้งหมด
+  static getAllPatients(callback) {
+    // ตรวจสอบว่าตาราง patient มีคอลัมน์ created_at หรือไม่
+    const checkColumnQuery = "SHOW COLUMNS FROM patient LIKE 'created_at'";
+    db.query(checkColumnQuery, (err, results) => {
+      if (err) return callback(err);
+      
+      let orderBy = "HN DESC"; // default order by HN
+      if (results.length > 0) {
+        orderBy = "created_at DESC"; // ถ้ามี created_at ให้ใช้
       }
-    }
-  );
-};
+      
+      const query = `SELECT * FROM patient ORDER BY ${orderBy}`;
+      db.query(query, callback);
+    });
+  }
 
-module.exports = {
-  searchPatients,
-  getPatientById,
-  updatePatient,
-};
+  // ค้นหาผู้ป่วยตามเงื่อนไข
+  static searchPatients(searchType, searchTerm, callback) {
+    const validSearchTypes = ["HN", "fname", "national_id"];
+    
+    if (!validSearchTypes.includes(searchType)) {
+      return callback(new Error('Invalid search type'));
+    }
+
+    // ตรวจสอบว่าตาราง patient มีคอลัมน์ created_at หรือไม่
+    const checkColumnQuery = "SHOW COLUMNS FROM patient LIKE 'created_at'";
+    db.query(checkColumnQuery, (err, results) => {
+      if (err) return callback(err);
+      
+      let orderBy = "HN DESC"; // default order by HN
+      if (results.length > 0) {
+        orderBy = "created_at DESC"; // ถ้ามี created_at ให้ใช้
+      }
+      
+      const query = `SELECT * FROM patient WHERE ${searchType} LIKE ? ORDER BY ${orderBy}`;
+      db.query(query, [`%${searchTerm}%`], callback);
+    });
+  }
+
+  // ค้นหาผู้ป่วยตาม HN
+  static getPatientByHN(HN, callback) {
+    const query = "SELECT * FROM patient WHERE HN = ?";
+    db.query(query, [HN], callback);
+  }
+
+  // เพิ่มผู้ป่วยใหม่
+  static createPatient(patientData, callback) {
+    const {
+      HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+      chronic_diseases, housenumber, moo, soi, subdistrict, district,
+      province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships
+    } = patientData;
+
+    // ตรวจสอบว่าตาราง patient มีคอลัมน์ created_at หรือไม่
+    const checkColumnQuery = "SHOW COLUMNS FROM patient LIKE 'created_at'";
+    db.query(checkColumnQuery, (err, results) => {
+      if (err) return callback(err);
+      
+      let query, values;
+      
+      if (results.length > 0) {
+        // ถ้ามี created_at ให้ใส่ field นี้ด้วย (ใช้ DEFAULT จะใส่เวลาปัจจุบันอัตโนมัติ)
+        query = `
+          INSERT INTO patient (
+            HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+            chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
+            postcode, emergency_fname, emergency_lname, emergency_phone, relationships
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+      } else {
+        query = `
+          INSERT INTO patient (
+            HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+            chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
+            postcode, emergency_fname, emergency_lname, emergency_phone, relationships
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+      }
+
+      values = [
+        HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+        chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
+        postcode, emergency_fname, emergency_lname, emergency_phone, relationships
+      ];
+
+      db.query(query, values, callback);
+    });
+  }
+
+  // อัพเดทข้อมูลผู้ป่วย
+  static updatePatient(HN, patientData, callback) {
+    const {
+      fname, lname, national_id, gender, phone, age, dob, allergy_history,
+      chronic_diseases, housenumber, moo, soi, subdistrict, district,
+      province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships
+    } = patientData;
+
+    const query = `
+      UPDATE patient SET
+        fname = ?, lname = ?, national_id = ?, gender = ?, phone = ?, age = ?, dob = ?,
+        allergy_history = ?, chronic_diseases = ?, housenumber = ?, moo = ?, soi = ?,
+        subdistrict = ?, district = ?, province = ?, postcode = ?, emergency_fname = ?,
+        emergency_lname = ?, emergency_phone = ?, relationships = ?
+      WHERE HN = ?
+    `;
+
+    const values = [
+      fname, lname, national_id, gender, phone, age, dob, allergy_history,
+      chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
+      postcode, emergency_fname, emergency_lname, emergency_phone, relationships, HN
+    ];
+
+    db.query(query, values, callback);
+  }
+
+  // ลบผู้ป่วย
+  static deletePatient(HN, callback) {
+    const query = "DELETE FROM patient WHERE HN = ?";
+    db.query(query, [HN], callback);
+  }
+
+  // สร้าง HN ใหม่
+  static generateHN(callback) {
+    const now = new Date();
+    const year = (now.getFullYear() + 543).toString().slice(-2);
+    const yearPart = year;
+
+    const query = `
+      SELECT MAX(CAST(SUBSTRING(HN, 3) AS UNSIGNED)) AS maxHN 
+      FROM patient 
+      WHERE HN LIKE ?
+    `;
+
+    db.query(query, [`${yearPart}%`], (err, results) => {
+      if (err) {
+        console.error("Error generating HN:", err);
+        return callback(err);
+      }
+
+      let newHN = yearPart + "0001";
+      if (results[0] && results[0].maxHN !== null) {
+        newHN = yearPart + String(results[0].maxHN + 1).padStart(4, "0");
+      }
+
+      callback(null, newHN);
+    });
+  }
+
+  // ตรวจสอบว่ามี HN นี้อยู่แล้วหรือไม่
+  static checkHNExists(HN, callback) {
+    const query = "SELECT COUNT(*) as count FROM patient WHERE HN = ?";
+    db.query(query, [HN], (err, results) => {
+      if (err) return callback(err);
+      callback(null, results[0].count > 0);
+    });
+  }
+
+  // ตรวจสอบว่ามีรหัสบัตรประชาชนนี้อยู่แล้วหรือไม่
+  static checkNationalIdExists(national_id, excludeHN = null, callback) {
+    let query = "SELECT COUNT(*) as count FROM patient WHERE national_id = ?";
+    let params = [national_id];
+
+    if (excludeHN) {
+      query += " AND HN != ?";
+      params.push(excludeHN);
+    }
+
+    db.query(query, params, (err, results) => {
+      if (err) return callback(err);
+      callback(null, results[0].count > 0);
+    });
+  }
+}
+
+module.exports = PatientModel;

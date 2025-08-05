@@ -1,83 +1,188 @@
-body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    height: 100vh;
-    /* เต็มหน้าจอ */
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    /* จัดกลางแนวนอน */
-    align-items: center;
-    /* จัดกลางแนวตั้ง */
-    background-color: #F0FFF0; /* พื้นหลังสีอ่อน สบายตา */
+/* ========== CSS Variables ========== */
+:root {
+    --primary-color: #00897B;
+    --primary-light: #4DB6AC;
+    --primary-dark: #00695C;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-color: #e0e0e0;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.16);
 }
 
-/* ฟอร์ม */
-form {
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    /* เงาฟอร์ม */
+/* ========== Base Styles ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Sarabun', 'Prompt', 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #E0F2F1 0%, #F5F5F5 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* ========== Auth Form ========== */
+.auth-form {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
     width: 100%;
     max-width: 400px;
-    /* กำหนดความกว้างสูงสุด */
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.text-center {
     text-align: center;
 }
 
-/* ฟอนต์ที่ใช้ */
 h1 {
-    color: #333;
-    /* สีข้อความหัวข้อ */
-    font-size: 28px;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-top: 1rem;
 }
 
-/* ปรับสไตล์ให้กับอินพุต */
-input {
+/* ========== Form Elements ========== */
+label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    box-sizing: border-box;
-    /* คำนวณ padding ในขนาด */
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    background-color: white;
 }
 
-/* ปรับสไตล์ให้กับปุ่ม */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+}
+
+/* ========== Button ========== */
 button {
-    background-color: #3A7D44;
-    /* สีฟ้าของปุ่ม */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
-    padding: 12px 20px;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    width: 100%;
-    /* ปรับให้ปุ่มเต็มความกว้าง */
-    transition: background-color 0.3s;
-    font-size: 16px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,137,123,0.3);
+    font-family: inherit;
 }
 
 button:hover {
-    background-color: #9DC08B;
-    /* เปลี่ยนสีเมื่อ hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,137,123,0.4);
 }
 
-/* เพิ่มความนุ่มนวลให้กับฟอร์ม */
-form input:focus,
-form button:focus {
-    outline: none;
-    border-color: #007bff;
-    /* สีขอบเมื่อเลือก */
+button:active {
+    transform: translateY(0);
 }
 
-/* ปรับระยะห่างของข้อความ */
-form label {
-    font-size: 16px;
-    margin-bottom: 5px;
-    color: #555;
-    /* สีข้อความ */
-    display: block;
-    text-align: left;
+/* ========== Error/Success Messages ========== */
+.error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #ef5350;
+    animation: slideIn 0.3s ease-out;
+}
+
+.success-message {
+    background: #e8f5e8;
+    color: #2e7d32;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary-color);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== Links ========== */
+.auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.auth-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.auth-links a:hover {
+    color: var(--primary-dark);
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+    
+    .auth-form {
+        padding: 2rem;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+    }
 }

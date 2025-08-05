@@ -4,29 +4,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
+    <title><%= title %></title>
+    
+    <!-- Google Fonts สำหรับฟอนต์ไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS ของเรา -->
     <link rel="stylesheet" href="/css/index.css">
+    
 </head>
 
 <body>
     <header>
-        <h1><%= title %></h1>
-        <div class="logout-form">
-            <a href="/logout" class="menu-btn2">Logout</a>
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-heartbeat"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="logout-section">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    ออกจากระบบ
+                </a>
+            </div>
         </div>
     </header>
     
-
-    <div class="container">
-        <!-- ปุ่มข้อมูลผู้ป่วย -->
-        <button class="menu-btn menu-btn-large" onclick="window.location.href='/patients/add'">ลงทะเบียนผู้ป่วยใหม่</button>
-        <button class="menu-btn menu-btn-large" onclick="window.location.href='/patients'">ค้นหาข้อมูลผู้ป่วย</button>
-        <button class="menu-btn menu-btn-large" onclick="window.location.href='/examinationroom'">ห้องตรวจ</button>
-        <button class="menu-btn menu-btn-large" onclick="window.location.href='/medicaHistorydate'">ประวัติการรักษา</button>
+    <div class="main-container">
+        <div class="welcome-section">
+            <h2>ยินดีต้อนรับสู่ระบบคลินิกกายภาพบำบัด</h2>
+            <p>เลือกเมนูด้านล่างเพื่อเริ่มใช้งาน</p>
+        </div>
+        
+        <div class="menu-grid">
+            <!-- ลงทะเบียนผู้ป่วยใหม่ -->
+            <div class="menu-card" onclick="window.location.href='/patients/add'">
+                <div class="icon-wrapper">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>ลงทะเบียนผู้ป่วยใหม่</h3>
+                <p>เพิ่มข้อมูลผู้ป่วยใหม่เข้าสู่ระบบ</p>
+                <a href="/patients/add" class="btn-action">เริ่มลงทะเบียน</a>
+            </div>
+            
+            <!-- ค้นหาข้อมูลผู้ป่วย -->
+            <div class="menu-card" onclick="window.location.href='/patients'">
+                <div class="icon-wrapper">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>ค้นหาข้อมูลผู้ป่วย</h3>
+                <p>ค้นหาและจัดการข้อมูลผู้ป่วย</p>
+                <a href="/patients" class="btn-action">ค้นหาผู้ป่วย</a>
+            </div>
+            
+            <!-- ห้องตรวจ -->
+            <div class="menu-card" onclick="window.location.href='/examinationroom'">
+                <div class="icon-wrapper">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h3>ห้องตรวจ</h3>
+                <p>บันทึกการตรวจและการรักษา</p>
+                <a href="/examinationroom" class="btn-action">เข้าห้องตรวจ</a>
+            </div>
+            
+            <!-- ประวัติการรักษา -->
+            <div class="menu-card" onclick="window.location.href='/medicaHistorydate'">
+                <div class="icon-wrapper">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>ประวัติการรักษา</h3>
+                <p>ดูประวัติการรักษาของผู้ป่วย</p>
+                <a href="/medicaHistorydate" class="btn-action">ดูประวัติ</a>
+            </div>
+        </div>
     </div>
-
 </body>
 
 </html>

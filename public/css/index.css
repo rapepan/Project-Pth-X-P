@@ -1,63 +1,365 @@
-body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+/* ========== CSS Variables ========== */
+:root {
+    --primary-color: #00897B;
+    --primary-light: #4DB6AC;
+    --primary-dark: #00695C;
+    --secondary-color: #FF8A65;
+    --success-color: #66BB6A;
+    --warning-color: #FFA726;
+    --danger-color: #EF5350;
+    --info-color: #42A5F5;
+    --bg-light: #F0FFF0;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-color: #e0e0e0;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.16);
+}
+
+/* ========== Base Styles ========== */
+* {
     margin: 0;
     padding: 0;
-    background-color: #F0FFF0; /* พื้นหลังสีอ่อน สบายตา */
-    color: #333;
+    box-sizing: border-box;
 }
 
+body {
+    font-family: 'Sarabun', 'Prompt', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, #E0F2F1 0%, #F5F5F5 100%);
+    min-height: 100vh;
+}
+
+/* ========== Header ========== */
 header {
-    background-color: #ACE1AF;
-    color: rgb(255, 255, 255);
-    text-align: center;
-    padding: 15px 0;
-    font-size: 32px;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.logout-form {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 30px;
-    margin-top: 10px;
-}
-
-.menu-btn2 {
-    background-color: #ACE1AF; /* เขียวเข้ม */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
 }
 
-.menu-btn2:hover {
-    background-color: #ff878c;
+header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
 }
 
-/* ส่วนของเนื้อหาหลัก */
-.container {
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.5; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.3; 
+    }
+}
+
+.header-content {
     max-width: 1200px;
-    margin: 10px;
-    padding: 0 20px; /* <-- ตรงนี้คือจุดสำคัญ: padding ซ้าย-ขวา */
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
-.menu-btn {
-    background-color: #3A7D44; /* สีฟ้าของปุ่ม */
+.logo-section h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-section h1 .fas {
+    font-size: 2.5rem;
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.1); 
+    }
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.2);
     color: white;
-    padding: 14px 28px;
-    border: none;
-    cursor: pointer;
-    width: 20%; /* ให้ปุ่มเต็มความกว้าง */
-    max-width: 300px; /* จำกัดความกว้างสูงสุด */
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    margin: 10px 0; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
 }
 
-.menu-btn:hover {
-    background-color: #9DC08B; /* เปลี่ยนสีเมื่อ hover */
+.logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+/* ========== Main Container ========== */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ========== Welcome Section ========== */
+.welcome-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.welcome-section h2 {
+    font-size: 2rem;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.welcome-section p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+/* ========== Menu Grid ========== */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* ========== Menu Cards ========== */
+.menu-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.menu-card:nth-child(1) { animation-delay: 0.1s; }
+.menu-card:nth-child(2) { animation-delay: 0.2s; }
+.menu-card:nth-child(3) { animation-delay: 0.3s; }
+.menu-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.menu-card:hover::before {
+    left: 100%;
+}
+
+.menu-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+}
+
+.menu-card:active {
+    transform: translateY(-4px);
+}
+
+/* ========== Icon Wrapper ========== */
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,137,123,0.3);
+}
+
+.menu-card:hover .icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 25px rgba(0,137,123,0.4);
+}
+
+.icon-wrapper .fas {
+    font-size: 2rem;
+    color: white;
+}
+
+/* ========== Card Content ========== */
+.menu-card h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.menu-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* ========== Action Button ========== */
+.btn-action {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(0,137,123,0.3);
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,137,123,0.4);
+    color: white;
+}
+
+/* ========== Specific Card Colors ========== */
+.menu-card:nth-child(1) .icon-wrapper {
+    background: linear-gradient(135deg, var(--success-color) 0%, #4CAF50 100%);
+    box-shadow: 0 4px 15px rgba(102,187,106,0.3);
+}
+
+.menu-card:nth-child(1):hover .icon-wrapper {
+    box-shadow: 0 6px 25px rgba(102,187,106,0.4);
+}
+
+.menu-card:nth-child(2) .icon-wrapper {
+    background: linear-gradient(135deg, var(--info-color) 0%, #2196F3 100%);
+    box-shadow: 0 4px 15px rgba(66,165,245,0.3);
+}
+
+.menu-card:nth-child(2):hover .icon-wrapper {
+    box-shadow: 0 6px 25px rgba(66,165,245,0.4);
+}
+
+.menu-card:nth-child(3) .icon-wrapper {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #FF9800 100%);
+    box-shadow: 0 4px 15px rgba(255,167,38,0.3);
+}
+
+.menu-card:nth-child(3):hover .icon-wrapper {
+    box-shadow: 0 6px 25px rgba(255,167,38,0.4);
+}
+
+.menu-card:nth-child(4) .icon-wrapper {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #FF7043 100%);
+    box-shadow: 0 4px 15px rgba(255,138,101,0.3);
+}
+
+.menu-card:nth-child(4):hover .icon-wrapper {
+    box-shadow: 0 6px 25px rgba(255,138,101,0.4);
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .logo-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .welcome-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .menu-card {
+        padding: 1.5rem;
+    }
+    
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .icon-wrapper .fas {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-section h1 {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .menu-card h3 {
+        font-size: 1.1rem;
+    }
 }

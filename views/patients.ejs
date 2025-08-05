@@ -1,150 +1,217 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
-    <link rel="stylesheet" href="/css/patients.css"> <!-- ใช้ CSS เฉพาะหน้า Patients -->
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/patients.css">
 </head>
-
 <body>
-    <header>
-        <h1>
-            <%= title %>
-        </h1>
-    </header>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <h1 class="page-title">
+                <i class="fas fa-users"></i> ค้นหาข้อมูลผู้ป่วย
+            </h1>
+        </div>
+    </div>
 
+    <!-- Navigation -->
     <nav>
-        <a href="/index">หน้าหลัก</a>
-        <a href="/patients">ค้นหาข้อมูลผู้ป่วย</a>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/patients" class="active"><i class="fas fa-search"></i> ค้นหาข้อมูลผู้ป่วย</a>
+        <a href="/patients/add"><i class="fas fa-user-plus"></i> ลงทะเบียนผู้ป่วยใหม่</a>
     </nav>
 
     <div class="container">
-        <h2>ค้นหาผู้ป่วย</h2>
-        <!-- ฟอร์มค้นหาผู้ป่วย -->
-        <form class="search-bar" action="/patients" method="GET">
-            <select name="searchType">
-                <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาด้วย HN</option>
-                <option value="fname" <%=searchType==='fname' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
-                <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน</option>
-            </select>
-            <input type="text" name="search" placeholder="ค้นหาผู้ป่วย" value="<%= searchTerm %>">
-            <button type="submit">ค้นหา</button>
-        </form>
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 class="search-title">
+                <i class="fas fa-search"></i> ค้นหาผู้ป่วย
+            </h2>
+            
+            <form class="search-form" action="/patients" method="GET">
+                <div class="form-group">
+                    <label class="form-label">ประเภทการค้นหา</label>
+                    <select name="searchType" class="form-control">
+                        <option value="HN" <%=searchType==='HN' ? 'selected' : '' %>>ค้นหาด้วย HN</option>
+                        <option value="fname" <%=searchType==='fname' ? 'selected' : '' %>>ค้นหาตามชื่อ</option>
+                        <option value="national_id" <%=searchType==='national_id' ? 'selected' : '' %>>ค้นหาตามรหัสบัตรประชาชน</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">คำค้นหา</label>
+                    <input type="text" name="search" class="form-control" placeholder="กรอกข้อมูลที่ต้องการค้นหา" value="<%= searchTerm %>" autofocus>
+                </div>
+                
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> ค้นหา
+                </button>
+            </form>
+        </div>
 
+        <!-- Results Section -->
         <% if (patients.length > 0 && searchTerm) { %>
-            <h3>ผลการค้นหา</h3>
+            <div class="results-info">
+                <div class="results-count">
+                    <i class="fas fa-check-circle"></i> 
+                    พบผู้ป่วย <%= patients.length %> ราย
+                </div>
+                <div>
+                    คำค้นหา: "<strong><%= searchTerm %></strong>"
+                </div>
+            </div>
+            
             <div class="patient-list">
                 <% patients.forEach(function(patient) { %>
-                    <div class="patient-entry">
-                        <h4>ข้อมูลส่วนตัว</h4>
-                        <div class="patient-row">
-                            <div class="patient-label">HN:</div>
-                            <div class="patient-value"><%= patient.HN %></div>
-
-                            <div class="patient-label">ชื่อ:</div>
-                            <div class="patient-value"><%= patient.fname %></div>
-
-                            <div class="patient-label">นามสกุล:</div>
-                            <div class="patient-value"><%= patient.lname %></div>
+                    <div class="patient-card">
+                        <!-- Patient Header -->
+                        <div class="patient-header">
+                            <div class="patient-header-content">
+                                <div class="patient-id">
+                                    <div class="patient-avatar">
+                                        <%= patient.fname.charAt(0).toUpperCase() %>
+                                    </div>
+                                    <div class="patient-name-section">
+                                        <h3><%= patient.fname %> <%= patient.lname %></h3>
+                                        <div class="patient-hn">HN: <%= patient.HN %></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <% if(patient.gender === 'ชาย') { %>
+                                        <span class="tag tag-info"><i class="fas fa-mars"></i> ชาย</span>
+                                    <% } else { %>
+                                        <span class="tag tag-info"><i class="fas fa-venus"></i> หญิง</span>
+                                    <% } %>
+                                    <span class="tag tag-info"><i class="fas fa-birthday-cake"></i> <%= patient.age %> ปี</span>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="patient-row">
-                            <div class="patient-label">รหัสประจำตัวประชาชน:</div>
-                            <div class="patient-value"><%= patient.national_id %></div>
-
-                            <div class="patient-label">เพศ:</div>
-                            <div class="patient-value"><%= patient.gender %></div>
-
-                            <div class="patient-label">เบอร์ติดต่อ:</div>
-                            <div class="patient-value"><%= patient.phone %></div>
-                        </div>
-
-                        <div class="patient-row">
-                            <div class="patient-label">อายุ:</div>
-                            <div class="patient-value"><%= patient.age %></div>
-
-                            <div class="patient-label">วันเดือนปีเกิด:</div>
-                            <div class="patient-value">
-                                <%= new Date(patient.dob).toLocaleDateString('th-TH') %>
+                        <!-- Patient Body -->
+                        <div class="patient-body">
+                            <!-- Personal Info -->
+                            <div class="info-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-user"></i> ข้อมูลส่วนตัว
+                                </h4>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">รหัสประจำตัวประชาชน</span>
+                                        <span class="info-value"><%= patient.national_id %></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">เบอร์ติดต่อ</span>
+                                        <span class="info-value"><i class="fas fa-phone"></i> <%= patient.phone %></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">วันเกิด</span>
+                                        <span class="info-value"><%= new Date(patient.dob).toLocaleDateString('th-TH') %></span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="patient-label">โรคประจำตัว:</div>
-                            <div class="patient-value"><%= patient.chronic_diseases %></div>
-                        </div>
-
-                        <div class="patient-row">
-                            <div class="patient-label">ประวัติการแพ้ยา:</div>
-                            <div class="patient-value2"><%= patient.allergy_history %></div>
-                        </div>
-
-                        <h4>ที่อยู่ปัจุบัน</h4>
-                        <div class="patient-row">
-                            <div class="patient-label">เลขที่:</div>
-                            <div class="patient-value"><%= patient.housenumber %></div>
-
-                            <div class="patient-label">หมู่:</div>
-                            <div class="patient-value"><%= patient.moo %></div>
-
-                            <div class="patient-label">ซอย:</div>
-                            <div class="patient-value"><%= patient.soi %></div>
-                        </div>
-
-                        <div class="patient-row">
-                            <div class="patient-label">ตำบล/แขวง:</div>
-                            <div class="patient-value"><%= patient.subdistrict %></div>
                             
-                            <div class="patient-label">อำเภอ/เขต:</div>
-                            <div class="patient-value"><%= patient.district %></div>
-
-                            <div class="patient-label">จังหวัด:</div>
-                            <div class="patient-value"><%= patient.province %></div>
-
+                            <!-- Medical Info -->
+                            <div class="info-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-notes-medical"></i> ข้อมูลทางการแพทย์
+                                </h4>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">โรคประจำตัว</span>
+                                        <span class="info-value">
+                                            <% if(patient.chronic_diseases && patient.chronic_diseases !== '-') { %>
+                                                <span class="tag tag-danger"><%= patient.chronic_diseases %></span>
+                                            <% } else { %>
+                                                ไม่มี
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">ประวัติการแพ้ยา</span>
+                                        <span class="info-value">
+                                            <% if(patient.allergy_history && patient.allergy_history !== '-') { %>
+                                                <span class="tag tag-danger"><i class="fas fa-exclamation-triangle"></i> <%= patient.allergy_history %></span>
+                                            <% } else { %>
+                                                ไม่มี
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Address Info -->
+                            <div class="info-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-map-marker-alt"></i> ที่อยู่
+                                </h4>
+                                <div class="info-value">
+                                    <%= patient.housenumber %> 
+                                    <% if(patient.moo && patient.moo !== '-') { %>หมู่ <%= patient.moo %><% } %>
+                                    <% if(patient.soi && patient.soi !== '-') { %>ซอย <%= patient.soi %><% } %>
+                                    ต.<%= patient.subdistrict %> 
+                                    อ.<%= patient.district %> 
+                                    จ.<%= patient.province %> 
+                                    <%= patient.postcode %>
+                                </div>
+                            </div>
+                            
+                            <!-- Emergency Contact -->
+                            <div class="info-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-phone-alt"></i> ติดต่อฉุกเฉิน
+                                </h4>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">ชื่อผู้ติดต่อ</span>
+                                        <span class="info-value"><%= patient.emergency_fname %> <%= patient.emergency_lname %></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">เบอร์โทร</span>
+                                        <span class="info-value"><i class="fas fa-phone"></i> <%= patient.emergency_phone %></span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">ความสัมพันธ์</span>
+                                        <span class="info-value"><%= patient.relationships %></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="patient-row">
-                            <div class="patient-label">รหัสไปรษณีย์:</div>
-                            <div class="patient-value2"><%= patient.postcode %></div>
-                        </div>
-
-                        <h4>ข้อมูลติดต่อกรณีฉุกเฉิน</h4>
-                        <div class="patient-row">
-                            <div class="patient-label">ชื่อ:</div>
-                            <div class="patient-value"><%= patient.emergency_fname %></div>
-
-                            <div class="patient-label">นามสกุล:</div>
-                            <div class="patient-value"><%= patient.emergency_lname %></div>
-
-                            <div class="patient-label"></div>
-                            <div class="patient-value"></div>
-                        </div>
-
-                        <div class="patient-row">
-                            <div class="patient-label">เบอร์ติดต่อ:</div>
-                            <div class="patient-value"><%= patient.emergency_phone %></div>
-
-                            <div class="patient-label">ความสัมพันธ์:</div>
-                            <div class="patient-value"><%= patient.relationships %></div>
-
-                            <div class="patient-label"></div>
-                            <div class="patient-value"></div>
+                        
+                        <!-- Patient Actions -->
+                        <div class="patient-actions">
+                            <a href="/examinationroom/<%= patient.HN %>" class="action-btn">
+                                <i class="fas fa-check-circle"></i> ยืนยันมารับบริการ
+                            </a>
                         </div>
                     </div>
-                    <div>
-                        <a href="/examinationroom/<%= patient.id %>" class="menu-btn">ยืนยันมารับบริการ</a>
-                    </div>                                   
-                    
                 <% }); %>
             </div>
         <% } else if (searchTerm) { %>
-            <p>ไม่พบข้อมูลผู้ป่วยที่ตรงกับคำค้นหา</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-state-title">ไม่พบข้อมูลผู้ป่วย</h3>
+                <p class="empty-state-text">
+                    ไม่พบผู้ป่วยที่ตรงกับคำค้นหา "<strong><%= searchTerm %></strong>"<br>
+                    กรุณาตรวจสอบข้อมูลและลองค้นหาใหม่อีกครั้ง
+                </p>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h3 class="empty-state-title">เริ่มค้นหาผู้ป่วย</h3>
+                <p class="empty-state-text">
+                    กรอกข้อมูลในช่องค้นหาด้านบนเพื่อค้นหาผู้ป่วยในระบบ
+                </p>
+            </div>
         <% } %>
-        
     </div>
-    
 </body>
-
 </html>

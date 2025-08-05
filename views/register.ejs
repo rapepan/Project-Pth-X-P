@@ -1,36 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/register.css">   
+    <title>ลงทะเบียน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/register.css">
 </head>
-
 <body>
-
-    <% if (message) { %>
-        <p style="color: red;"><%= message %></p>
-    <% } %>
-
-    <form action="/register" method="POST">
-        <h2>Register</h2>
-        <label for="username">Username:</label>
-        <input type="text" name="username" required><br>
-
-        <label for="password">Password:</label>
-        <input type="password" name="password" required><br>
-
-        <label for="role">Role:</label>
-        <select name="role" required>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-        </select><br>
-
-        <button type="submit">Register</button>
+    <form action="/register" method="POST" class="auth-form">
+        <div class="text-center" style="margin-bottom: 2rem;">
+            <i class="fas fa-heartbeat" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h1>ลงทะเบียนผู้ใช้ใหม่</h1>
+        </div>
+                <% if (message) { %>
+            <div style="background-color: #ffebee; color: #c62828; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <%= message %>
+            </div>
+        <% } %>
+        <div style="margin-bottom: 1.5rem;">
+            <label for="username">ชื่อผู้ใช้:</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label for="password">รหัสผ่าน:</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+            <div style="margin-bottom: 1.5rem;">
+            <label for="role">ระดับผู้ใช้:</label>
+            <select name="role" id="role" required>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+        </div>
+        <button type="submit" style="width: 100%;">
+            <i class="fas fa-sign-in-alt"></i> ลงทะเบียน
+        </button>
     </form>
 </body>
-
 </html>

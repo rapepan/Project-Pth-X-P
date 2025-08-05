@@ -5,10 +5,75 @@ node_modules/
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Environment files
+# Environment files (IMPORTANT - ห้ามอัปโหลดไฟล์นี้)
 .env
+.env.local
+.env.development
+.env.production
 
 # IDE files
 .idea/           # JetBrains IDEs
 .vscode/         # VS Code
+*.swp           # Vim
+*.swo           # Vim
+*~              # Emacs
+
+# OS generated files
+.DS_Store        # macOS
+.DS_Store?       # macOS
+._*              # macOS
+Thumbs.db        # Windows
+ehthumbs.db      # Windows
+Desktop.ini      # Windows
+
+# npm/yarn files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# temporary folders
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Upload folders (ถ้ามี)
+uploads/
+public/uploads/

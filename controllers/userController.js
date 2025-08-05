@@ -30,7 +30,7 @@ const loginUser = (req, res, next) => {
       if (isMatch) {
         req.login(user, (err) => {
           if (err) return next(err);
-          return res.redirect("/dashboard"); // ส่งผู้ใช้ไปหน้า dashboard
+          return res.redirect("/index"); // ส่งผู้ใช้ไปหน้า dashboard
         });
       } else {
         return res.status(401).send("Incorrect password");

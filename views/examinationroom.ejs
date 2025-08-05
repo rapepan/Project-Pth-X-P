@@ -1,53 +1,89 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/examinationroom.css">
 </head>
-
 <body>
+    <!-- Page Header -->
     <header>
-        <h1>
-            <%= title %>
-        </h1>
+        <h1><i class="fas fa-stethoscope"></i> <%= title %></h1>
     </header>
 
+    <!-- Navigation -->
     <nav>
-        <a href="/index">หน้าหลัก</a>
-        <!-- <a href="/patientHistory">ซักประวัติ</a> -->
-        <a href="">การวินิฉัย</a>
-        <a href="">หัตการ</a>
-        <a href="">ข้อมูลทางกายภาพบำบัด</a>
-        <a href="">สรุปค่าใช้จ่าย</a>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="#" class="active"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+        <a href="#"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+        <a href="#"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+        <a href="#"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
     </nav>
 
     <div class="container">
-        <h2>ซักประวัติ</h2>
-        <!-- แสดงข้อมูลผู้ป่วยและลิงก์ไปยังหน้า medicalFrom -->
+        
         <% if (patient) { %>
-            <div class="patient-list">
+            <!-- Patient Information Card -->
+            <div class="patient-entry fade-in">
                 <div class="patient-row">
-                    <div class="patient-label">ชื่อ:</div>
-                    <div class="patient-value"><a href="/medicalFrom/<%= patient.id %>">
-                            <%= patient.fname %>
-                                <%= patient.lname %>
-                        </a></div>
+                    <div class="patient-label">
+                        <i class="fas fa-user"></i> 
+                        ชื่อ-นามสกุลผู้ป่วย
+                    </div>
+                    <div class="patient-value">
+                        <a href="/medicalFrom/<%= patient.HN %>">
+                            <i class="fas fa-external-link-alt"></i>
+                            <%= patient.fname %> <%= patient.lname %>
+                        </a>
+                    </div>
                 </div>
-            </div><br><br>
-
-            <!-- ปุ่มไปที่หน้า medicalFrom -->
-            <button class="button"
-                onclick="window.location.href='/medicalHistory/<%= patient.id %>'">ดูประวัติผู้ป่วย</button>
-            <% } else { %>
-                <p>ไม่พบข้อมูลผู้ป่วย</p>
-                <% } %>
+            </div>
+            
+            <!-- Action Button -->
+            <div class="fade-in" style="animation-delay: 0.2s;">
+                <button onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
+                    <i class="fas fa-file-medical"></i> 
+                    ดูประวัติผู้ป่วย
+                </button>
+            </div>
+            
+        <% } else { %>
+            <!-- No Patient Data Notice -->
+            <div class="notice fade-in">
+                <i class="fas fa-exclamation-circle"></i> 
+                ไม่พบข้อมูลผู้ป่วยในระบบ
+            </div>
+        <% } %>
     </div>
 
+    <!-- Add some JavaScript for enhanced interactions -->
+    <script>
+        // Add loading state to button clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!this.disabled) {
+                        this.style.opacity = '0.7';
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลด...';
+                        this.disabled = true;
+                        
+                        // Restore button after a delay if navigation doesn't happen
+                        setTimeout(() => {
+                            this.style.opacity = '1';
+                            this.innerHTML = '<i class="fas fa-file-medical"></i> ดูประวัติผู้ป่วย';
+                            this.disabled = false;
+                        }, 3000);
+                    }
+                });
+            });
+            
+            // Add smooth scroll behavior for better UX
+            document.documentElement.style.scrollBehavior = 'smooth';
+        });
+    </script>
 </body>
-
 </html>

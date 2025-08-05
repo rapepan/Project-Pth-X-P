@@ -29,7 +29,7 @@
             <!-- ถ้าไม่มีข้อมูลผู้ป่วย (เมื่อไม่มี id ใน URL) -->
         <% } %>
 
-        <form action="/medicalHistory/edit/<%= patientId %>" method="POST">
+        <form action="/medicalHistory/edit/<%= patient.HN %>" method="POST">
             <div class="form-row">
                 <div class="input-container">
                     <label for="weight">น้ำหนัก:</label>

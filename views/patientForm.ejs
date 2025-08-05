@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ลงทะเบียนผู้ป่วยใหม่</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/patientForm.css">
 </head>
 <body>
     <div class="container">
-        <h1>ลงทะเบียนผู้ป่วยใหม่</h1>
+        <h1><i class="fas fa-user-plus"></i> ลงทะเบียนผู้ป่วยใหม่</h1>
         <form action="/patients/add" method="POST">
-            <h4>ข้อมูลส่วนตัว</h4>
+            <h3><i class="fas fa-id-card"></i> ข้อมูลส่วนตัว</h3>
             <div class="form-row">
                 <div class="input-container">
                     <input type="text" id="fname" name="fname" placeholder="ชื่อ" required>
@@ -22,7 +24,7 @@
 
             <div class="form-row">
                 <div class="input-container">
-                    <input type="text" id="national_id" name="national_id" placeholder="เลขบัตรประจำตัวประชาชน" required>                   
+                    <input type="text" id="national_id" name="national_id" placeholder="เลขบัตรประจำตัวประชาชน" required>
                 </div>
                 <div class="input-container">
                     <select id="gender" name="gender" required>
@@ -45,7 +47,7 @@
             <div class="form-row">
                 <div class="input-container">
                     <input type="date" id="dob" name="dob" placeholder="วันเดือนปีเกิด" required>
-                </div>                              
+                </div>
                 <div class="input-container">
                     <input type="text" id="chronic_diseases" name="chronic_diseases" placeholder="โรคประจำตัว (ถ้ามี)" required>
                 </div>
@@ -57,7 +59,7 @@
                 </div>
             </div>
 
-            <h4>ที่อยู่ปัจุบัน</h4>
+            <h3><i class="fas fa-map-marker-alt"></i> ที่อยู่ปัจจุบัน</h3>
             <div class="form-row">
                 <div class="input-container">
                     <input type="text" id="housenumber" name="housenumber" placeholder="เลขที่" required>
@@ -91,7 +93,7 @@
                 </div>
             </div>
             
-            <h4>ข้อมูลติดต่อกรณีฉุกเฉิน</h4>
+            <h3><i class="fas fa-phone-alt"></i> ข้อมูลติดต่อกรณีฉุกเฉิน</h3>
             <div class="form-row">
                 <div class="input-container">
                     <input type="text" id="emergency_fname" name="emergency_fname" placeholder="ชื่อ" required>
@@ -110,17 +112,19 @@
                 </div>
             </div>
 
-            <button type="submit">บันทึกข้อมูล</button><br><br>
-            <button class="button2" onclick="goBack()">ย้อนกลับ</button>
+            <button type="submit">
+                <i class="fas fa-save"></i> บันทึกข้อมูล
+            </button>
+            <button type="button" class="button2" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> ย้อนกลับ
+            </button>
         </form>
     </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
-
-<script>
-    function goBack() {
-    window.history.back(); // หรือใช้ window.history.go(-1);
-}
-
-</script>
-
 </html>

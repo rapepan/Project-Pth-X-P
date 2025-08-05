@@ -1,129 +1,211 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/medicaHistory.css">
 </head>
-
 <body>
+    <!-- Page Header -->
     <header>
-        <h1><%= title %></h1>
+        <h1><i class="fas fa-file-medical"></i> <%= title %></h1>
     </header>
 
+    <!-- Navigation -->
     <nav>
-        <a href="/index">หน้าหลัก</a>
-        <!-- <a href="/patientHistory/<%= patient ? patient.id : '' %>">ประวัติการซักประวัติ</a> -->
-        <a href="/examinationroom/<%= patient ? patient.id : '' %>">ห้องตรวจ</a>
-        <a href="/patients">ข้อมูลผู้ป่วย</a>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <a href="/patients"><i class="fas fa-users"></i> ข้อมูลผู้ป่วย</a>
     </nav>
 
     <div class="container">
         <% if (patient && medicalfrom) { %>
-            <div class="patient-list">
+            <div class="patient-list fade-in">
                 <div class="patient-entry">
-                    <h3>ประวัติผู้ป่วย</h3>
+                    <!-- Patient Information Header -->
+                    <h3>
+                        <i class="fas fa-user-injured"></i> 
+                        ประวัติผู้ป่วย
+                    </h3>
+                    
                     <div class="patient-row">
-                        <div class="patient-label">HN:</div>
-                        <div class="patient-value"><%= patient.HN %></div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-id-badge"></i> HN
+                            </div>
+                            <div class="patient-value"><%= patient.HN %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-user"></i> ชื่อ
+                            </div>
+                            <div class="patient-value"><%= patient.fname %></div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-user"></i> นามสกุล
+                            </div>
+                            <div class="patient-value"><%= patient.lname %></div>
+                        </div>
+                    </div>
 
-                        <div class="patient-label">ชื่อ:</div>
-                        <div class="patient-value"><%= patient.fname %></div>
+                    <!-- Body Measurements -->
+                    <h4>
+                        <i class="fas fa-weight"></i> 
+                        ข้อมูลร่างกาย
+                    </h4>
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-weight-hanging"></i> น้ำหนัก
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.weight %> กก.</div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-ruler-vertical"></i> ส่วนสูง
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.height %> ซม.</div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-calculator"></i> BMI
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.bmi %></div>
+                        </div>
+                    </div>
 
-                        <div class="patient-label">นามสกุล:</div>
-                        <div class="patient-value"><%= patient.lname %></div>
+                    <!-- Vital Signs -->
+                    <h4>
+                        <i class="fas fa-heartbeat"></i> 
+                        สัญญาณชีพ
+                    </h4>
+                    <div class="patient-row">
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-tint"></i> ความดันโลหิต
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.bloodPressure %> mmHg</div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-heart"></i> ชีพจร
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.pulse %> ครั้ง/นาที</div>
+                        </div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-lungs"></i> O2Sat
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.o2Sat %> %</div>
+                        </div>
                     </div>
 
                     <div class="patient-row">
-                        <div class="patient-label">น้ำหนัก:</div>
-                        <div class="patient-value"><%= medicalfrom.weight %></div>
-
-                        <div class="patient-label">ส่วนสูง:</div>
-                        <div class="patient-value"><%= medicalfrom.height %></div>
-
-                        <div class="patient-label">ความดันโลหิต:</div>
-                        <div class="patient-value"><%= medicalfrom.bloodPressure %></div>
+                        <div>
+                            <div class="patient-label">
+                                <i class="fas fa-wind"></i> อัตราการหายใจ
+                            </div>
+                            <div class="patient-value"><%= medicalfrom.respiratoryRate %> ครั้ง/นาที</div>
+                        </div>
                     </div>
 
-                    <div class="patient-row">
-                        <div class="patient-label">ชีพจร:</div>
-                        <div class="patient-value"><%= medicalfrom.pulse %></div>
-
-                        <div class="patient-label">O2Sat:</div>
-                        <div class="patient-value"><%= medicalfrom.o2Sat %></div>
-
-                        <div class="patient-label">อัตราการหายใจ:</div>
-                        <div class="patient-value"><%= medicalfrom.respiratoryRate %></div>
-                    </div>
-
-                    <div class="patient-row">
-                        <div class="patient-label">BMI:</div>
-                        <div class="patient-value"><%= medicalfrom.bmi %></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
+                    <!-- Medical History -->
+                    <h4>
+                        <i class="fas fa-notes-medical"></i> 
+                        ประวัติการเจ็บป่วย
+                    </h4>
+                    
+                    <div class="patient-row2">
+                        <div>
+                            <div class="patient-label2">
+                                <i class="fas fa-exclamation-circle"></i> อาการสำคัญ
+                            </div>
+                            <div class="patient-value2"><%= medicalfrom.symptoms %></div>
+                        </div>
                     </div>
 
                     <div class="patient-row2">
-                        <div class="patient-label2">อาการสำคัญ:</div>
-                        <div class="patient-value2"><%= medicalfrom.symptoms %></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
+                        <div>
+                            <div class="patient-label2">
+                                <i class="fas fa-clock"></i> ประวัติปัจจุบัน
+                            </div>
+                            <div class="patient-value2"><%= medicalfrom.currentHistory %></div>
+                        </div>
                     </div>
 
                     <div class="patient-row2">
-                        <div class="patient-label2">ประวัติปัจจุบัน:</div>
-                        <div class="patient-value2"><%= medicalfrom.currentHistory %></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
-                    </div>
-
-                    <div class="patient-row2">
-                        <div class="patient-label2">ประวัติอดีต:</div>
-                        <div class="patient-value2"><%= medicalfrom.pastHistory %></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
-
-                        <div class="patient-label"></div>
-                        <div class="patient-value"></div>
+                        <div>
+                            <div class="patient-label2">
+                                <i class="fas fa-history"></i> ประวัติอดีต
+                            </div>
+                            <div class="patient-value2"><%= medicalfrom.pastHistory %></div>
+                        </div>
                     </div>
                 </div>
-            </div> <br><br>
+            </div>
 
-            <button>
-                <a href="/medicalHistory/edit/<%= patient.id %>" style="text-decoration: none; color: white;">แก้ไขข้อมูลการซักประวัติ</a>
-            </button><br><br>
-
-            <!-- <button class="button2">
-                <a href="/medicalHistory/delete/<%= patient.id %>" style="text-decoration: none; color: white;">ลบข้อมูลการซักประวัติ</a>
-            </button><br><br>  -->
         <% } else { %>
-            <p>ไม่พบข้อมูลผู้ป่วย</p>
+            <div class="notice warning fade-in">
+                <i class="fas fa-exclamation-circle"></i> 
+                ไม่พบข้อมูลผู้ป่วยในระบบ
+            </div>
         <% } %>
 
-        <button class="button3" onclick="goBack()">ย้อนกลับ</button>
+        <!-- Back Button -->
+        <div class="fade-in" style="animation-delay: 0.3s;">
+            <button class="button3" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> 
+                ย้อนกลับ
+            </button>
+        </div>
     </div>
 
+    <!-- Enhanced JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhanced back button functionality
+            function goBack() {
+                // Add loading state
+                const backBtn = document.querySelector('.button3');
+                const originalContent = backBtn.innerHTML;
+                backBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลด...';
+                backBtn.disabled = true;
+                
+                // Go back in history
+                setTimeout(() => {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        // Fallback to index page if no history
+                        window.location.href = '/index';
+                    }
+                }, 500);
+                
+                // Restore button after delay if still on page
+                setTimeout(() => {
+                    backBtn.innerHTML = originalContent;
+                    backBtn.disabled = false;
+                }, 3000);
+            }
+            
+            // Make goBack function globally accessible
+            window.goBack = goBack;
+            
+            // Add smooth scroll behavior
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                // ESC key to go back
+                if (e.key === 'Escape') {
+                    goBack();
+                }
+            });
+        });
+    </script>
 </body>
-
-<script>
-    function goBack() {
-    window.history.back(); // หรือใช้ window.history.go(-1);
-}
-</script>
-
 </html>

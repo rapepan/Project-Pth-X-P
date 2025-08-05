@@ -195,10 +195,9 @@ process.on('SIGTERM', () => {
 });
 
 // Server setup
-const PORT = process.env.PORT || 3306;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ Patient routes enabled at /patients`);
-  console.log(`✅ Medical routes enabled`);
+    console.log(`💡 Developed by JIM`);
 });

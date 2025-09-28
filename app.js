@@ -6,8 +6,6 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const LocalStrategy = require("passport-local").Strategy;
 const methodOverride = require('method-override');
-
-// Import routes - เปิดใช้งานทั้งหมด
 const userRoutes = require("./routes/userRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const medicalRoutes = require("./routes/medicalRoutes");
@@ -199,5 +197,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`💡 Developed by JIM`);   
+    console.log(`💡 Developed by JIM`);
 });

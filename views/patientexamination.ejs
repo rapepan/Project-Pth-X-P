@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตรวจร่างกายผู้ป่วย</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/patientexamination.css">
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-user-md"></i> ระบบตรวจร่างกายผู้ป่วย</h1>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <% if (patient) { %>
+            <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% } else { %>
+            <a href="/examinationroom"><i class="fas fa-diagnoses"></i> ห้องตรวจ</a>
+        <% } %>
+        <a href="#" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+        <a href="#"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+        <a href="#"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+        <a href="#"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+        <a href="#"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
+    </nav>
+
+    <div class="container">
+        <% if (errors && errors.length > 0) { %>
+            <div class="notice" style="background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); color: #c62828;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <ul style="margin: 0; padding-left: 1rem;">
+                    <% errors.forEach(error => { %>
+                        <li><%= error %></li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% } %>
+
+        <% if (message) { %>
+            <div class="notice fade-in">
+                <i class="fas fa-info-circle"></i> 
+                <%= message %>
+            </div>
+        <% } %>
+
+        <% if (patient) { %>
+            <form action="/patientexamination/<%= patient.HN %>" method="POST">
+        <% } else { %>
+            <form action="/patientexamination" method="POST">
+        <% } %>
+            <!-- Patient Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-user"></i>
+                    <h2>ข้อมูลผู้ป่วย</h2>
+                </div>
+                <div class="section-content">
+                    <div class="patient-info">
+                        <div class="info-group">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i>
+                                ชื่อผู้ป่วย
+                            </div>
+                            <input type="text" name="patientName" class="info-input" 
+                                   value="<%= patient ? (patient.fname + ' ' + patient.lname) : '' %>" 
+                                   placeholder="กรอกชื่อผู้ป่วย" 
+                                   <%= patient ? 'readonly' : '' %>>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">
+                                <i class="fas fa-calendar"></i>
+                                อายุ
+                            </div>
+                            <input type="number" name="age" class="info-input" 
+                                   value="<%= patient ? patient.age : '' %>" 
+                                   placeholder="อายุ"
+                                   <%= patient ? 'readonly' : '' %>>
+                        </div>
+                        <div class="info-group">
+                            <div class="info-label">
+                                <i class="fas fa-venus-mars"></i>
+                                เพศ
+                            </div>
+                            <input type="text" name="gender" class="info-input" 
+                                   value="<% if (patient) { %><% if (patient.gender === 'male') { %>ชาย<% } else if (patient.gender === 'female') { %>หญิง<% } else { %><%= patient.gender || 'ไม่ระบุ' %><% } %><% } else { %>ไม่ระบุ<% } %>" 
+                                   readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observation & Palpation -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-eye"></i>
+                    <h2>การสังเกต (Observation) และการคลำ (Palpation)</h2>
+                </div>
+                <div class="section-content">
+                    <div class="input-with-checkbox">
+                        <label>การสังเกต:</label>
+                        <input type="text" name="observation" placeholder="บันทึกการสังเกต">
+                    </div>
+                    <div class="input-with-checkbox">
+                        <label>การคลำ:</label>
+                        <input type="text" name="palpation" placeholder="บันทึกการคลำ">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Range of Motion & Movement Tests -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-running"></i>
+                    <h2>การทดสอบการเคลื่อนไหว</h2>
+                </div>
+                <div class="section-content">
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="rom" id="rom" value="1">
+                            <label for="rom">ROM (Range of Motion)</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="wnl" id="wnl1" value="1">
+                            <label for="wnl1">WNL (Within Normal Limits)</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="limited" id="limited" value="1">
+                            <label for="limited">Limited</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="mmt" id="mmt" value="1">
+                            <label for="mmt">MMT (Manual Muscle Testing)</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="wnl2" id="wnl2" value="1">
+                            <label for="wnl2">WNL</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="weakness" id="weakness" value="1">
+                            <label for="weakness">Weakness</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="accessoryMovement" id="accessory" value="1">
+                            <label for="accessory">Accessory Movement</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" name="normal" id="normal" value="1">
+                            <label for="normal">Normal</label>
+                        </div>
+                    </div>
+                    
+                    <div class="input-with-checkbox">
+                        <input type="checkbox" name="hypoCheck" id="hypo" value="1">
+                        <label for="hypo">Hypomobility</label>
+                        <input type="text" name="hypomobility" placeholder="ระบุตำแหน่ง">
+                    </div>
+                    <div class="input-with-checkbox">
+                        <input type="checkbox" name="hyperCheck" id="hyper" value="1">
+                        <label for="hyper">Hypermobility</label>
+                        <input type="text" name="hypermobility" placeholder="ระบุตำแหน่ง">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Tests -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h2>การทดสอบพิเศษ</h2>
+                </div>
+                <div class="section-content">
+                    <div class="special-tests">
+                        <div class="test-group">
+                            <h3><i class="fas fa-hand-paper"></i> Sensory Test</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="pinprick" id="pinprick" value="1">
+                                <label for="pinprick">Pinprick</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="lightTouch" id="light-touch" value="1">
+                                <label for="light-touch">Light Touch</label>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <input type="text" name="sensoryTest" placeholder="ผลการทดสอบ">
+                            </div>
+                        </div>
+
+                        <div class="test-group">
+                            <h3><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</h3>
+                            <div class="checkbox-grid">
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="normalReflex" id="normal-reflex" value="1">
+                                    <label for="normal-reflex">Normal</label>
+                                </div>
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="abnormalReflex" id="abnormal-reflex" value="1">
+                                    <label for="abnormal-reflex">Abnormal</label>
+                                </div>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <input type="text" name="deepTendonReflex" placeholder="รายละเอียดการทดสอบ">
+                            </div>
+                        </div>
+
+                        <div class="test-group">
+                            <h3><i class="fas fa-walking"></i> Transfer & Ambulation</h3>
+                            <div class="checkbox-grid">
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="independent1" id="independent1" value="1">
+                                    <label for="independent1">Independent</label>
+                                </div>
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="dependent1" id="dependent1" value="1">
+                                    <label for="dependent1">Dependent</label>
+                                </div>
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="independent2" id="independent2" value="1">
+                                    <label for="independent2">Independent</label>
+                                </div>
+                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                    <input type="checkbox" name="dependent2" id="dependent2" value="1">
+                                    <label for="dependent2">Dependent</label>
+                                </div>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <input type="text" name="transferAmbulation" placeholder="รายละเอียดการทดสอบ">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-sticky-note"></i>
+                    <h2>หมายเหตุเพิ่มเติม</h2>
+                </div>
+                <div class="section-content">
+                    <textarea name="notes" class="info-input" rows="4" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button type="button" class="secondary" onclick="clearForm()">
+                    <i class="fas fa-eraser"></i>
+                    ล้างข้อมูล
+                </button>
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    บันทึกข้อมูล
+                </button>
+                <button type="button" onclick="printForm()">
+                    <i class="fas fa-print"></i>
+                    พิมพ์รายงาน
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- External JavaScript File -->
+    <script src="/js/patientexamination.js"></script>
+</body>
+</html>

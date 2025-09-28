@@ -67,6 +67,96 @@ class MedicalController {
     });
   }
 
+  // แสดงฟอร์มตรวจร่างกาย - เพิ่มใหม่
+  static showPatientExamination(req, res) {
+    const HN = req.params.HN;
+
+    if (!HN) {
+      return res.render("patientexamination", {
+        title: "ระบบตรวจร่างกายผู้ป่วย",
+        patient: null,
+        user: req.user,
+        errors: [],
+        message: "กรุณาเลือกผู้ป่วยก่อน"
+      });
+    }
+
+    PatientModel.getPatientByHN(HN, (err, results) => {
+      if (err) {
+        console.error("Error fetching patient:", err);
+        return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+      }
+
+      if (results.length === 0) {
+        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+      }
+
+      res.render("patientexamination", {
+        title: "ระบบตรวจร่างกายผู้ป่วย",
+        patient: results[0],
+        user: req.user,
+        errors: [],
+        message: null
+      });
+    });
+  }
+
+  // บันทึกข้อมูลการตรวจร่างกาย - เพิ่มใหม่
+  static savePatientExamination(req, res) {
+    const HN = req.params.HN;
+    const examinationData = req.body;
+
+    // ตรวจสอบข้อมูลที่จำเป็น
+    const errors = [];
+    if (!examinationData.patientName) errors.push('กรุณากรอกชื่อผู้ป่วย');
+
+    if (errors.length > 0) {
+      PatientModel.getPatientByHN(HN, (err, results) => {
+        if (err || results.length === 0) {
+          return res.status(500).send("เกิดข้อผิดพลาด");
+        }
+
+        return res.render("patientexamination", {
+          title: "ระบบตรวจร่างกายผู้ป่วย",
+          patient: results[0],
+          user: req.user,
+          errors,
+          message: null,
+          formData: examinationData
+        });
+      });
+      return;
+    }
+
+    // เตรียมข้อมูลสำหรับบันทึก
+    examinationData.HN = HN;
+
+    // บันทึกข้อมูล
+    MedicalModel.createExaminationRecord(examinationData, (err, result) => {
+      if (err) {
+        console.error("Error saving examination record:", err);
+        PatientModel.getPatientByHN(HN, (err, results) => {
+          if (err || results.length === 0) {
+            return res.status(500).send("เกิดข้อผิดพลาด");
+          }
+
+          return res.render("patientexamination", {
+            title: "ระบบตรวจร่างกายผู้ป่วย",
+            patient: results[0],
+            user: req.user,
+            errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล'],
+            message: null,
+            formData: examinationData
+          });
+        });
+        return;
+      }
+
+      // บันทึกสำเร็จ
+      res.redirect(`/medicalHistory/${HN}?success=examination`);
+    });
+  }
+
   // บันทึกข้อมูลการซักประวัติ
   static saveMedicalForm(req, res) {
     const HN = req.params.HN;

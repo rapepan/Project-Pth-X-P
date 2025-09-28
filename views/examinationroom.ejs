@@ -17,7 +17,13 @@
     <!-- Navigation -->
     <nav>
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="#" class="active"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+        <a href="#" class="active"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (patient) { %>
+            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+        <% } else { %>
+            <a href="/patientexamination"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+        <% } %>
+        <a href="#"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
         <a href="#"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
         <a href="#"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
         <a href="#"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
@@ -42,12 +48,18 @@
                 </div>
             </div>
             
-            <!-- Action Button -->
+            <!-- Action Buttons -->
             <div class="fade-in" style="animation-delay: 0.2s;">
-                <button onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
-                    <i class="fas fa-file-medical"></i> 
-                    ดูประวัติผู้ป่วย
-                </button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <button onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
+                        <i class="fas fa-file-medical"></i> 
+                        ดูประวัติผู้ป่วย
+                    </button>
+                    <button onclick="window.location.href='/patientexamination/<%= patient.HN %>'" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
+                        <i class="fas fa-user-md"></i> 
+                        ตรวจร่างกาย
+                    </button>
+                </div>
             </div>
             
         <% } else { %>
@@ -68,13 +80,14 @@
                 button.addEventListener('click', function() {
                     if (!this.disabled) {
                         this.style.opacity = '0.7';
+                        const originalHTML = this.innerHTML;
                         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลด...';
                         this.disabled = true;
                         
                         // Restore button after a delay if navigation doesn't happen
                         setTimeout(() => {
                             this.style.opacity = '1';
-                            this.innerHTML = '<i class="fas fa-file-medical"></i> ดูประวัติผู้ป่วย';
+                            this.innerHTML = originalHTML;
                             this.disabled = false;
                         }, 3000);
                     }

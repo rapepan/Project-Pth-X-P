@@ -157,71 +157,75 @@ class MedicalController {
     });
   }
 
-  // บันทึกข้อมูลการซักประวัติ
-  static saveMedicalForm(req, res) {
-    const HN = req.params.HN;
-    const medicalData = req.body;
+// บันทึกข้อมูลการซักประวัติ
+static saveMedicalForm(req, res) {
+  const HN = req.params.HN;
+  const medicalData = req.body;
 
-    // ตรวจสอบข้อมูลที่จำเป็น
-    const errors = [];
-    if (!medicalData.weight) errors.push('กรุณากรอกน้ำหนัก');
-    if (!medicalData.height) errors.push('กรุณากรอกส่วนสูง');
-    if (!medicalData.bloodPressure) errors.push('กรุณากรอกความดันโลหิต');
-    if (!medicalData.pulse) errors.push('กรุณากรอกชีพจร');
-    if (!medicalData.symptoms) errors.push('กรุณากรอกอาการ');
+  // ตรวจสอบข้อมูลที่จำเป็น
+  const errors = [];
+  if (!medicalData.weight) errors.push('กรุณากรอกน้ำหนัก');
+  if (!medicalData.height) errors.push('กรุณากรอกส่วนสูง');
+  if (!medicalData.bloodPressure) errors.push('กรุณากรอกความดันโลหิต');
+  if (!medicalData.pulse) errors.push('กรุณากรอกชีพจร');
+  if (!medicalData.symptoms) errors.push('กรุณากรอกอาการ');
 
-    if (errors.length > 0) {
-      PatientModel.getPatientByHN(HN, (err, results) => {
-        if (err || results.length === 0) {
-          return res.status(500).send("เกิดข้อผิดพลาด");
-        }
+  if (errors.length > 0) {
+    PatientModel.getPatientByHN(HN, (err, results) => {
+      if (err || results.length === 0) {
+        return res.status(500).send("เกิดข้อผิดพลาด");
+      }
 
-        return res.render("medicalFrom", {
-          title: "ซักประวัติ",
-          patient: results[0],
-          user: req.user,
-          errors,
-          message: null,
-          formData: medicalData
-        });
+      return res.render("medicalFrom", {
+        title: "ซักประวัติ",
+        patient: results[0],
+        user: req.user,
+        errors,
+        message: null,
+        formData: medicalData
       });
-      return;
+    });
+    return;
+  }
+
+  // คำนวณ BMI
+  const weight = parseFloat(medicalData.weight);
+  const height = parseFloat(medicalData.height) / 100;
+  const bmi = (weight / (height * height)).toFixed(2);
+
+  // ดึงข้อมูลผู้ป่วย เพื่อเอา fname / lname มาด้วย
+  PatientModel.getPatientByHN(HN, (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(500).send("เกิดข้อผิดพลาด");
     }
 
-    // คำนวณ BMI
-    const weight = parseFloat(medicalData.weight);
-    const height = parseFloat(medicalData.height) / 100; // แปลงเป็นเมตร
-    const bmi = (weight / (height * height)).toFixed(2);
+    const patient = results[0];
 
-    // เตรียมข้อมูลสำหรับบันทึก
+    // ใส่ข้อมูลที่ต้องใช้บันทึก
     medicalData.HN = HN;
     medicalData.bmi = bmi;
+    medicalData.fname = patient.fname;  
+    medicalData.lname = patient.lname;  
 
     // บันทึกข้อมูล
     MedicalModel.createMedicalRecord(medicalData, (err, result) => {
       if (err) {
         console.error("Error saving medical record:", err);
-        PatientModel.getPatientByHN(HN, (err, results) => {
-          if (err || results.length === 0) {
-            return res.status(500).send("เกิดข้อผิดพลาด");
-          }
-
-          return res.render("medicalFrom", {
-            title: "ซักประวัติ",
-            patient: results[0],
-            user: req.user,
-            errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล'],
-            message: null,
-            formData: medicalData
-          });
+        return res.render("medicalFrom", {
+          title: "ซักประวัติ",
+          patient,
+          user: req.user,
+          errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล'],
+          message: null,
+          formData: medicalData
         });
-        return;
       }
 
-      // บันทึกสำเร็จ
+      // สำเร็จ
       res.redirect(`/medicalHistory/${HN}?success=true`);
     });
-  }
+  });
+}
 
   // แสดงประวัติการรักษา
   static showMedicalHistory(req, res) {

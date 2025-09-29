@@ -92,6 +92,38 @@ app.use((req, res, next) => {
   next();
 });
 
+// Function to format login notification
+function formatLoginNotification(user, req) {
+  const timestamp = new Date().toLocaleString('th-TH', { 
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  
+  const clientIP = req.headers['x-forwarded-for'] || 
+                   req.connection.remoteAddress || 
+                   req.socket.remoteAddress ||
+                   req.ip;
+  
+  const userAgent = req.headers['user-agent'];
+  
+  console.log('\n╔════════════════════════════════════════════════════════╗');
+  console.log('║                  🔐 USER LOGIN DETECTED                 ║');
+  console.log('╠════════════════════════════════════════════════════════╣');
+  console.log(`║ 📅 Time     : ${timestamp}`);
+  console.log(`║ 👤 Username : ${user.username}`);
+  console.log(`║ 🆔 User ID  : ${user.id}`);
+  console.log(`║ 🎭 Role     : ${user.role || 'user'}`);
+  console.log('╚════════════════════════════════════════════════════════╝\n');
+  
+  // Additional simple log for quick reference
+  console.log(`✅ [${timestamp}] Login: ${user.username} (${user.role || 'user'})`);
+}
+
 // Root route
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -108,13 +140,43 @@ app.get("/login", (req, res) => {
   });
 });
 
-app.post("/login", 
-  passport.authenticate("local", {
-    successRedirect: "/index",  
-    failureRedirect: "/login?message=รหัสผ่านไม่ถูกต้อง",
-    failureFlash: false
-  })
-);
+// Modified login POST route with notification
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error('❌ Login Error:', err);
+      return next(err);
+    }
+    
+    if (!user) {
+      // Failed login attempt notification
+      const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+      const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+      console.log(`⚠️  [${timestamp}] Failed login attempt: ${req.body.username} from ${clientIP}`);
+      
+      return res.redirect("/login?message=รหัสผ่านไม่ถูกต้อง");
+    }
+    
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('❌ Session Error:', err);
+        return next(err);
+      }
+      
+      // Successful login notification
+      formatLoginNotification(user, req);
+      
+      // Log to file if needed (optional)
+      const fs = require('fs');
+      const logEntry = `[${new Date().toISOString()}] LOGIN - User: ${user.username}, Role: ${user.role || 'user'}, IP: ${req.ip}\n`;
+      fs.appendFile('login.log', logEntry, (err) => {
+        if (err) console.error('Failed to write to log file:', err);
+      });
+      
+      return res.redirect("/index");
+    });
+  })(req, res, next);
+});
 
 app.get("/register", (req, res) => {
   if (req.isAuthenticated()) {
@@ -126,7 +188,24 @@ app.get("/register", (req, res) => {
   });
 });
 
+// Modified logout route with notification
 app.get("/logout", (req, res, next) => {
+  if (req.user) {
+    const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+    const username = req.user.username;
+    const role = req.user.role || 'user';
+    
+    console.log('\n╔════════════════════════════════════════════════════════╗');
+    console.log('║                  🚪 USER LOGOUT                         ║');
+    console.log('╠════════════════════════════════════════════════════════╣');
+    console.log(`║ 📅 Time     : ${timestamp}`);
+    console.log(`║ 👤 Username : ${username}`);
+    console.log(`║ 🎭 Role     : ${role}`);
+    console.log('╚════════════════════════════════════════════════════════╝\n');
+    
+    console.log(`👋 [${timestamp}] Logout: ${username} (${role})`);
+  }
+  
   req.logout((err) => {
     if (err) return next(err);
     res.redirect("/login?message=ออกจากระบบเรียบร้อยแล้ว");
@@ -164,9 +243,41 @@ app.get("/api/patients/search", checkRole("user"), (req, res) => {
   });
 });
 
+// Middleware to track active sessions (optional)
+let activeSessions = new Map();
+
+app.use((req, res, next) => {
+  if (req.user && req.sessionID) {
+    if (!activeSessions.has(req.user.id)) {
+      activeSessions.set(req.user.id, {
+        username: req.user.username,
+        role: req.user.role || 'user',
+        loginTime: new Date(),
+        lastActivity: new Date(),
+        sessionID: req.sessionID
+      });
+    } else {
+      activeSessions.get(req.user.id).lastActivity = new Date();
+    }
+  }
+  next();
+});
+
+// Endpoint to view active sessions (for admin only)
+app.get("/admin/sessions", checkRole("admin"), (req, res) => {
+  const sessions = Array.from(activeSessions.entries()).map(([userId, data]) => ({
+    userId,
+    ...data,
+    duration: Math.floor((new Date() - data.loginTime) / 1000 / 60) + ' minutes'
+  }));
+  
+  console.log('\n📊 Active Sessions:', sessions);
+  res.json(sessions);
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Application Error:', err.stack);
   res.status(500).render('error', {
     title: "เกิดข้อผิดพลาด",
     message: "เกิดข้อผิดพลาดในระบบ",
@@ -176,6 +287,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
+  console.log(`⚠️  404 Not Found: ${req.method} ${req.url}`);
   res.status(404).render('error', {
     title: "ไม่พบหน้าที่ต้องการ",
     message: "ไม่พบหน้าที่คุณต้องการ",
@@ -185,17 +297,31 @@ app.use((req, res) => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  
+  // Log all active sessions before shutdown
+  if (activeSessions.size > 0) {
+    console.log('\n📊 Active sessions at shutdown:');
+    activeSessions.forEach((session, userId) => {
+      console.log(`  - ${session.username} (${session.role})`);
+    });
+  }
+  
   db.end(() => {
-    console.log('Database connection closed');
+    console.log('💾 Database connection closed');
     process.exit(0);
   });
 });
 
 // Server setup
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3306;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`💡 Developed by JIM`);
+  console.log('\n╔════════════════════════════════════════════════════════╗');
+  console.log('║              🏥 PTN-X-P SERVER STARTED                  ║');
+  console.log('╠════════════════════════════════════════════════════════╣');
+  console.log(`║ 🚀 Server Port  : ${PORT}                              `);
+  console.log(`║ 🔍 Environment  : ${process.env.NODE_ENV || 'development'}                      `);
+  console.log(`║ 📅 Started      : ${new Date().toLocaleString('th-TH')} `);
+  console.log('║ 💡 Developed by : JIM                                   ║');
+  console.log('╚════════════════════════════════════════════════════════╝\n');
 });

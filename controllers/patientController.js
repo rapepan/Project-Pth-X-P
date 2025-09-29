@@ -45,7 +45,8 @@ class PatientController {
 
   // เพิ่มผู้ป่วยใหม่
   static addPatient(req, res) {
-    const patientData = req.body;
+    // จัดการข้อมูลก่อนบันทึก
+    const patientData = PatientController.preparePatientData(req.body);
 
     // Validation
     const errors = PatientController.validatePatientData(patientData);
@@ -93,93 +94,24 @@ class PatientController {
         PatientModel.createPatient(patientData, (err, result) => {
           if (err) {
             console.error("Error inserting patient:", err);
+            // ถ้า error เกี่ยวกับ duplicate entry ให้แสดงข้อความที่เข้าใจง่าย
+            if (err.code === 'ER_DUP_ENTRY') {
+              return res.render("patientForm", {
+                title: "เพิ่มผู้ป่วยใหม่",
+                patient: patientData,
+                errors: ['ข้อมูลซ้ำในระบบ กรุณาตรวจสอบอีกครั้ง'],
+                message: null
+              });
+            }
             return res.status(500).render('error', { 
               message: "ไม่สามารถบันทึกข้อมูลผู้ป่วยได้",
               error: err 
             });
           }
 
-          res.redirect("/patients?success=add");
+          // Redirect with success message
+          res.redirect(`/patients?search=${newHN}&searchType=HN&success=add`);
         });
-      });
-    });
-  }
-
-  // แสดงฟอร์มแก้ไขผู้ป่วย
-  static showEditForm(req, res) {
-    const HN = req.params.HN;
-
-    PatientModel.getPatientByHN(HN, (err, results) => {
-      if (err) {
-        console.error("Error fetching patient:", err);
-        return res.status(500).render('error', { 
-          message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
-          error: err 
-        });
-      }
-
-      if (results.length === 0) {
-        return res.status(404).render('error', { 
-          message: "ไม่พบข้อมูลผู้ป่วย",
-          error: null 
-        });
-      }
-
-      res.render("patientForm", {
-        title: "แก้ไขข้อมูลผู้ป่วย",
-        patient: results[0],
-        errors: [],
-        message: null
-      });
-    });
-  }
-
-  // อัพเดทข้อมูลผู้ป่วย
-  static updatePatient(req, res) {
-    const HN = req.params.HN;
-    const patientData = req.body;
-
-    // Validation
-    const errors = PatientController.validatePatientData(patientData);
-    if (errors.length > 0) {
-      return res.render("patientForm", {
-        title: "แก้ไขข้อมูลผู้ป่วย",
-        patient: { ...patientData, HN },
-        errors,
-        message: null
-      });
-    }
-
-    // ตรวจสอบรหัสบัตรประชาชนซ้ำ (ยกเว้นผู้ป่วยคนนี้)
-    PatientModel.checkNationalIdExists(patientData.national_id, HN, (err, exists) => {
-      if (err) {
-        console.error("Error checking national ID:", err);
-        return res.status(500).render('error', { 
-          message: "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล",
-          error: err 
-        });
-      }
-
-      if (exists) {
-        return res.render("patientForm", {
-          title: "แก้ไขข้อมูลผู้ป่วย",
-          patient: { ...patientData, HN },
-          errors: ['รหัสบัตรประชาชนนี้มีอยู่ในระบบแล้ว'],
-          message: null
-        });
-      }
-
-      // อัพเดทข้อมูล
-      PatientModel.updatePatient(HN, patientData, (err, result) => {
-        if (err) {
-          console.error("Error updating patient:", err);
-          return res.status(500).render('error', { 
-            message: "ไม่สามารถอัพเดทข้อมูลผู้ป่วยได้",
-            error: err 
-          });
-        }
-
-        res.redirect(`/patients/${HN}?success=update`);
       });
     });
   }
@@ -212,38 +144,46 @@ class PatientController {
     });
   }
 
-  // ลบผู้ป่วย
-  static deletePatient(req, res) {
-    const HN = req.params.HN;
-
-    PatientModel.deletePatient(HN, (err, result) => {
-      if (err) {
-        console.error("Error deleting patient:", err);
-        return res.status(500).json({ 
-          success: false, 
-          message: "ไม่สามารถลบข้อมูลผู้ป่วยได้" 
-        });
+  // Prepare patient data - จัดการข้อมูลให้พร้อมบันทึก
+  static preparePatientData(data) {
+    const preparedData = { ...data };
+    
+    // ฟิลด์ที่ถ้าไม่มีค่าให้ใส่ '-'
+    const optionalTextFields = ['chronic_diseases', 'allergy_history', 'moo', 'soi'];
+    
+    optionalTextFields.forEach(field => {
+      if (!preparedData[field] || preparedData[field].trim() === '') {
+        preparedData[field] = '-';
       }
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ 
-          success: false, 
-          message: "ไม่พบข้อมูลผู้ป่วย" 
-        });
-      }
-
-      res.json({ 
-        success: true, 
-        message: "ลบข้อมูลผู้ป่วยเรียบร้อยแล้ว" 
-      });
     });
+    
+    // ทำความสะอาดข้อมูลตัวเลข
+    if (preparedData.national_id) {
+      preparedData.national_id = preparedData.national_id.replace(/\D/g, '');
+    }
+    if (preparedData.phone) {
+      preparedData.phone = preparedData.phone.replace(/\D/g, '');
+    }
+    if (preparedData.emergency_phone) {
+      preparedData.emergency_phone = preparedData.emergency_phone.replace(/\D/g, '');
+    }
+    if (preparedData.postcode) {
+      preparedData.postcode = preparedData.postcode.replace(/\D/g, '');
+    }
+    
+    // แปลง age เป็นตัวเลข
+    if (preparedData.age) {
+      preparedData.age = parseInt(preparedData.age, 10);
+    }
+    
+    return preparedData;
   }
 
   // Validation helper
   static validatePatientData(data) {
     const errors = [];
 
-    // Required fields
+    // Required fields - ฟิลด์ที่จำเป็นต้องมี
     const requiredFields = [
       'fname', 'lname', 'national_id', 'gender', 'phone', 
       'age', 'dob', 'housenumber', 'subdistrict', 'district', 
@@ -258,27 +198,49 @@ class PatientController {
     });
 
     // Validate national ID (13 digits)
-    if (data.national_id && !/^\d{13}$/.test(data.national_id)) {
-      errors.push('รหัสบัตรประชาชนต้องเป็นตัวเลข 13 หลัก');
+    if (data.national_id) {
+      const cleanedId = data.national_id.replace(/\D/g, '');
+      if (cleanedId.length !== 13) {
+        errors.push('รหัสบัตรประชาชนต้องเป็นตัวเลข 13 หลัก');
+      }
     }
 
     // Validate phone numbers (10 digits)
-    if (data.phone && !/^\d{10}$/.test(data.phone)) {
-      errors.push('เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก');
+    if (data.phone) {
+      const cleanedPhone = data.phone.replace(/\D/g, '');
+      if (cleanedPhone.length !== 10) {
+        errors.push('เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก');
+      }
     }
 
-    if (data.emergency_phone && !/^\d{10}$/.test(data.emergency_phone)) {
-      errors.push('เบอร์โทรศัพท์ฉุกเฉินต้องเป็นตัวเลข 10 หลัก');
+    if (data.emergency_phone) {
+      const cleanedEmergencyPhone = data.emergency_phone.replace(/\D/g, '');
+      if (cleanedEmergencyPhone.length !== 10) {
+        errors.push('เบอร์โทรศัพท์ฉุกเฉินต้องเป็นตัวเลข 10 หลัก');
+      }
     }
 
     // Validate age
-    if (data.age && (isNaN(data.age) || data.age < 0 || data.age > 150)) {
+    const age = parseInt(data.age, 10);
+    if (isNaN(age) || age < 0 || age > 150) {
       errors.push('อายุต้องเป็นตัวเลขระหว่าง 0-150');
     }
 
     // Validate postcode (5 digits)
-    if (data.postcode && !/^\d{5}$/.test(data.postcode)) {
-      errors.push('รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก');
+    if (data.postcode) {
+      const cleanedPostcode = data.postcode.replace(/\D/g, '');
+      if (cleanedPostcode.length !== 5) {
+        errors.push('รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก');
+      }
+    }
+
+    // Validate date of birth
+    if (data.dob) {
+      const dobDate = new Date(data.dob);
+      const today = new Date();
+      if (dobDate > today) {
+        errors.push('วันเกิดไม่สามารถเป็นวันในอนาคตได้');
+      }
     }
 
     return errors;

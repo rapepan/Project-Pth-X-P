@@ -153,7 +153,7 @@ class MedicalController {
       }
 
       // บันทึกสำเร็จ
-      res.redirect(`/medicalHistory/${HN}?success=examination`);
+      res.redirect(`/examinationroom/${HN}?success=examination`);
     });
   }
 

@@ -91,38 +91,6 @@ class PatientModel {
     });
   }
 
-  // อัพเดทข้อมูลผู้ป่วย
-  static updatePatient(HN, patientData, callback) {
-    const {
-      fname, lname, national_id, gender, phone, age, dob, allergy_history,
-      chronic_diseases, housenumber, moo, soi, subdistrict, district,
-      province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships
-    } = patientData;
-
-    const query = `
-      UPDATE patient SET
-        fname = ?, lname = ?, national_id = ?, gender = ?, phone = ?, age = ?, dob = ?,
-        allergy_history = ?, chronic_diseases = ?, housenumber = ?, moo = ?, soi = ?,
-        subdistrict = ?, district = ?, province = ?, postcode = ?, emergency_fname = ?,
-        emergency_lname = ?, emergency_phone = ?, relationships = ?
-      WHERE HN = ?
-    `;
-
-    const values = [
-      fname, lname, national_id, gender, phone, age, dob, allergy_history,
-      chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
-      postcode, emergency_fname, emergency_lname, emergency_phone, relationships, HN
-    ];
-
-    db.query(query, values, callback);
-  }
-
-  // ลบผู้ป่วย
-  static deletePatient(HN, callback) {
-    const query = "DELETE FROM patient WHERE HN = ?";
-    db.query(query, [HN], callback);
-  }
-
   // สร้าง HN ใหม่
   static generateHN(callback) {
     const now = new Date();

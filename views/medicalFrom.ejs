@@ -34,11 +34,11 @@
             <h3><i class="fas fa-weight"></i> ข้อมูลร่างกาย</h3>
             <div class="form-row">
                 <div class="input-container">
-                    <input type="text" id="weight" name="weight" placeholder="น้ำหนัก" required>
+                    <input type="number" step="0.1" id="weight" name="weight" placeholder="น้ำหนัก" required>
                     <span class="unit">kg</span>
                 </div>
                 <div class="input-container">
-                    <input type="text" id="height" name="height" placeholder="ส่วนสูง" required>
+                    <input type="number" step="0.1" id="height" name="height" placeholder="ส่วนสูง" required>
                     <span class="unit">cm</span>
                 </div>
             </div>
@@ -46,48 +46,48 @@
             <h3><i class="fas fa-heartbeat"></i> สัญญาณชีพ</h3>
             <div class="form-row">
                 <div class="input-container">
-                    <input type="text" id="bloodPressure" name="bloodPressure" placeholder="ความดันโลหิต" required>
+                    <input type="text" id="bloodPressure" name="bloodPressure" placeholder="ความดันโลหิต (120/80)" pattern="\d{2,3}/\d{2,3}" required>
                     <span class="unit">mmHg</span>
                 </div>
                 <div class="input-container">
-                    <input type="text" id="pulse" name="pulse" placeholder="ชีพจร" required>
+                    <input type="number" id="pulse" name="pulse" placeholder="ชีพจร" min="40" max="200" required>
                     <span class="unit">/min</span>
                 </div>
             </div>
           
             <div class="form-row">
                 <div class="input-container">
-                    <input type="text" id="o2Sat" name="o2Sat" placeholder="O2Sat" required>
+                    <input type="number" id="o2Sat" name="o2Sat" placeholder="O2Sat" min="0" max="100" required>
                     <span class="unit">%</span>
                 </div>
                 <div class="input-container">
-                    <input type="text" id="respiratoryRate" name="respiratoryRate" placeholder="อัตราการหายใจ" required>
+                    <input type="number" id="respiratoryRate" name="respiratoryRate" placeholder="อัตราการหายใจ" min="10" max="60" required>
                     <span class="unit">/min</span>
                 </div>
             </div>
           
             <div class="form-row">
                 <div class="input-container">
-                    <input type="number" id="bmi" name="bmi" placeholder="BMI" required>
+                    <input type="number" step="0.01" id="bmi" name="bmi" placeholder="BMI (คำนวณอัตโนมัติ)" readonly>
                 </div>
             </div>
           
             <h3><i class="fas fa-notes-medical"></i> ประวัติการเจ็บป่วย</h3>
-                        <div class="form-row">
+            <div class="form-row">
                 <div class="input-container2">
-                    <textarea id="symptoms" name="symptoms" placeholder="อาการสำคัญ" required></textarea>
+                    <textarea id="symptoms" name="symptoms" placeholder="อาการสำคัญ" rows="4" required></textarea>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-container2">
-                    <textarea id="currentHistory" name="currentHistory" placeholder="ประวัติปัจจุบัน" required></textarea>
+                    <textarea id="currentHistory" name="currentHistory" placeholder="ประวัติปัจจุบัน" rows="4" required></textarea>
                 </div>
             </div>
           
             <div class="form-row">
                 <div class="input-container2">
-                    <textarea id="pastHistory" name="pastHistory" placeholder="ประวัติอดีต" required></textarea>
+                    <textarea id="pastHistory" name="pastHistory" placeholder="ประวัติอดีต" rows="4" required></textarea>
                 </div>
             </div>
           
@@ -101,20 +101,49 @@
     </div>
 
     <script>
-         document.getElementById("historyForm").addEventListener("submit", function(event) {
-            var weight = document.getElementById("weight").value + "kg";
-            var height = document.getElementById("height").value + "cm";
-            var bloodPressure = document.getElementById("bloodPressure").value + "mmHg";
-            var pulse = document.getElementById("pulse").value + "/min";
-            var o2Sat = document.getElementById("o2Sat").value + "%";
-            var respiratoryRate = document.getElementById("respiratoryRate").value + "/min";
+        // คำนวณ BMI อัตโนมัติ
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById("weight").value);
+            const height = parseFloat(document.getElementById("height").value);
+            
+            if (weight > 0 && height > 0) {
+                const heightInMeters = height / 100;
+                const bmi = weight / (heightInMeters * heightInMeters);
+                document.getElementById("bmi").value = bmi.toFixed(2);
+            }
+        }
 
-            document.getElementById("weight").value = weight;
-            document.getElementById("height").value = height;
-            document.getElementById("bloodPressure").value = bloodPressure;
-            document.getElementById("pulse").value = pulse;
-            document.getElementById("o2Sat").value = o2Sat;
-            document.getElementById("respiratoryRate").value = respiratoryRate;
+        // เพิ่ม event listeners
+        document.getElementById("weight").addEventListener("input", calculateBMI);
+        document.getElementById("height").addEventListener("input", calculateBMI);
+
+        // ไม่ต้อง append หน่วยเข้าไปในค่า - ให้ส่งเป็นตัวเลขล้วนๆ
+        document.getElementById("historyForm").addEventListener("submit", function(event) {
+            // ตรวจสอบค่าว่างก่อนส่ง
+            const requiredFields = ['weight', 'height', 'bloodPressure', 'pulse', 'o2Sat', 'respiratoryRate', 'symptoms', 'currentHistory', 'pastHistory'];
+            
+            for (let field of requiredFields) {
+                const element = document.getElementById(field);
+                if (!element.value.trim()) {
+                    event.preventDefault();
+                    alert(`กรุณากรอก${element.placeholder}`);
+                    element.focus();
+                    return false;
+                }
+            }
+            
+            // คำนวณ BMI ก่อนส่ง
+            calculateBMI();
+            
+            console.log("Submitting form with data:", {
+                weight: document.getElementById("weight").value,
+                height: document.getElementById("height").value,
+                bloodPressure: document.getElementById("bloodPressure").value,
+                pulse: document.getElementById("pulse").value,
+                o2Sat: document.getElementById("o2Sat").value,
+                respiratoryRate: document.getElementById("respiratoryRate").value,
+                bmi: document.getElementById("bmi").value
+            });
         });
 
         function goBack() {
@@ -122,4 +151,4 @@
         }
     </script>
 </body>
-</html>  
+</html>

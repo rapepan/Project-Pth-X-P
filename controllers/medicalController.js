@@ -67,7 +67,107 @@ class MedicalController {
     });
   }
 
-  // แสดงฟอร์มตรวจร่างกาย - เพิ่มใหม่
+  // บันทึกข้อมูลการซักประวัติ - ปรับปรุงใหม่
+  static saveMedicalForm(req, res) {
+    const HN = req.params.HN;
+    const medicalData = req.body;
+
+    console.log("Received medical form data:", medicalData);
+
+    // ทำความสะอาดข้อมูลและแปลงเป็นตัวเลข
+    const cleanData = {
+      weight: parseFloat(String(medicalData.weight).replace(/[^\d.]/g, '')),
+      height: parseFloat(String(medicalData.height).replace(/[^\d.]/g, '')),
+      bloodPressure: String(medicalData.bloodPressure).replace(/[^\d\/]/g, ''),
+      pulse: parseInt(String(medicalData.pulse).replace(/[^\d]/g, '')),
+      o2Sat: parseInt(String(medicalData.o2Sat).replace(/[^\d]/g, '')),
+      respiratoryRate: parseInt(String(medicalData.respiratoryRate).replace(/[^\d]/g, '')),
+      bmi: parseFloat(medicalData.bmi) || 0,
+      symptoms: medicalData.symptoms || '',
+      currentHistory: medicalData.currentHistory || '',
+      pastHistory: medicalData.pastHistory || ''
+    };
+
+    // ตรวจสอบข้อมูลที่จำเป็น
+    const errors = [];
+    if (isNaN(cleanData.weight) || cleanData.weight <= 0) errors.push('น้ำหนักไม่ถูกต้อง');
+    if (isNaN(cleanData.height) || cleanData.height <= 0) errors.push('ส่วนสูงไม่ถูกต้อง');
+    if (!cleanData.bloodPressure) errors.push('กรุณากรอกความดันโลหิต');
+    if (isNaN(cleanData.pulse) || cleanData.pulse <= 0) errors.push('ชีพจรไม่ถูกต้อง');
+    if (!cleanData.symptoms.trim()) errors.push('กรุณากรอกอาการ');
+
+    if (errors.length > 0) {
+      console.log("Validation errors:", errors);
+      PatientModel.getPatientByHN(HN, (err, results) => {
+        if (err || results.length === 0) {
+          return res.status(500).send("เกิดข้อผิดพลาด");
+        }
+
+        return res.render("medicalFrom", {
+          title: "ซักประวัติ",
+          patient: results[0],
+          user: req.user,
+          errors,
+          message: null,
+          formData: medicalData
+        });
+      });
+      return;
+    }
+
+    // คำนวณ BMI ใหม่เพื่อความแน่นอน
+    const heightInMeters = cleanData.height / 100;
+    cleanData.bmi = (cleanData.weight / (heightInMeters * heightInMeters)).toFixed(2);
+
+    // ดึงข้อมูลผู้ป่วย
+    PatientModel.getPatientByHN(HN, (err, results) => {
+      if (err || results.length === 0) {
+        console.error("Error fetching patient:", err);
+        return res.status(500).send("ไม่พบข้อมูลผู้ป่วย");
+      }
+
+      const patient = results[0];
+
+      // เตรียมข้อมูลสำหรับบันทึก - เพิ่มหน่วยกลับเข้าไป
+      const saveData = {
+        HN: HN,
+        fname: patient.fname,
+        lname: patient.lname,
+        weight: cleanData.weight + 'kg',
+        height: cleanData.height + 'cm',
+        bloodPressure: cleanData.bloodPressure + 'mmHg',
+        pulse: cleanData.pulse + '/min',
+        o2Sat: cleanData.o2Sat + '%',
+        respiratoryRate: cleanData.respiratoryRate + '/min',
+        bmi: cleanData.bmi,
+        symptoms: cleanData.symptoms,
+        currentHistory: cleanData.currentHistory,
+        pastHistory: cleanData.pastHistory
+      };
+
+      console.log("Saving medical record with data:", saveData);
+
+      // บันทึกข้อมูล
+      MedicalModel.createMedicalRecord(saveData, (err, result) => {
+        if (err) {
+          console.error("Database error saving medical record:", err);
+          return res.render("medicalFrom", {
+            title: "ซักประวัติ",
+            patient,
+            user: req.user,
+            errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message],
+            message: null,
+            formData: medicalData
+          });
+        }
+
+        console.log("Medical record saved successfully:", result.insertId);
+        res.redirect(`/medicalHistory/${HN}?success=true`);
+      });
+    });
+  }
+
+  // แสดงฟอร์มตรวจร่างกาย
   static showPatientExamination(req, res) {
     const HN = req.params.HN;
 
@@ -101,7 +201,7 @@ class MedicalController {
     });
   }
 
-  // บันทึกข้อมูลการตรวจร่างกาย - เพิ่มใหม่
+  // บันทึกข้อมูลการตรวจร่างกาย
   static savePatientExamination(req, res) {
     const HN = req.params.HN;
     const examinationData = req.body;
@@ -128,10 +228,8 @@ class MedicalController {
       return;
     }
 
-    // เตรียมข้อมูลสำหรับบันทึก
     examinationData.HN = HN;
 
-    // บันทึกข้อมูล
     MedicalModel.createExaminationRecord(examinationData, (err, result) => {
       if (err) {
         console.error("Error saving examination record:", err);
@@ -144,7 +242,7 @@ class MedicalController {
             title: "ระบบตรวจร่างกายผู้ป่วย",
             patient: results[0],
             user: req.user,
-            errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล'],
+            errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message],
             message: null,
             formData: examinationData
           });
@@ -152,80 +250,9 @@ class MedicalController {
         return;
       }
 
-      // บันทึกสำเร็จ
       res.redirect(`/examinationroom/${HN}?success=examination`);
     });
   }
-
-// บันทึกข้อมูลการซักประวัติ
-static saveMedicalForm(req, res) {
-  const HN = req.params.HN;
-  const medicalData = req.body;
-
-  // ตรวจสอบข้อมูลที่จำเป็น
-  const errors = [];
-  if (!medicalData.weight) errors.push('กรุณากรอกน้ำหนัก');
-  if (!medicalData.height) errors.push('กรุณากรอกส่วนสูง');
-  if (!medicalData.bloodPressure) errors.push('กรุณากรอกความดันโลหิต');
-  if (!medicalData.pulse) errors.push('กรุณากรอกชีพจร');
-  if (!medicalData.symptoms) errors.push('กรุณากรอกอาการ');
-
-  if (errors.length > 0) {
-    PatientModel.getPatientByHN(HN, (err, results) => {
-      if (err || results.length === 0) {
-        return res.status(500).send("เกิดข้อผิดพลาด");
-      }
-
-      return res.render("medicalFrom", {
-        title: "ซักประวัติ",
-        patient: results[0],
-        user: req.user,
-        errors,
-        message: null,
-        formData: medicalData
-      });
-    });
-    return;
-  }
-
-  // คำนวณ BMI
-  const weight = parseFloat(medicalData.weight);
-  const height = parseFloat(medicalData.height) / 100;
-  const bmi = (weight / (height * height)).toFixed(2);
-
-  // ดึงข้อมูลผู้ป่วย เพื่อเอา fname / lname มาด้วย
-  PatientModel.getPatientByHN(HN, (err, results) => {
-    if (err || results.length === 0) {
-      return res.status(500).send("เกิดข้อผิดพลาด");
-    }
-
-    const patient = results[0];
-
-    // ใส่ข้อมูลที่ต้องใช้บันทึก
-    medicalData.HN = HN;
-    medicalData.bmi = bmi;
-    medicalData.fname = patient.fname;  
-    medicalData.lname = patient.lname;  
-
-    // บันทึกข้อมูล
-    MedicalModel.createMedicalRecord(medicalData, (err, result) => {
-      if (err) {
-        console.error("Error saving medical record:", err);
-        return res.render("medicalFrom", {
-          title: "ซักประวัติ",
-          patient,
-          user: req.user,
-          errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล'],
-          message: null,
-          formData: medicalData
-        });
-      }
-
-      // สำเร็จ
-      res.redirect(`/medicalHistory/${HN}?success=true`);
-    });
-  });
-}
 
   // แสดงประวัติการรักษา
   static showMedicalHistory(req, res) {
@@ -290,7 +317,6 @@ static saveMedicalForm(req, res) {
 
       const patient = patientResults[0];
 
-      // ดึงวันที่ทั้งหมดที่มีประวัติการรักษา
       MedicalModel.getAvailableDates(hn, (err, datesResults) => {
         if (err) {
           console.error("Error fetching dates:", err);
@@ -329,4 +355,4 @@ static saveMedicalForm(req, res) {
   }
 }
 
-module.exports = MedicalController;  
+module.exports = MedicalController;

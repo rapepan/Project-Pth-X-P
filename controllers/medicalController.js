@@ -329,4 +329,4 @@ static saveMedicalForm(req, res) {
   }
 }
 
-module.exports = MedicalController;
+module.exports = MedicalController;  

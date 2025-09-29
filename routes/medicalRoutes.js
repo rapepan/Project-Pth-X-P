@@ -27,4 +27,4 @@ router.post("/patientexamination/:HN", checkRole("user"), MedicalController.save
 router.get("/medicalHistory/:HN", checkRole("user"), MedicalController.showMedicalHistory);
 router.get("/medicaHistorydate", checkRole("user"), MedicalController.showMedicalHistoryByDate);
 
-module.exports = router;
+module.exports = router;  

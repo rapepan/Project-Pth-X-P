@@ -270,4 +270,4 @@ class PatientController {
   }
 }
 
-module.exports = PatientController;
+module.exports = PatientController;  

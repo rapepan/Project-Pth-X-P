@@ -144,4 +144,4 @@ class PatientModel {
   }
 }
 
-module.exports = PatientModel;
+module.exports = PatientModel;  

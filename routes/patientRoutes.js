@@ -17,4 +17,4 @@ router.get("/", checkRole("user"), PatientController.searchPage);
 router.get("/add", checkRole("user"), PatientController.showAddForm);
 router.post("/add", checkRole("user"), PatientController.addPatient);
 router.get("/:HN", checkRole("user"), PatientController.viewPatient);
-module.exports = router;
+module.exports = router;  

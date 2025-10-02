@@ -19,10 +19,6 @@ router.get("/examinationroom/:HN?", checkRole("user"), MedicalController.showExa
 router.get("/medicalFrom/:HN?", checkRole("user"), MedicalController.showMedicalForm);
 router.post("/medicalFrom/:HN", checkRole("user"), MedicalController.saveMedicalForm);
 
-// Patient examination routes - เพิ่มใหม่
-router.get("/patientexamination/:HN?", checkRole("user"), MedicalController.showPatientExamination);
-router.post("/patientexamination/:HN", checkRole("user"), MedicalController.savePatientExamination);
-
 // Medical history routes
 router.get("/medicalHistory/:HN", checkRole("user"), MedicalController.showMedicalHistory);
 router.get("/medicaHistorydate", checkRole("user"), MedicalController.showMedicalHistoryByDate);

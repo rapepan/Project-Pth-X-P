@@ -12,6 +12,7 @@
   const userRoutes = require("./routes/userRoutes");
   const patientRoutes = require("./routes/patientRoutes");
   const medicalRoutes = require("./routes/medicalRoutes");
+  const examinationRoutes = require("./routes/examinationRoutes");
 
   // Import database
   const db = require("./config/db");
@@ -263,6 +264,7 @@
   app.use("/", userRoutes);
   app.use("/patients", patientRoutes);
   app.use("/", medicalRoutes);
+  app.use("/", examinationRoutes);
 
   // API Routes for AJAX calls
   app.get("/api/patients/search", checkRole("user"), (req, res) => {

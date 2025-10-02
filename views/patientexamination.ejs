@@ -29,10 +29,11 @@
     </nav>
 
     <div class="container">
+        <!-- Error Messages -->
         <% if (errors && errors.length > 0) { %>
-            <div class="notice" style="background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); color: #c62828;">
+            <div class="notice error">
                 <i class="fas fa-exclamation-triangle"></i>
-                <ul style="margin: 0; padding-left: 1rem;">
+                <ul>
                     <% errors.forEach(error => { %>
                         <li><%= error %></li>
                     <% }); %>
@@ -40,19 +41,22 @@
             </div>
         <% } %>
 
+        <!-- Success/Info Messages -->
         <% if (message) { %>
             <div class="notice fade-in">
                 <i class="fas fa-info-circle"></i> 
-                <%= message %>
+                <span><%= message %></span>
             </div>
         <% } %>
 
+        <!-- Main Form -->
         <% if (patient) { %>
-            <form action="/patientexamination/<%= patient.HN %>" method="POST">
+            <form action="/patientexamination/<%= patient.HN %>" method="POST" id="examinationForm">
         <% } else { %>
-            <form action="/patientexamination" method="POST">
+            <form action="/patientexamination" method="POST" id="examinationForm">
         <% } %>
-            <!-- Patient Information -->
+
+            <!-- Patient Information Section -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-user"></i>
@@ -93,155 +97,172 @@
                 </div>
             </div>
 
-            <!-- Observation & Palpation -->
+            <!-- Observation & Palpation Section -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-eye"></i>
                     <h2>การสังเกต (Observation) และการคลำ (Palpation)</h2>
                 </div>
                 <div class="section-content">
-                    <div class="input-with-checkbox">
-                        <label>การสังเกต:</label>
-                        <input type="text" name="observation" placeholder="บันทึกการสังเกต">
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-eye"></i>
+                            Observation
+                        </div>
+                        <textarea name="observation" class="info-input" rows="5" placeholder="Observation" required></textarea>
                     </div>
-                    <div class="input-with-checkbox">
-                        <label>การคลำ:</label>
-                        <input type="text" name="palpation" placeholder="บันทึกการคลำ">
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-hand-paper"></i>
+                            Palpation
+                        </div>
+                        <textarea name="palpation" class="info-input" rows="5" placeholder="Palpation" required></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Range of Motion & Movement Tests -->
+            <!-- Range of Motion & Movement Tests Section -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-running"></i>
                     <h2>การทดสอบการเคลื่อนไหว</h2>
                 </div>
                 <div class="section-content">
-                    <div class="checkbox-grid">
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="rom" id="rom" value="1">
-                            <label for="rom">ROM (Range of Motion)</label>
+                    <div class="special-tests">
+                        <!-- ROM Test -->
+                        <div class="test-group">
+                            <h3><i class="fas fa-arrows-alt"></i required> ROM (Range of Motion)</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="romWNL" id="rom-wnl" value="1">
+                                <label for="rom-wnl">WNL (Within Normal Limits)</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="romWeakness" id="rom-weakness" value="1">
+                                <label for="rom-weakness">Weakness</label>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <textarea name="romNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
+                            </div>
                         </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="wnl" id="wnl1" value="1">
-                            <label for="wnl1">WNL (Within Normal Limits)</label>
+
+                        <!-- MMT Test -->
+                        <div class="test-group">
+                            <h3><i class="fas fa-dumbbell"></i> MMT (Manual Muscle Testing)</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="mmtNormal" id="mmt-normal" value="1">
+                                <label for="mmt-normal">Normal</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="mmtLimited" id="mmt-limited" value="1">
+                                <label for="mmt-limited">Limited</label>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <textarea name="mmtNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
+                            </div>
                         </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="limited" id="limited" value="1">
-                            <label for="limited">Limited</label>
+
+                        <!-- Accessory Movement -->
+                        <div class="test-group">
+                            <h3><i class="fas fa-hand-holding-heart"></i> Accessory Movement</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="accessoryNormal" id="accessory-normal" value="1">
+                                <label for="accessory-normal">Normal</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="accessoryHypermobility" id="accessory-hypermobility" value="1">
+                                <label for="accessory-hypermobility">Hypermobility</label>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <textarea name="accessoryNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
+                            </div>
                         </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="mmt" id="mmt" value="1">
-                            <label for="mmt">MMT (Manual Muscle Testing)</label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="wnl2" id="wnl2" value="1">
-                            <label for="wnl2">WNL</label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="weakness" id="weakness" value="1">
-                            <label for="weakness">Weakness</label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="accessoryMovement" id="accessory" value="1">
-                            <label for="accessory">Accessory Movement</label>
-                        </div>
-                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                            <input type="checkbox" name="normal" id="normal" value="1">
-                            <label for="normal">Normal</label>
-                        </div>
-                    </div>
-                    
-                    <div class="input-with-checkbox">
-                        <input type="checkbox" name="hypoCheck" id="hypo" value="1">
-                        <label for="hypo">Hypomobility</label>
-                        <input type="text" name="hypomobility" placeholder="ระบุตำแหน่ง">
-                    </div>
-                    <div class="input-with-checkbox">
-                        <input type="checkbox" name="hyperCheck" id="hyper" value="1">
-                        <label for="hyper">Hypermobility</label>
-                        <input type="text" name="hypermobility" placeholder="ระบุตำแหน่ง">
                     </div>
                 </div>
             </div>
 
-            <!-- Special Tests -->
+            <!-- Special Tests Section -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-clipboard-check"></i>
                     <h2>การทดสอบพิเศษ</h2>
                 </div>
-                <div class="section-content">
+                <div class="section-content"> 
                     <div class="special-tests">
+                        <!-- Sensory Test -->
                         <div class="test-group">
                             <h3><i class="fas fa-hand-paper"></i> Sensory Test</h3>
                             <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="pinprick" id="pinprick" value="1">
-                                <label for="pinprick">Pinprick</label>
+                                <input type="checkbox" name="pinprick" id="sensory-pinprick" value="1">
+                                <label for="sensory-pinprick">Pinprick</label>
                             </div>
                             <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="lightTouch" id="light-touch" value="1">
-                                <label for="light-touch">Light Touch</label>
+                                <input type="checkbox" name="lightTouch" id="sensory-light-touch" value="1">
+                                <label for="sensory-light-touch">Light Touch</label>
                             </div>
                             <div class="input-with-checkbox">
-                                <input type="text" name="sensoryTest" placeholder="ผลการทดสอบ">
+                                <textarea name="sensoryTest" class="info-input2" rows="2" placeholder="ผลการทดสอบ"></textarea>
                             </div>
                         </div>
 
+                        <!-- Deep Tendon Reflex -->
                         <div class="test-group">
                             <h3><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</h3>
-                            <div class="checkbox-grid">
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="normalReflex" id="normal-reflex" value="1">
-                                    <label for="normal-reflex">Normal</label>
-                                </div>
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="abnormalReflex" id="abnormal-reflex" value="1">
-                                    <label for="abnormal-reflex">Abnormal</label>
-                                </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="normalReflex" id="reflex-normal" value="1">
+                                <label for="reflex-normal">Normal</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="abnormalReflex" id="reflex-abnormal" value="1">
+                                <label for="reflex-abnormal">Abnormal</label>
                             </div>
                             <div class="input-with-checkbox">
-                                <input type="text" name="deepTendonReflex" placeholder="รายละเอียดการทดสอบ">
+                                <textarea name="deepTendonReflex" class="info-input2" rows="2" placeholder="รายละเอียดการทดสอบ"></textarea>
                             </div>
                         </div>
 
+                        <!-- Transfer -->
                         <div class="test-group">
-                            <h3><i class="fas fa-walking"></i> Transfer & Ambulation</h3>
-                            <div class="checkbox-grid">
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="independent1" id="independent1" value="1">
-                                    <label for="independent1">Independent</label>
-                                </div>
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="dependent1" id="dependent1" value="1">
-                                    <label for="dependent1">Dependent</label>
-                                </div>
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="independent2" id="independent2" value="1">
-                                    <label for="independent2">Independent</label>
-                                </div>
-                                <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                    <input type="checkbox" name="dependent2" id="dependent2" value="1">
-                                    <label for="dependent2">Dependent</label>
-                                </div>
+                            <h3><i class="fas fa-exchange-alt"></i> Transfer</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="transferIndependent" id="transfer-independent" value="1">
+                                <label for="transfer-independent">Independent</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="transferDependent" id="transfer-dependent" value="1">
+                                <label for="transfer-dependent">Dependent</label>
                             </div>
                             <div class="input-with-checkbox">
-                                <input type="text" name="transferAmbulation" placeholder="รายละเอียดการทดสอบ">
+                                <textarea name="transferNotes" class="info-input2" rows="2" placeholder="รายละเอียด"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Ambulation -->
+                        <div class="test-group">
+                            <h3><i class="fas fa-walking"></i> Ambulation</h3>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="ambulationIndependent" id="ambulation-independent" value="1">
+                                <label for="ambulation-independent">Independent</label>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="ambulationDependent" id="ambulation-dependent" value="1">
+                                <label for="ambulation-dependent">Dependent</label>
+                            </div>
+                            <div class="input-with-checkbox">
+                                <textarea name="ambulationNotes" class="info-input2" rows="2" placeholder="รายละเอียด"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Additional Notes -->
+            <!-- Additional Notes Section -->
             <div class="form-section">
                 <div class="section-header">
                     <i class="fas fa-sticky-note"></i>
                     <h2>หมายเหตุเพิ่มเติม</h2>
                 </div>
                 <div class="section-content">
-                    <textarea name="notes" class="info-input" rows="4" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
+                    <textarea name="notes" class="info-input" rows="8" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
                 </div>
             </div>
 
@@ -251,11 +272,11 @@
                     <i class="fas fa-eraser"></i>
                     ล้างข้อมูล
                 </button>
-                <button type="submit">
+                <button type="submit" class="primary">
                     <i class="fas fa-save"></i>
                     บันทึกข้อมูล
                 </button>
-                <button type="button" onclick="printForm()">
+                <button type="button" class="tertiary" onclick="printForm()">
                     <i class="fas fa-print"></i>
                     พิมพ์รายงาน
                 </button>
@@ -263,7 +284,7 @@
         </form>
     </div>
 
-    <!-- External JavaScript File -->
+    <!-- External JavaScript File (if exists) -->
     <script src="/js/patientexamination.js"></script>
 </body>
 </html>

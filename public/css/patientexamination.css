@@ -226,6 +226,63 @@ nav a .fas {
     cursor: not-allowed;
 }
 
+textarea.info-input {
+    resize: vertical;
+    min-height: 150px;
+    line-height: 1.8;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Larger textarea in input-with-checkbox */
+.input-with-checkbox textarea.info-input {
+    min-height: 100px;
+    width: 100%;
+}
+
+.info-input2 {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.info-input2:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+}
+
+.info-input2:read-only {
+    background: var(--bg-light);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.info-input2:disabled {
+    background: #f5f5f5;
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+textarea.info-input2 {
+    resize: vertical;
+    min-height: 280px;
+    line-height: 1.8;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Larger textarea in input-with-checkbox */
+.input-with-checkbox2 textarea.info-input2 {
+    min-height: 100px;
+    width: 100%;
+}
+
 /* ========== Checkbox Groups ========== */
 .checkbox-grid {
     display: grid;
@@ -333,12 +390,13 @@ nav a .fas {
 
 button {
     flex: 1;
-    padding: 1rem 2rem;
+    min-width: 200px;
+    padding: 1.25rem 2.5rem;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
     font-size: 1.1rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
@@ -346,31 +404,54 @@ button {
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0,137,123,0.3);
+    box-shadow: 0 4px 16px rgba(0,137,123,0.3);
     font-family: inherit;
+    position: relative;
+    overflow: hidden;
 }
 
 button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,137,123,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,137,123,0.4);
 }
 
 button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(0,137,123,0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,137,123,0.3);
 }
 
+/* Button Color Variants */
 button.secondary {
-    background: linear-gradient(135deg, var(--text-secondary) 0%, #555 100%);
-    box-shadow: 0 4px 12px rgba(102,102,102,0.3);
+    background: linear-gradient(135deg, #EF5350 0%, #C62828 100%);
+    box-shadow: 0 4px 16px rgba(239,83,80,0.3);
 }
 
 button.secondary:hover {
-    box-shadow: 0 6px 20px rgba(102,102,102,0.4);
+    box-shadow: 0 8px 24px rgba(239,83,80,0.4);
+}
+
+button.primary {
+    background: linear-gradient(135deg, #66BB6A 0%, #388E3C 100%);
+    box-shadow: 0 4px 16px rgba(102,187,106,0.3);
+}
+
+button.primary:hover {
+    box-shadow: 0 8px 24px rgba(102,187,106,0.4);
+}
+
+button.tertiary {
+    background: linear-gradient(135deg, #9E9E9E 0%, #616161 100%);
+    box-shadow: 0 4px 16px rgba(158,158,158,0.3);
+}
+
+button.tertiary:hover {
+    box-shadow: 0 8px 24px rgba(158,158,158,0.4);
 }
 
 button .fas {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    position: relative;
+    z-index: 1;
 }
 
 /* ========== Notice Messages ========== */

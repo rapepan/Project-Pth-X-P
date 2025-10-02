@@ -65,3 +65,41 @@
                 });
             }
         });
+
+        // Toggle checkbox and add visual feedback
+        function toggleCheckbox(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('checked');
+            } else {
+                element.classList.remove('checked');
+            }
+        }
+
+        // Clear form data
+        function clearForm() {
+            if (confirm('คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?')) {
+                document.getElementById('examinationForm').reset();
+                
+                // Remove checked class from all checkbox items
+                document.querySelectorAll('.checkbox-item').forEach(item => {
+                    item.classList.remove('checked');
+                });
+            }
+        }
+
+        // Print form
+        function printForm() {
+            window.print();
+        }
+
+        // Initialize checked states on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.closest('.checkbox-item').classList.add('checked');
+                }
+            });
+        });

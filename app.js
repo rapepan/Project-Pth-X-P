@@ -13,6 +13,7 @@ const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const medicalRoutes = require("./routes/medicalRoutes");
 const examinationRoutes = require("./routes/examinationRoutes");
+const { checkRole } = require("./middleware/authMiddleware");
 
 // Import database
 const db = require("./config/db");
@@ -63,15 +64,7 @@ require("./config/passportConfig");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middleware for role checking
-function checkRole(role) {
-  return function (req, res, next) {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.redirect("/login");
-  };
-}
+// ใช้ checkRole กลางจาก middleware/authMiddleware เพื่อบังคับสิทธิ์ตามบทบาท
 
 // Global middleware to make user available in all views
 app.use((req, res, next) => {

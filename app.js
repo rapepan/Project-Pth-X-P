@@ -264,7 +264,7 @@ process.on('SIGINT', () => {
 const PORT = process.env.PORT || 3000;
 
 // Bind to all interfaces for cloud, localhost for local
-const HOST = isProduction ? '0.0.0.0' : 'localhost';
+const HOST = isProduction ? '0.0.0.0' : '10.104.21.17';
 
 app.listen(PORT, HOST, () => {
   console.log('\n╔═══════════════════════════════════════════════════════╗');

@@ -41,10 +41,8 @@ pool.getConnection((err, connection) => {
     console.error("   Database:", process.env.DB_NAME);
     console.error("   Error:", err.message);
     
-    // เปลี่ยนพฤติกรรม: อย่าปิดแอปใน production เพื่อให้เว็บยังตอบได้และ /health แสดงสถานะ DB
-    // หากต้องการบังคับให้หยุด ให้ตั้ง DB_STRICT=true
-    if (process.env.DB_STRICT === 'true') {
-      console.error('DB_STRICT=true → exiting process');
+    if (process.env.NODE_ENV === 'production') {
+      // ถ้าเป็น production ให้ exit เมื่อเชื่อมต่อไม่ได้
       process.exit(1);
     }
     return;

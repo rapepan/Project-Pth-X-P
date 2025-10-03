@@ -2,10 +2,19 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const AuthController = require('../controllers/authController');
-const { checkRole, redirectIfAuthenticated } = require('../middleware/authMiddleware');
+
+// Middleware for role checking
+function checkRole(role) {
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect("/login");
+  };
+}
 
 // Auth routes
-router.get("/login", redirectIfAuthenticated, AuthController.showLogin);
+router.get("/login", AuthController.showLogin);
 router.post("/login", 
   passport.authenticate("local", {
     successRedirect: "/index",  
@@ -14,7 +23,7 @@ router.post("/login",
   })
 );
 
-router.get("/register", redirectIfAuthenticated, AuthController.showRegister);
+router.get("/register", AuthController.showRegister);
 router.post("/register", AuthController.register);
 
 router.get("/logout", AuthController.logout);

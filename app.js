@@ -7,13 +7,12 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
+const LocalStrategy = require("passport-local").Strategy;
 const methodOverride = require('method-override');
-const authRoutes = require("./routes/authRoutes");
-// const userRoutes = require("./routes/userRoutes"); // ปิดใช้งานเพื่อหลีกเลี่ยงซ้ำกับ authRoutes
+const userRoutes = require("./routes/userRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const medicalRoutes = require("./routes/medicalRoutes");
 const examinationRoutes = require("./routes/examinationRoutes");
-const { checkRole } = require("./middleware/authMiddleware");
 
 // Import database
 const db = require("./config/db");
@@ -59,12 +58,53 @@ app.use(
   })
 );
 
-// Passport configuration (centralized)
-require("./config/passportConfig");
+// Passport configuration
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ใช้ checkRole กลางจาก middleware/authMiddleware เพื่อบังคับสิทธิ์ตามบทบาท
+// Passport LocalStrategy
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    const query = "SELECT * FROM users WHERE username = ?";
+    db.query(query, [username], (err, results) => {
+      if (err) return done(err);
+      if (results.length === 0) return done(null, false, { message: "ไม่พบผู้ใช้" });
+
+      const user = results[0];
+      bcrypt.compare(password, user.password, (err, isMatch) => {
+        if (err) return done(err);
+        if (isMatch) {
+          return done(null, user);
+        } else {
+          return done(null, false, { message: "รหัสผ่านไม่ถูกต้อง" });
+        }
+      });
+    });
+  })
+);
+
+// Passport serialize/deserialize
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  const query = "SELECT * FROM users WHERE id = ?";
+  db.query(query, [id], (err, results) => {
+    if (err) return done(err);
+    done(null, results[0]);
+  });
+});
+
+// Middleware for role checking
+function checkRole(role) {
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect("/login");
+  };
+}
 
 // Global middleware to make user available in all views
 app.use((req, res, next) => {
@@ -134,8 +174,98 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+// Auth routes
+app.get("/login", (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.redirect("/index");
+  }
+  res.render("login", { 
+    title: "เข้าสู่ระบบ",
+    message: req.query.message || null 
+  });
+});
+
+// Login POST route
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      console.error('❌ Login Error:', err);
+      return next(err);
+    }
+    
+    if (!user) {
+      const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+      const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+      console.log(`⚠️  [${timestamp}] Failed login attempt: ${req.body.username} from ${clientIP}`);
+      
+      return res.redirect("/login?message=รหัสผ่านไม่ถูกต้อง");
+    }
+    
+    req.logIn(user, (err) => {
+      if (err) {
+        console.error('❌ Session Error:', err);
+        return next(err);
+      }
+      
+      formatLoginNotification(user, req);
+      
+      // Log to file if in production
+      if (isProduction) {
+        const fs = require('fs');
+        const logEntry = `[${new Date().toISOString()}] LOGIN - User: ${user.username}, Role: ${user.role || 'user'}, IP: ${req.ip}\n`;
+        fs.appendFile('login.log', logEntry, (err) => {
+          if (err) console.error('Failed to write to log file:', err);
+        });
+      }
+      
+      return res.redirect("/index");
+    });
+  })(req, res, next);
+});
+
+app.get("/register", (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.redirect("/index");
+  }
+  res.render("register", { 
+    title: "สมัครสมาชิก",
+    message: null 
+  });
+});
+
+// Logout route
+app.get("/logout", (req, res, next) => {
+  if (req.user) {
+    const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+    const username = req.user.username;
+    const role = req.user.role || 'user';
+    
+    console.log('\n╔═══════════════════════════════════════════════════════╗');
+    console.log('║                  🚪 USER LOGOUT                         ║');
+    console.log('╠═══════════════════════════════════════════════════════╣');
+    console.log(`║ 📅 Time     : ${timestamp}`);
+    console.log(`║ 👤 Username : ${username}`);
+    console.log(`║ 🎭 Role     : ${role}`);
+    console.log('╚═══════════════════════════════════════════════════════╝\n');
+    
+    console.log(`👋 [${timestamp}] Logout: ${username} (${role})`);
+  }
+  
+  req.logout((err) => {
+    if (err) return next(err);
+    res.redirect("/login?message=ออกจากระบบเรียบร้อยแล้ว");
+  });
+});
+
+app.get("/index", checkRole('user'), (req, res) => {
+  res.render("index", { 
+    title: "PTN-X-P",
+    user: req.user 
+  });
+});
+
 // Routes
-app.use("/", authRoutes);
+app.use("/", userRoutes);
 app.use("/patients", patientRoutes);
 app.use("/", medicalRoutes);
 app.use("/", examinationRoutes);
@@ -263,7 +393,6 @@ process.on('SIGINT', () => {
 // Server setup
 const PORT = process.env.PORT || 3000;
 
-// Bind to all interfaces for cloud, localhost for local
 const HOST = isProduction ? '0.0.0.0' : '10.104.21.17';
 
 app.listen(PORT, HOST, () => {

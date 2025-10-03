@@ -1,7 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const MedicalController = require('../controllers/medicalController');
-const { checkRole } = require('../middleware/authMiddleware');
+
+// Middleware for role checking
+function checkRole(role) {
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect("/login");
+  };
+}
 
 // Examination room routes
 router.get("/examinationroom/:HN?", checkRole("user"), MedicalController.showExaminationRoom);

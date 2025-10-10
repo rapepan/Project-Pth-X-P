@@ -208,7 +208,7 @@ process.on('SIGINT', () => {
 
 // Server setup
 const PORT = process.env.PORT || 3000;
-const HOST = isProduction ? '0.0.0.0' : 'localhost';
+const HOST = '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
   console.log('\n╔═══════════════════════════════════════════════════════╗');

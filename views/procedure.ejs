@@ -61,9 +61,6 @@
                     <h2 class="section-title">
                         <i class="fas fa-medkit"></i> การรักษาของผู้ป่วย HN: <%= HN %>
                     </h2>
-                    <button class="btn-procedure secondary" onclick="showCreateProcedureForm()">
-                        <i class="fas fa-plus"></i> เพิ่มการรักษาใหม่
-                    </button>
                 </div>
 
                 <% if (procedures && procedures.length > 0) { %>
@@ -164,20 +161,6 @@
                             <input type="text" name="procedureName" class="form-control" required placeholder="กรอกชื่อการรักษา">
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">ประเภทการรักษา *</label>
-                            <select name="procedureType" class="form-control" required>
-                                <option value="">เลือกประเภทการรักษา</option>
-                                <option value="manual">การบำบัดด้วยมือ</option>
-                                <option value="electrotherapy">การรักษาด้วยไฟฟ้า</option>
-                                <option value="exercise">การออกกำลังกาย</option>
-                                <option value="thermal">การรักษาด้วยความร้อน/เย็น</option>
-                                <option value="traction">การดึง</option>
-                                <option value="massage">การนวด</option>
-                                <option value="other">อื่นๆ</option>
-                            </select>
-                        </div>
-                        
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">ผู้ทำการรักษา</label>
@@ -191,23 +174,17 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">ความถี่</label>
-                            <input type="text" name="frequency" class="form-control" placeholder="เช่น ทุกวัน, 3 ครั้ง/สัปดาห์">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">เทคนิคที่ใช้</label>
-                            <textarea name="techniques" class="form-control" rows="3" placeholder="อธิบายเทคนิคที่ใช้ในการรักษา"></textarea>
+                            <label class="form-label">รายละเอียดเพิ่มเติม</label>
+                            <textarea name="techniques" class="form-control" rows="3" placeholder="รายละเอียดเพิ่มเติม"></textarea>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">ผลการรักษา</label>
                             <select name="effectiveness" class="form-control">
                                 <option value="">เลือกผลการรักษา</option>
-                                <option value="excellent">ดีมาก</option>
-                                <option value="good">ดี</option>
-                                <option value="fair">ปานกลาง</option>
-                                <option value="poor">ไม่ดี</option>
+                                <option value="good">ดีขึ้น</option>
+                                <option value="fair">แย่ลง</option>
+                                <option value="poor">คงเดิม</option>
                                 <option value="unknown">ยังประเมินไม่ได้</option>
                             </select>
                         </div>

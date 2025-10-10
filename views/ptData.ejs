@@ -32,7 +32,7 @@
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (patient) { %>
-            <a href="/ptdata/<%= patient.HN %>" class="active"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+            <a href="/ptdata/<%= patient.HN %>" class="active"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
         <% } else { %>
         <% } %>
     </nav>
@@ -61,16 +61,7 @@
                     <h2 class="section-title">
                         <i class="fas fa-database"></i> ข้อมูลกายภาพบำบัดของผู้ป่วย HN: <%= HN %>
                     </h2>
-                    <div class="header-actions">
-                        <button class="btn-ptdata primary" onclick="showProgressChart()">
-                            <i class="fas fa-chart-bar"></i> กราฟความก้าวหน้า
-                        </button>
-                        <button class="btn-ptdata secondary" onclick="showCreatePTDataForm()">
-                            <i class="fas fa-plus"></i> เพิ่มข้อมูลใหม่
-                        </button>
-                    </div>
                 </div>
-
 
                 <% if (ptData && ptData.length > 0) { %>
                     <div class="ptdata-grid">
@@ -207,9 +198,11 @@
                         <div class="form-group">
                             <label class="form-label">สถานะ</label>
                             <select name="status" class="form-control">
-                                <option value="active">ใช้งาน</option>
-                                <option value="completed">เสร็จสิ้น</option>
-                                <option value="pending">รอดำเนินการ</option>
+                                <option value="">เลือกผลการรักษา</option>
+                                <option value="good">ดีขึ้น</option>
+                                <option value="fair">แย่ลง</option>
+                                <option value="poor">คงเดิม</option>
+                                <option value="unknown">ยังประเมินไม่ได้</option>
                             </select>
                         </div>
                         

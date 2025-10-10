@@ -52,6 +52,19 @@ class DiagnosisController {
       return res.status(400).send("ข้อมูลไม่ครบถ้วน");
     }
 
+    // Process multiple ICD-10 codes
+    const icd10Codes = [];
+    if (diagnosisData.icd10Codes && Array.isArray(diagnosisData.icd10Codes)) {
+      diagnosisData.icd10Codes.forEach(codeData => {
+        if (codeData.code && codeData.description) {
+          icd10Codes.push({
+            code: codeData.code,
+            description: codeData.description
+          });
+        }
+      });
+    }
+
     const saveData = {
       HN,
       patientName: diagnosisData.patientName,
@@ -59,8 +72,7 @@ class DiagnosisController {
       chiefComplaint: diagnosisData.chiefComplaint || '',
       presentIllness: diagnosisData.presentIllness || '',
       pastHistory: diagnosisData.pastHistory || '',
-      icd10Code: diagnosisData.icd10Code || '',
-      icd10Description: diagnosisData.icd10Description || '',
+      icd10Codes: icd10Codes, // Array of ICD-10 codes
       diagnosisType: diagnosisData.diagnosisType || 'primary',
       severity: diagnosisData.severity || 'moderate',
       prognosis: diagnosisData.prognosis || '',

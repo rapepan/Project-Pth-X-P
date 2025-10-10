@@ -4,14 +4,17 @@ class DiagnosisModel {
 
   // บันทึกการวินิจฉัย
   static createDiagnosis(data, callback) {
+    // Convert ICD-10 codes array to JSON string
+    const icd10CodesJson = JSON.stringify(data.icd10Codes || []);
+    
     const insertQuery = `
       INSERT INTO diagnosis (
         HN, patient_name, diagnosis_date,
         chief_complaint, present_illness, past_history,
-        icd10_code, icd10_description, diagnosis_type,
+        icd10_codes, diagnosis_type,
         severity, prognosis, treatment_plan,
         special_considerations, created_by, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -21,8 +24,7 @@ class DiagnosisModel {
       data.chiefComplaint || '',
       data.presentIllness || '',
       data.pastHistory || '',
-      data.icd10Code || '',
-      data.icd10Description || '',
+      icd10CodesJson,
       data.diagnosisType || 'primary',
       data.severity || 'moderate',
       data.prognosis || '',
@@ -37,14 +39,16 @@ class DiagnosisModel {
 
   // อัปเดตการวินิจฉัย
   static updateDiagnosis(id, data, callback) {
+    // Convert ICD-10 codes array to JSON string
+    const icd10CodesJson = JSON.stringify(data.icd10Codes || []);
+    
     const updateQuery = `
       UPDATE diagnosis
       SET 
         chief_complaint = ?,
         present_illness = ?,
         past_history = ?,
-        icd10_code = ?,
-        icd10_description = ?,
+        icd10_codes = ?,
         diagnosis_type = ?,
         severity = ?,
         prognosis = ?,
@@ -59,8 +63,7 @@ class DiagnosisModel {
       data.chiefComplaint || '',
       data.presentIllness || '',
       data.pastHistory || '',
-      data.icd10Code || '',
-      data.icd10Description || '',
+      icd10CodesJson,
       data.diagnosisType || 'primary',
       data.severity || 'moderate',
       data.prognosis || '',
@@ -81,7 +84,19 @@ class DiagnosisModel {
       LEFT JOIN users u ON d.created_by = u.id
       WHERE d.id = ?
     `;
-    db.query(query, [id], callback);
+    db.query(query, [id], (err, results) => {
+      if (err) return callback(err);
+      if (results.length > 0) {
+        const diagnosis = results[0];
+        // Parse ICD-10 codes JSON
+        try {
+          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
+        } catch (e) {
+          diagnosis.icd10_codes = [];
+        }
+      }
+      callback(null, results);
+    });
   }
 
   // ดึงประวัติการวินิจฉัยทั้งหมด
@@ -93,7 +108,18 @@ class DiagnosisModel {
       WHERE d.HN = ?
       ORDER BY d.diagnosis_date DESC, d.created_at DESC
     `;
-    db.query(query, [HN], callback);
+    db.query(query, [HN], (err, results) => {
+      if (err) return callback(err);
+      // Parse ICD-10 codes JSON for each diagnosis
+      results.forEach(diagnosis => {
+        try {
+          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
+        } catch (e) {
+          diagnosis.icd10_codes = [];
+        }
+      });
+      callback(null, results);
+    });
   }
 
   // ดึงการวินิจฉัยล่าสุด
@@ -106,7 +132,19 @@ class DiagnosisModel {
       ORDER BY d.diagnosis_date DESC, d.created_at DESC
       LIMIT 1
     `;
-    db.query(query, [HN], callback);
+    db.query(query, [HN], (err, results) => {
+      if (err) return callback(err);
+      if (results.length > 0) {
+        const diagnosis = results[0];
+        // Parse ICD-10 codes JSON
+        try {
+          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
+        } catch (e) {
+          diagnosis.icd10_codes = [];
+        }
+      }
+      callback(null, results);
+    });
   }
 
   // ค้นหา ICD-10

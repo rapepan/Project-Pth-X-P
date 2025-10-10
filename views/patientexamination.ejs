@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบตรวจร่างกายผู้ป่วย</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/examinationroom.css">
     <link rel="stylesheet" href="/css/patientexamination.css">
+
 </head>
 <body>
-        <!-- Page Header -->
+    <!-- Sticky Header - ใช้ธีมเดียวกับ index.css -->
     <header class="sticky-header">
         <div class="header-content">
             <div class="logo-section">
@@ -25,27 +27,23 @@
     </header>
 
     <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-content">
+    <nav>
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <% if (typeof patient !== 'undefined' && patient) { %>
             <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+            <a href="/patientexamination/<%= patient.HN %>" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
         <% } else { %>
             <a href="/examinationroom"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% } %>
-        <% if (typeof patient !== 'undefined' && patient) { %>
-            <a href="/patientexamination/<%= patient.HN %>" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-            <a href="/examinationHistory/<%= patient.HN %>"><i class="fas fa-history"></i> ประวัติการตรวจ</a>
-        <% } %>
-        </div>
     </nav>
 
-    <div class="container">
-        <!-- Error Messages -->
-        <% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
-            <div class="notice error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <ul>
+    <div class="main-container">
+
+
+        <% if (errors && errors.length > 0) { %>
+            <div class="error-message fade-in">
+                <strong><i class="fas fa-exclamation-triangle"></i> พบข้อผิดพลาด:</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem;">
                     <% errors.forEach(error => { %>
                         <li><%= error %></li>
                     <% }); %>
@@ -53,238 +51,241 @@
             </div>
         <% } %>
 
-        <!-- Success/Info Messages -->
-        <% if (typeof message !== 'undefined' && message) { %>
-            <div class="notice fade-in">
-                <i class="fas fa-info-circle"></i> 
-                <span><%= message %></span>
-            </div>
-        <% } %>
+        <% if (patient) { %>
 
-        <!-- Main Form -->
-        <% if (typeof patient !== 'undefined' && patient) { %>
-            <form action="/patientexamination/<%= patient.HN %>" method="POST" id="examinationForm">
+            <!-- Patient Examination Form -->
+            <form action="/patientexamination/<%= patient.HN %>" method="POST">
+                <!-- Basic Information -->
+                <div class="form-section fade-in" style="animation-delay: 0.1s;">
+                    <h3><i class="fas fa-info-circle"></i> ข้อมูลผู้ป่วย</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i> HN <span class="required"></span>
+                            </label>
+                            <input type="text" name="HN" value="<%= patient.HN %>" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i> ชื่อผู้ป่วย <span class="required"></span>
+                            </label>
+                            <input type="text" name="patient_name" value="<%= patient.fname %> <%= patient.lname %>" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> อายุ</label>
+                            <input type="number" name="age" value="<%= patient.age %>" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observation & Palpation -->
+                <div class="form-section fade-in" style="animation-delay: 0.3s;">
+                    <h3><i class="fas fa-eye"></i> การสังเกต (Observation) และการคลำ (Palpation)</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-eye"></i> Observation</label>
+                        <textarea name="observation" rows="5" placeholder="Observation" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-paper"></i> Palpation</label>
+                        <textarea name="palpation" rows="5" placeholder="Palpation" required></textarea>
+                    </div>
+                </div>
+
+                 <!-- Range of Motion & Movement Tests -->
+                <div class="form-section fade-in" style="animation-delay: 0.5s;">
+                    <h3><i class="fas fa-running"></i> การทดสอบการเคลื่อนไหว</h3>
+                    
+                    <!-- ROM Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-arrows-alt"></i> ROM (Range of Motion)</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="romWNL" id="rom-wnl" value="1">
+                            <label for="rom-wnl">WNL (Within Normal Limits)</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="checkbox" name="romWeakness" id="rom-weakness" value="1">
+                            <label for="rom-weakness">Limited</label>
+                            <input type="text" name="romNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+
+                    <!-- MMT Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-dumbbell"></i> MMT (Manual Muscle Testing)</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="mmtNormal" id="mmt-normal" value="1">
+                            <label for="mmt-normal">Normal</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="checkbox" name="mmtLimited" id="mmt-limited" value="1">
+                            <label for="mmt-limited">Weakness</label>
+                            <input type="text" name="mmtNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+
+                    <!-- Accessory Movement -->
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-holding-heart"></i> Accessory Movement</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="accessoryNormal" id="accessory-normal" value="1">
+                            <label for="accessory-normal">Normal</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="checkbox" name="accessoryHypomobility" id="accessory-hypomobility" value="1">
+                            <label for="accessory-hypomobility">Hypomobility</label>
+                            <input type="text" name="accessoryNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                        <div class="radio-option">
+                            <input type="checkbox" name="accessoryHypermobility" id="accessory-hypermobility" value="1">
+                            <label for="accessory-hypermobility">Hypermobility</label>
+                            <input type="text" name="accessoryNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Tests -->
+                <div class="form-section fade-in" style="animation-delay: 0.7s;">
+                    <h3><i class="fas fa-clipboard-check"></i> การทดสอบพิเศษ</h3>
+                    
+                    <!-- Sensory Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-paper"></i> Sensory Test</label>
+
+                        <!-- Pinprick -->
+                        <div class="radio-option">
+                            <input type="checkbox" name="sensoryPinprick" id="sensory-pinprick" value="1">
+                            <label for="sensory-pinprick"><strong>Pinprick</strong></label>
+                        </div>
+                        <div style="margin-left: 30px;">
+                            <div class="radio-option">
+                                <input type="checkbox" name="pinprickIntact" id="pinprick-intact" value="1">
+                                <label for="pinprick-intact">Intact</label>
+                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                            <div class="radio-option">
+                                <input type="checkbox" name="pinprickImpair" id="pinprick-impair" value="1">
+                                <label for="pinprick-impair">Impair</label>
+                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                            <div class="radio-option">
+                                <input type="checkbox" name="pinprickLoss" id="pinprick-loss" value="1">
+                                <label for="pinprick-loss">Loss</label>
+                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                        </div>
+
+                        <!-- Light Touch -->
+                        <div class="radio-option" style="margin-top: 10px;">
+                            <input type="checkbox" name="sensoryLightTouch" id="sensory-light-touch" value="1">
+                            <label for="sensory-light-touch"><strong>Light Touch</strong></label>
+                        </div>
+                        <div style="margin-left: 30px;">
+                            <div class="radio-option">
+                                <input type="checkbox" name="lightTouchIntact" id="light-touch-intact" value="1">
+                                <label for="light-touch-intact">Intact</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="checkbox" name="lightTouchImpair" id="light-touch-impair" value="1">
+                                <label for="light-touch-impair">Impair</label>
+                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                            <div class="radio-option">
+                                <input type="checkbox" name="lightTouchLoss" id="light-touch-loss" value="1">
+                                <label for="light-touch-loss">Loss</label>
+                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                    </div>
+
+                    <!-- Deep Tendon Reflex -->
+                    <div class="form-group">
+                        <label><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="normalDTR" id="dtr-normal" value="1">
+                            <label for="dtr-normal">Normal of</label>
+                            <input type="text" name="deepTendonReflexNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                        <div class="radio-option">
+                            <input type="checkbox" name="abnormalDTR" id="dtr-abnormal" value="1">
+                            <label for="dtr-abnormal">Abnormal of</label>
+                            <input type="text" name="deepTendonReflexNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+
+                    <!-- Transfer -->
+                    <div class="form-group">
+                        <label><i class="fas fa-exchange-alt"></i> Transfer</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="transferIndependent" id="transfer-independent" value="1">
+                            <label for="transfer-independent"><strong>Independent</strong></label>
+                        </div>
+                        <div class="radio-option" style="margin-top: 10px;">
+                            <input type="checkbox" name="transferDependent" id="transfer-dependent" value="1">
+                            <label for="transfer-dependent"><strong>Dependent</strong></label>
+                            <input type="text" name="transferNotes2" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+
+                    <!-- Ambulation -->
+                    <div class="form-group">
+                        <label><i class="fas fa-walking"></i> Ambulation</label>
+                        <div class="radio-option">
+                            <input type="checkbox" name="ambulationIndependent" id="ambulation-independent" value="1">
+                            <label for="ambulation-independent"><strong>Independent</strong></label>
+                        </div>
+                        <div style="margin-left: 30px;">
+                            <div class="radio-option">
+                                <input type="checkbox" name="ambulationHandFree" id="ambulation-hand-free" value="1">
+                                <label for="ambulation-hand-free">Hand-Free</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="checkbox" name="ambulationWith" id="ambulation-with" value="1">
+                                <label for="ambulation-with">With</label>
+                                <input type="text" name="ambulationNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            </div>
+                        </div>
+                        <div class="radio-option" style="margin-top: 10px;">
+                            <input type="checkbox" name="ambulationDependent" id="ambulation-dependent" value="1">
+                            <label for="ambulation-dependent"><strong>Dependent</strong></label>
+                            <input type="text" name="ambulationNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div class="form-section fade-in" style="animation-delay: 0.8s;">
+                    <h3><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-dots"></i> หมายเหตุ</label>
+                        <textarea name="notes" rows="8" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="btn-group fade-in" style="animation-delay: 0.9s;">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> บันทึกข้อมูล
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="window.history.back()">
+                        <i class="fas fa-times"></i> ยกเลิก
+                    </button>
+                </div>
+            </form>
+
         <% } else { %>
-            <form action="/patientexamination" method="POST" id="examinationForm">
+            <div class="no-patient-section fade-in">
+                <div class="no-patient-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>ยังไม่ได้เลือกผู้ป่วย</h2>
+                <p>กรุณาเลือกผู้ป่วยเพื่อเริ่มการตรวจร่างกาย</p>
+                <div class="no-patient-actions">
+                    <button class="action-btn primary" onclick="window.location.href='/patients'">
+                        <i class="fas fa-search"></i>
+                        <span>ค้นหาผู้ป่วย</span>
+                    </button>
+                </div>
+            </div>
         <% } %>
-
-            <!-- Patient Information Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="fas fa-user"></i>
-                    <h2>ข้อมูลผู้ป่วย</h2>
-                </div>
-                <div class="section-content">
-                    <div class="patient-info">
-                        <div class="info-group">
-                            <div class="info-label">
-                                <i class="fas fa-user"></i>
-                                ชื่อผู้ป่วย
-                            </div>
-                            <input type="text" name="patient_name" class="info-input" 
-                                   value="<%= (typeof patient !== 'undefined' && patient) ? (patient.fname + ' ' + patient.lname) : '' %>" 
-                                   placeholder="กรอกชื่อผู้ป่วย" 
-                                   <%= (typeof patient !== 'undefined' && patient) ? 'readonly' : '' %>>
-                        </div>
-                        <div class="info-group">
-                            <div class="info-label">
-                                <i class="fas fa-calendar"></i>
-                                อายุ
-                            </div>
-                            <input type="number" name="age" class="info-input" 
-                                   value="<%= (typeof patient !== 'undefined' && patient) ? patient.age : '' %>" 
-                                   placeholder="อายุ"
-                                   <%= (typeof patient !== 'undefined' && patient) ? 'readonly' : '' %>>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Observation & Palpation Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="fas fa-eye"></i>
-                    <h2>การสังเกต (Observation) และการคลำ (Palpation)</h2>
-                </div>
-                <div class="section-content">
-                    <div class="info-group">
-                        <div class="info-label">
-                            <i class="fas fa-eye"></i>
-                            Observation
-                        </div>
-                        <textarea name="observation" class="info-input" rows="5" placeholder="Observation" required></textarea>
-                    </div>
-                    <div class="info-group">
-                        <div class="info-label">
-                            <i class="fas fa-hand-paper"></i>
-                            Palpation
-                        </div>
-                        <textarea name="palpation" class="info-input" rows="5" placeholder="Palpation" required></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Range of Motion & Movement Tests Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="fas fa-running"></i>
-                    <h2>การทดสอบการเคลื่อนไหว</h2>
-                </div>
-                <div class="section-content">
-                    <div class="special-tests">
-                        <!-- ROM Test -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-arrows-alt"></i required> ROM (Range of Motion)</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="romWNL" id="rom-wnl" value="1">
-                                <label for="rom-wnl">WNL (Within Normal Limits)</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="romWeakness" id="rom-weakness" value="1">
-                                <label for="rom-weakness">Weakness</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="romNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- MMT Test -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-dumbbell"></i> MMT (Manual Muscle Testing)</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="mmtNormal" id="mmt-normal" value="1">
-                                <label for="mmt-normal">Normal</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="mmtLimited" id="mmt-limited" value="1">
-                                <label for="mmt-limited">Limited</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="mmtNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Accessory Movement -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-hand-holding-heart"></i> Accessory Movement</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="accessoryNormal" id="accessory-normal" value="1">
-                                <label for="accessory-normal">Normal</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="accessoryHypermobility" id="accessory-hypermobility" value="1">
-                                <label for="accessory-hypermobility">Hypermobility</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="accessoryNotes" class="info-input2" rows="2" placeholder="บันทึกการสังเกต"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Special Tests Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="fas fa-clipboard-check"></i>
-                    <h2>การทดสอบพิเศษ</h2>
-                </div>
-                <div class="section-content"> 
-                    <div class="special-tests">
-                        <!-- Sensory Test -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-hand-paper"></i> Sensory Test</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="pinprick" id="sensory-pinprick" value="1">
-                                <label for="sensory-pinprick">Pinprick</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="lightTouch" id="sensory-light-touch" value="1">
-                                <label for="sensory-light-touch">Light Touch</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="sensoryTest" class="info-input2" rows="2" placeholder="ผลการทดสอบ"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Deep Tendon Reflex -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="normalReflex" id="reflex-normal" value="1">
-                                <label for="reflex-normal">Normal</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="abnormalReflex" id="reflex-abnormal" value="1">
-                                <label for="reflex-abnormal">Abnormal</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="deepTendonReflex" class="info-input2" rows="2" placeholder="รายละเอียดการทดสอบ"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Transfer -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-exchange-alt"></i> Transfer</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="transferIndependent" id="transfer-independent" value="1">
-                                <label for="transfer-independent">Independent</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="transferDependent" id="transfer-dependent" value="1">
-                                <label for="transfer-dependent">Dependent</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="transferNotes" class="info-input2" rows="2" placeholder="รายละเอียด"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Ambulation -->
-                        <div class="test-group">
-                            <h3><i class="fas fa-walking"></i> Ambulation</h3>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="ambulationIndependent" id="ambulation-independent" value="1">
-                                <label for="ambulation-independent">Independent</label>
-                            </div>
-                            <div class="checkbox-item" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="ambulationDependent" id="ambulation-dependent" value="1">
-                                <label for="ambulation-dependent">Dependent</label>
-                            </div>
-                            <div class="input-with-checkbox">
-                                <textarea name="ambulationNotes" class="info-input2" rows="2" placeholder="รายละเอียด"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Notes Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="fas fa-sticky-note"></i>
-                    <h2>หมายเหตุเพิ่มเติม</h2>
-                </div>
-                <div class="section-content">
-                    <textarea name="notes" class="info-input" rows="8" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button type="button" class="btn-examination secondary" onclick="clearForm()">
-                    <i class="fas fa-eraser"></i>
-                    ล้างข้อมูล
-                </button>
-                <button type="submit" class="btn-examination primary">
-                    <i class="fas fa-save"></i>
-                    บันทึกข้อมูล
-                </button>
-                <button type="button" class="btn-examination tertiary" onclick="printForm()">
-                    <i class="fas fa-print"></i>
-                    พิมพ์รายงาน
-                </button>
-            </div>
-        </form>
     </div>
 
     <!-- External JavaScript File (if exists) -->

@@ -32,7 +32,7 @@
             <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
             <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
             <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-            <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+            <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
             <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
             <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
@@ -113,31 +113,6 @@
                     <span>ประวัติการตรวจ</span>
                     <small>ผลการตรวจร่างกาย</small>
                 </button>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="section-header fade-in" style="animation-delay: 0.4s;">
-                <i class="fas fa-clock"></i>
-                <h2>กิจกรรมล่าสุด</h2>
-            </div>
-
-            <div class="activity-timeline fade-in" style="animation-delay: 0.5s;">
-                <div class="timeline-item">
-                    <div class="timeline-marker success"></div>
-                    <div class="timeline-content">
-                        <h4>เข้าสู่ระบบ</h4>
-                        <p>ผู้ป่วยเข้าสู่ระบบการรักษา</p>
-                        <span class="timeline-time"><%= new Date().toLocaleString('th-TH') %></span>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker info"></div>
-                    <div class="timeline-content">
-                        <h4>รอการตรวจ</h4>
-                        <p>พร้อมสำหรับการตรวจร่างกาย</p>
-                        <span class="timeline-time">รอการดำเนินการ</span>
-                    </div>
-                </div>
             </div>
             
         <% } else { %>

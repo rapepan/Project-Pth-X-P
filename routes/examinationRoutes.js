@@ -23,6 +23,9 @@ router.get("/examinationHistory/:HN", checkRole('user'), ExaminationController.s
 // แสดงรายละเอียดการตรวจ
 router.get("/examinationDetail/:HN/:examId", checkRole('user'), ExaminationController.showExaminationDetail);
 
+// แสดงหน้าการพิมพ์รายงานการตรวจ
+router.get("/examinationPrint/:examId", checkRole('user'), ExaminationController.showExaminationPrint);
+
 // แสดงการตรวจล่าสุด (ใช้ form submit)
 router.post("/examination/latest/:HN", checkRole('user'), ExaminationController.getLatestExamination);
 

@@ -617,3 +617,116 @@ body {
         padding: 0.875rem 1.5rem;
     }
 }
+
+/* ========== Selected ICD-10 Codes Styling ========== */
+.selected-codes-container {
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    min-height: 60px;
+    transition: var(--transition);
+}
+
+.selected-codes-container:hover {
+    border-color: var(--primary-color);
+}
+
+.no-selection {
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.selected-code-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f3e5f5 100%);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    transition: var(--transition);
+}
+
+.selected-code-item:last-child {
+    margin-bottom: 0;
+}
+
+.selected-code-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.selected-code-item .code {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-right: 10px;
+}
+
+.selected-code-item .description {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.remove-btn {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.7rem;
+}
+
+.remove-btn:hover {
+    background: #d32f2f;
+    transform: scale(1.1);
+}
+
+/* ========== ICD-10 Search Results Enhancement ========== */
+.icd10-item.selected {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f3e5f5 100%);
+    border-left: 4px solid var(--primary-color);
+}
+
+.icd10-item.selected .icd10-code {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.selected-indicator {
+    float: right;
+    color: var(--success-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* ========== Readonly Input Styling ========== */
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    border: 2px solid var(--border-light);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.form-group input[readonly]:focus {
+    border-color: var(--border-light);
+    box-shadow: none;
+    outline: none;
+}
+
+.form-group input[readonly]:hover {
+    background-color: #f8f9fa;
+    border-color: var(--border-light);
+}

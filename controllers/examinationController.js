@@ -111,7 +111,7 @@ class ExaminationController {
         return res.redirect(`/patientexamination/${HN}?error=${encodeURIComponent(err.message)}`);
       }
 
-      res.redirect(`/patientexamination/${HN}?success=บันทึกการตรวจร่างกายเรียบร้อย`);
+      res.redirect(`/examinationHistory/${HN}?success=บันทึกการตรวจร่างกายเรียบร้อย`);
     });
   }
 
@@ -164,22 +164,42 @@ class ExaminationController {
   static showExaminationHistory(req, res) {
     const HN = req.params.HN;
 
-    ExaminationModel.getPatientExaminationHistory(HN, (err, examinationList) => {
+    // ดึงข้อมูลผู้ป่วย
+    PatientModel.getPatientByHN(HN, (err, patientResults) => {
       if (err) {
         return res.status(500).render('error', {
-          message: "ไม่สามารถดึงข้อมูลได้",
+          message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
           error: err
         });
       }
 
-      res.render("examinationHistory", {
-        title: "ประวัติการตรวจ",
-        HN: HN,
-        patient: { HN: HN },
-        examinations: examinationList || [],
-        examinationList: examinationList || [],
-        success: req.query.success,
-        error: req.query.error
+      if (patientResults.length === 0) {
+        return res.status(404).render('error', {
+          message: "ไม่พบข้อมูลผู้ป่วย",
+          error: null
+        });
+      }
+
+      const patient = patientResults[0];
+
+      // ดึงประวัติการตรวจ
+      ExaminationModel.getPatientExaminationHistory(HN, (err, examinationList) => {
+        if (err) {
+          return res.status(500).render('error', {
+            message: "ไม่สามารถดึงข้อมูลได้",
+            error: err
+          });
+        }
+
+        res.render("examinationHistory", {
+          title: "ประวัติการตรวจร่างกาย",
+          HN: HN,
+          patient: patient,
+          examinations: examinationList || [],
+          examinationList: examinationList || [],
+          success: req.query.success,
+          error: req.query.error
+        });
       });
     });
   }
@@ -188,7 +208,7 @@ class ExaminationController {
   static showExaminationDetail(req, res) {
     const examId = req.params.examId;
     
-    ExaminationModel.getExaminationById(examId, (err, examination) => {
+    ExaminationModel.getExaminationById(examId, (err, examinationResults) => {
       if (err) {
         return res.status(500).render('error', { 
           message: "ไม่สามารถดึงข้อมูลได้",
@@ -196,18 +216,78 @@ class ExaminationController {
         });
       }
       
-      if (!examination) {
+      if (!examinationResults || examinationResults.length === 0) {
         return res.status(404).render('error', { 
           message: "ไม่พบข้อมูลการตรวจ",
           error: null 
         });
       }
       
-      res.render("examinationDetail", {
-        title: "รายละเอียดการตรวจ",
-        examination: examination,
-        success: req.query.success,
-        error: req.query.error
+      const examination = examinationResults[0];
+      const HN = examination.HN;
+      
+      // ดึงข้อมูลผู้ป่วย
+      PatientModel.getPatientByHN(HN, (err, patientResults) => {
+        if (err) {
+          return res.status(500).render('error', { 
+            message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
+            error: err 
+          });
+        }
+        
+        const patient = patientResults && patientResults.length > 0 ? patientResults[0] : null;
+        
+        res.render("examinationDetail", {
+          title: "รายละเอียดการตรวจร่างกาย",
+          examination: examination,
+          patient: patient,
+          success: req.query.success,
+          error: req.query.error
+        });
+      });
+    });
+  }
+
+  // แสดงหน้าการพิมพ์รายงานการตรวจ
+  static showExaminationPrint(req, res) {
+    const examId = req.params.examId;
+    
+    ExaminationModel.getExaminationById(examId, (err, examinationResults) => {
+      if (err) {
+        return res.status(500).render('error', { 
+          message: "ไม่สามารถดึงข้อมูลได้",
+          error: err 
+        });
+      }
+      
+      if (!examinationResults || examinationResults.length === 0) {
+        return res.status(404).render('error', { 
+          message: "ไม่พบข้อมูลการตรวจ",
+          error: null 
+        });
+      }
+      
+      const examination = examinationResults[0];
+      const HN = examination.HN;
+      
+      // ดึงข้อมูลผู้ป่วย
+      PatientModel.getPatientByHN(HN, (err, patientResults) => {
+        if (err) {
+          return res.status(500).render('error', { 
+            message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
+            error: err 
+          });
+        }
+        
+        const patient = patientResults && patientResults.length > 0 ? patientResults[0] : null;
+        
+        res.render("examinationPrint", {
+          title: "พิมพ์รายงานการตรวจร่างกาย",
+          examination: examination,
+          patient: patient,
+          success: req.query.success,
+          error: req.query.error
+        });
       });
     });
   }

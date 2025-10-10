@@ -15,7 +15,7 @@ class PTDataController {
         }
 
         res.render("ptData", {
-          title: "ข้อมูลกายภาพบำบัด",
+          title: "สรุปผลการรักษา",
           HN: HN,
           patient: { HN: HN },
           ptData: ptData || [],

@@ -9,29 +9,18 @@
             }
         }
 
-        function clearForm() {
-            if (confirm('คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?')) {
-                // Clear all inputs except readonly ones
-                document.querySelectorAll('input[type="text"]:not([readonly]), input[type="number"]:not([readonly]), textarea, select:not([disabled])').forEach(input => {
-                    input.value = '';
-                });
-                
-                // Clear all checkboxes
-                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                
-                // Remove checked class from checkbox items
-                document.querySelectorAll('.checkbox-item').forEach(item => {
-                    item.classList.remove('checked');
-                });
-                
-                alert('ล้างข้อมูลเรียบร้อยแล้ว');
+        function goBack() {
+            // ตรวจสอบว่าอยู่ในหน้า patientexamination หรือไม่
+            const currentPath = window.location.pathname;
+            
+            if (currentPath.includes('/patientexamination/')) {
+                // ถ้าเป็นหน้า patientexamination ให้ไปที่ examinationHistory
+                const hn = currentPath.split('/')[2]; // ดึง HN จาก path
+                window.location.href = '/examinationroom/' + hn;
+            } else {
+                // ถ้าไม่ใช่ให้ไปหน้าหลัก
+                window.location.href = '/index';
             }
-        }
-
-        function printForm() {
-            window.print();
         }
 
         // Initialize form
@@ -78,22 +67,6 @@
             }
         }
 
-        // Clear form data
-        function clearForm() {
-            if (confirm('คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?')) {
-                document.getElementById('examinationForm').reset();
-                
-                // Remove checked class from all checkbox items
-                document.querySelectorAll('.checkbox-item').forEach(item => {
-                    item.classList.remove('checked');
-                });
-            }
-        }
-
-        // Print form
-        function printForm() {
-            window.print();
-        }
 
         // Initialize checked states on page load
         document.addEventListener('DOMContentLoaded', function() {

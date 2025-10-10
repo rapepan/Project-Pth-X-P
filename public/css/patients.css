@@ -1,36 +1,209 @@
-/* ========== CSS Variables ========== */
+/* ========== CSS Variables - ใช้ธีมเดียวกับ index.css ========== */
 :root {
     --primary-color: #00897B;
     --primary-light: #4DB6AC;
     --primary-dark: #00695C;
     --secondary-color: #FF8A65;
-    --danger-color: #EF5350;
-    --warning-color: #FFA726;
-    --info-color: #42A5F5;
     --success-color: #66BB6A;
+    --warning-color: #FFA726;
+    --danger-color: #EF5350;
+    --info-color: #42A5F5;
     --bg-light: #F0FFF0;
-    --text-primary: #333;
-    --text-secondary: #666;
+    --bg-white: #FFFFFF;
+    --bg-gradient: linear-gradient(135deg, #E8F5E9 0%, #E0F2F1 50%, #F5F5F5 100%);
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --text-light: #90a4ae;
     --border-color: #e0e0e0;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
-    --shadow-lg: 0 8px 16px rgba(0,0,0,0.16);
+    --border-light: #f0f0f0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 16px 40px rgba(0,0,0,0.16);
+    --shadow-hover: 0 12px 32px rgba(0,137,123,0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ========== Base Styles ========== */
-body {
-    font-family: 'Sarabun', 'Prompt', 'Helvetica Neue', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #E0F2F1 0%, #F5F5F5 100%);
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Sarabun', 'Prompt', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    line-height: 1.7;
+    min-height: 100vh;
+}
+
+/* ========== Sticky Header - ใช้ธีมเดียวกับ index.css ========== */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.sticky-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: headerPulse 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes headerPulse {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.1) rotate(5deg);
+        opacity: 0.3;
+    }
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    gap: 2rem;
+}
+
+.logo-section h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.logo-section h1 .fas {
+    font-size: 2.2rem;
+    animation: heartbeat 2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.15);
+    }
+    50% {
+        transform: scale(1);
+    }
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.user-info:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar .fas {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: white;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 400;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.65rem 1.5rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
 }
 
 /* ========== Page Header ========== */
@@ -91,51 +264,101 @@ body {
 
 /* ========== Navigation ========== */
 nav {
-    background-color: #333;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+    background: white;
+    box-shadow: var(--shadow-md);
     position: sticky;
     top: 0;
     z-index: 100;
-    margin-bottom: 2rem; /* เพิ่มระยะห่างด้านล่าง nav แทน */
+    margin: 0 auto 2rem;
+    max-width: 1400px;
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 nav a {
-    display: inline-block;
-    color: white;
-    padding: 14px 20px;
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    position: relative;
+    font-weight: 500;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
 }
 
-nav a:hover,
+nav a:hover {
+    color: var(--primary-color);
+    background: rgba(0,137,123,0.05);
+}
+
 nav a.active {
-    background-color: rgba(255,255,255,0.1);
-    transform: translateY(-2px);
-}
-
-nav a.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(0,137,123,0.08);
 }
 
 nav a .fas {
-    margin-right: 0.5rem;
+    font-size: 1rem;
 }
 
-/* ========== Container ========== */
+/* ========== Main Container ========== */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2.5rem;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem 2rem;
+}
+
+/* ========== Hero Section ========== */
+.hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(0, 137, 123, 0.05) 0%, rgba(77, 182, 172, 0.05) 100%);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    animation: fadeIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* ========== Search Section ========== */

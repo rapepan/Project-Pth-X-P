@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ข้อมูลส่วนตัว</h1>
+        
+        <% if (user) { %>
+        <form method="POST" action="/profile" class="profile-form">
+            <div class="form-group">
+                <label for="username">ชื่อผู้ใช้:</label>
+                <input type="text" id="username" value="<%= user.username %>" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">อีเมล:</label>
+                <input type="email" id="email" name="email" value="<%= user.email || '' %>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fullname">ชื่อ-นามสกุล:</label>
+                <input type="text" id="fullname" name="fullname" value="<%= user.fullname || '' %>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="role">บทบาท:</label>
+                <input type="text" id="role" value="<%= user.role || 'user' %>" disabled>
+            </div>
+            
+            <h3>เปลี่ยนรหัสผ่าน</h3>
+            <div class="form-group">
+                <label for="currentPassword">รหัสผ่านปัจจุบัน:</label>
+                <input type="password" id="currentPassword" name="currentPassword">
+            </div>
+            
+            <div class="form-group">
+                <label for="newPassword">รหัสผ่านใหม่:</label>
+                <input type="password" id="newPassword" name="newPassword">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmNewPassword">ยืนยันรหัสผ่านใหม่:</label>
+                <input type="password" id="confirmNewPassword" name="confirmNewPassword">
+            </div>
+            
+            <% if (errors && errors.length > 0) { %>
+            <div class="error-messages">
+                <% errors.forEach(error => { %>
+                <p class="error"><%= error %></p>
+                <% }); %>
+            </div>
+            <% } %>
+            
+            <% if (req.query.success === 'update') { %>
+            <div class="success-message">
+                <p>อัพเดทข้อมูลเรียบร้อยแล้ว</p>
+            </div>
+            <% } %>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">บันทึก</button>
+                <a href="/index" class="btn btn-secondary">ยกเลิก</a>
+            </div>
+        </form>
+        <% } else { %>
+        <p>ไม่พบข้อมูลผู้ใช้</p>
+        <% } %>
+    </div>
+</body>
+</html>

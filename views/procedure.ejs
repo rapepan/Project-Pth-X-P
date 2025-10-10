@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Google Fonts สำหรับฟอนต์ไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS ของเรา -->
+    <link rel="stylesheet" href="/css/procedure.css">
+    
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-stethoscope"></i>
+                <%= title %>
+            </h1>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (patient) { %>
+            <a href="/procedure/<%= patient.HN %>"  class="active"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+        <% } else { %>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
+        <!-- Alert Messages -->
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <%= error %>
+            </div>
+        <% } %>
+
+
+        <!-- Procedures Section -->
+        <% if (HN) { %>
+            <div class="procedures-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-medkit"></i> การรักษาของผู้ป่วย HN: <%= HN %>
+                    </h2>
+                    <button class="btn-procedure secondary" onclick="showCreateProcedureForm()">
+                        <i class="fas fa-plus"></i> เพิ่มการรักษาใหม่
+                    </button>
+                </div>
+
+                <% if (procedures && procedures.length > 0) { %>
+                    <div class="procedures-grid">
+                        <% procedures.forEach(function(procedure) { %>
+                            <div class="procedure-card">
+                                <div class="procedure-header">
+                                    <div class="procedure-info">
+                                        <h3><%= procedure.procedureName %></h3>
+                                        <span class="procedure-date">
+                                            <i class="fas fa-calendar"></i>
+                                            <%= new Date(procedure.created_at).toLocaleDateString('th-TH') %>
+                                        </span>
+                                    </div>
+                                    <div class="procedure-type">
+                                        <span class="type-badge type-<%= procedure.procedureType %>">
+                                            <i class="fas fa-<%= getProcedureIcon(procedure.procedureType) %>"></i>
+                                            <%= getProcedureTypeName(procedure.procedureType) %>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="procedure-body">
+                                    <div class="procedure-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">ผู้ทำการรักษา:</span>
+                                            <span class="detail-value"><%= procedure.therapist || 'ยังไม่ได้ระบุ' %></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ระยะเวลา:</span>
+                                            <span class="detail-value">
+                                                <i class="fas fa-clock"></i>
+                                                <%= procedure.duration || 'ไม่ระบุ' %> นาที
+                                            </span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ความถี่:</span>
+                                            <span class="detail-value"><%= procedure.frequency || 'ไม่ระบุ' %></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ผลการรักษา:</span>
+                                            <span class="detail-value status-<%= procedure.effectiveness || 'unknown' %>">
+                                                <i class="fas fa-<%= getEffectivenessIcon(procedure.effectiveness) %>"></i>
+                                                <%= getEffectivenessName(procedure.effectiveness) %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <% if (procedure.notes) { %>
+                                        <div class="procedure-notes">
+                                            <h4><i class="fas fa-sticky-note"></i> หมายเหตุ</h4>
+                                            <p><%= procedure.notes %></p>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="procedure-actions">
+                                    <a href="/procedureDetail/<%= HN %>/<%= procedure.procedureId %>" class="btn-view">
+                                        <i class="fas fa-eye"></i> ดูรายละเอียด
+                                    </a>
+                                    <a href="/procedureHistory/<%= HN %>" class="btn-history">
+                                        <i class="fas fa-history"></i> ประวัติ
+                                    </a>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-medkit"></i>
+                        </div>
+                        <h3 class="empty-state-title">ยังไม่มีการรักษา</h3>
+                        <p class="empty-state-text">
+                            ยังไม่มีการรักษาสำหรับผู้ป่วย HN: <%= HN %><br>
+                            คลิกปุ่ม "เพิ่มการรักษาใหม่" เพื่อเริ่มต้น
+                        </p>
+                        <button class="btn-procedure secondary" onclick="showCreateProcedureForm()">
+                            <i class="fas fa-plus"></i> เพิ่มการรักษาใหม่
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Create Procedure Form Modal -->
+            <div id="createProcedureModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-plus"></i> เพิ่มการรักษาใหม่</h3>
+                        <button class="btn-procedure tertiary" onclick="hideCreateProcedureForm()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form class="modal-body" action="/procedure/<%= HN %>" method="POST">
+                        <div class="form-group">
+                            <label class="form-label">ชื่อการรักษา *</label>
+                            <input type="text" name="procedureName" class="form-control" required placeholder="กรอกชื่อการรักษา">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ประเภทการรักษา *</label>
+                            <select name="procedureType" class="form-control" required>
+                                <option value="">เลือกประเภทการรักษา</option>
+                                <option value="manual">การบำบัดด้วยมือ</option>
+                                <option value="electrotherapy">การรักษาด้วยไฟฟ้า</option>
+                                <option value="exercise">การออกกำลังกาย</option>
+                                <option value="thermal">การรักษาด้วยความร้อน/เย็น</option>
+                                <option value="traction">การดึง</option>
+                                <option value="massage">การนวด</option>
+                                <option value="other">อื่นๆ</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">ผู้ทำการรักษา</label>
+                                <input type="text" name="therapist" class="form-control" placeholder="ชื่อผู้ทำการรักษา">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">ระยะเวลา (นาที)</label>
+                                <input type="number" name="duration" class="form-control" min="1" placeholder="ระยะเวลาการรักษา">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ความถี่</label>
+                            <input type="text" name="frequency" class="form-control" placeholder="เช่น ทุกวัน, 3 ครั้ง/สัปดาห์">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">เทคนิคที่ใช้</label>
+                            <textarea name="techniques" class="form-control" rows="3" placeholder="อธิบายเทคนิคที่ใช้ในการรักษา"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ผลการรักษา</label>
+                            <select name="effectiveness" class="form-control">
+                                <option value="">เลือกผลการรักษา</option>
+                                <option value="excellent">ดีมาก</option>
+                                <option value="good">ดี</option>
+                                <option value="fair">ปานกลาง</option>
+                                <option value="poor">ไม่ดี</option>
+                                <option value="unknown">ยังประเมินไม่ได้</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">หมายเหตุ</label>
+                            <textarea name="notes" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-procedure secondary" onclick="hideCreateProcedureForm()">
+                                <i class="fas fa-times"></i> ยกเลิก
+                            </button>
+                            <button type="submit" class="btn-procedure primary">
+                                <i class="fas fa-save"></i> บันทึกการรักษา
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-state-title">ค้นหาผู้ป่วยเพื่อบันทึกการรักษา</h3>
+                <p class="empty-state-text">
+                    กรอกข้อมูลในช่องค้นหาด้านบนเพื่อค้นหาผู้ป่วยและบันทึกการรักษา
+                </p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/procedure.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>
+
+<script>
+// Helper functions for EJS
+function getProcedureIcon(type) {
+    const icons = {
+        'manual': 'hand-paper',
+        'electrotherapy': 'bolt',
+        'exercise': 'running',
+        'thermal': 'thermometer-half',
+        'traction': 'arrows-alt-v',
+        'massage': 'hands',
+        'other': 'tools'
+    };
+    return icons[type] || 'medkit';
+}
+
+function getProcedureTypeName(type) {
+    const names = {
+        'manual': 'การบำบัดด้วยมือ',
+        'electrotherapy': 'การรักษาด้วยไฟฟ้า',
+        'exercise': 'การออกกำลังกาย',
+        'thermal': 'การรักษาด้วยความร้อน/เย็น',
+        'traction': 'การดึง',
+        'massage': 'การนวด',
+        'other': 'อื่นๆ'
+    };
+    return names[type] || type;
+}
+
+function getEffectivenessIcon(effectiveness) {
+    const icons = {
+        'excellent': 'star',
+        'good': 'thumbs-up',
+        'fair': 'minus',
+        'poor': 'thumbs-down',
+        'unknown': 'question'
+    };
+    return icons[effectiveness] || 'question';
+}
+
+function getEffectivenessName(effectiveness) {
+    const names = {
+        'excellent': 'ดีมาก',
+        'good': 'ดี',
+        'fair': 'ปานกลาง',
+        'poor': 'ไม่ดี',
+        'unknown': 'ยังประเมินไม่ได้'
+    };
+    return names[effectiveness] || 'ไม่ระบุ';
+}
+</script>

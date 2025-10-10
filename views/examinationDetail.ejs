@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/examinationDetail.css">
+</head>
+<body>
+    <div class="container">
+        <h1>รายละเอียดการตรวจร่างกาย</h1>
+        
+        <% if (patient && examination) { %>
+        <div class="patient-info">
+            <h2><%= patient.fname %> <%= patient.lname %> (HN: <%= patient.HN %>)</h2>
+            <p><strong>วันที่ตรวจ:</strong> <%= new Date(examination.created_at).toLocaleDateString('th-TH') %></p>
+        </div>
+        
+        <div class="examination-detail">
+            <h3>ข้อมูลการตรวจ</h3>
+            <p><strong>Observation:</strong> <%= examination.observation %></p>
+            <p><strong>Palpation:</strong> <%= examination.palpation %></p>
+            
+            <% if (examination.rom) { %>
+            <h4>ROM (Range of Motion)</h4>
+            <p>WNL: <%= examination.rom.WNL ? 'ใช่' : 'ไม่' %></p>
+            <p>Weakness: <%= examination.rom.Weakness ? 'ใช่' : 'ไม่' %></p>
+            <% if (examination.rom.note) { %>
+            <p><strong>หมายเหตุ:</strong> <%= examination.rom.note %></p>
+            <% } %>
+            <% } %>
+            
+            <% if (examination.mmt) { %>
+            <h4>MMT (Manual Muscle Testing)</h4>
+            <p>Normal: <%= examination.mmt.Normal ? 'ใช่' : 'ไม่' %></p>
+            <p>Limited: <%= examination.mmt.Limited ? 'ใช่' : 'ไม่' %></p>
+            <% if (examination.mmt.note) { %>
+            <p><strong>หมายเหตุ:</strong> <%= examination.mmt.note %></p>
+            <% } %>
+            <% } %>
+            
+            <% if (examination.notes) { %>
+            <h4>หมายเหตุเพิ่มเติม</h4>
+            <p><%= examination.notes %></p>
+            <% } %>
+        </div>
+        
+        <div class="actions">
+            <a href="/examinationPrint/<%= examination.id %>" class="btn btn-primary">พิมพ์รายงาน</a>
+            <a href="/examinationHistory/<%= patient.HN %>" class="btn btn-back">กลับ</a>
+        </div>
+        <% } else { %>
+        <p>ไม่พบข้อมูลการตรวจร่างกาย</p>
+        <% } %>
+    </div>
+</body>
+</html>

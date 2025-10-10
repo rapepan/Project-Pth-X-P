@@ -1,0 +1,400 @@
+/* ========== CSS Variables - ใช้ธีมเดียวกับ index.css ========== */
+:root {
+    --primary-color: #00897B;
+    --primary-light: #4DB6AC;
+    --primary-dark: #00695C;
+    --secondary-color: #FF8A65;
+    --success-color: #66BB6A;
+    --warning-color: #FFA726;
+    --danger-color: #EF5350;
+    --info-color: #42A5F5;
+    --bg-light: #F0FFF0;
+    --bg-white: #FFFFFF;
+    --bg-gradient: linear-gradient(135deg, #E8F5E9 0%, #E0F2F1 50%, #F5F5F5 100%);
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --text-light: #90a4ae;
+    --border-color: #e0e0e0;
+    --border-light: #f0f0f0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 16px 40px rgba(0,0,0,0.16);
+    --shadow-hover: 0 12px 32px rgba(0,137,123,0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Sarabun', 'Prompt', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    line-height: 1.7;
+    min-height: 100vh;
+}
+
+/* ========== Container ========== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== Page Header ========== */
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    border-radius: 2px;
+}
+
+/* ========== Patient Info ========== */
+.patient-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-md);
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.patient-info h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.patient-info p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.patient-info strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ========== Examination Detail ========== */
+.examination-detail {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.examination-detail h3 {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 10px;
+}
+
+.examination-detail h3::before {
+    content: '📋';
+    font-size: 1.2rem;
+}
+
+.examination-detail h4 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 25px 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.examination-detail h4::before {
+    content: '🔬';
+    font-size: 1rem;
+}
+
+.examination-detail p {
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.examination-detail strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ========== Data Sections ========== */
+.data-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.data-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.data-section p {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+/* ========== Status Indicators ========== */
+.status-yes {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.status-no {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+/* ========== Actions ========== */
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 30px;
+    border-top: 2px solid var(--border-light);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: inherit;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-back {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* ========== Empty State ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* ========== Error State ========== */
+.error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--danger-color);
+    background: #f8d7da;
+    border-radius: 8px;
+    border-left: 4px solid var(--danger-color);
+}
+
+/* ========== Print Button Special ========== */
+.btn-primary::before {
+    content: '🖨️';
+    font-size: 1rem;
+}
+
+.btn-secondary::before {
+    content: '📋';
+    font-size: 1rem;
+}
+
+.btn-back::before {
+    content: '⬅️';
+    font-size: 1rem;
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .patient-info {
+        padding: 20px;
+    }
+    
+    .examination-detail {
+        padding: 20px;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.6rem;
+    }
+    
+    .patient-info {
+        padding: 15px;
+    }
+    
+    .examination-detail {
+        padding: 15px;
+    }
+    
+    .examination-detail h3 {
+        font-size: 1.3rem;
+    }
+    
+    .examination-detail h4 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ========== Print Styles ========== */
+@media print {
+    .actions {
+        display: none;
+    }
+    
+    .examination-detail {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .patient-info {
+        background: #f8f9fa !important;
+    }
+}

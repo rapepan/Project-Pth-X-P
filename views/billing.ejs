@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Google Fonts สำหรับฟอนต์ไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS ของเรา -->
+    <link rel="stylesheet" href="/css/billing.css">
+    
+</head>
+<body>
+    <!-- Sticky Header - ใช้ธีมเดียวกับ index.css -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-money-bill-wave"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+  <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (patient) { %>
+            <a href="/billing/<%= patient.HN %>"  class="active"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
+        <% } else { %>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
+        <!-- Alert Messages -->
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <%= error %>
+            </div>
+        <% } %>
+
+
+        <!-- Bills Section -->
+        <% if (HN) { %>
+            <div class="bills-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-receipt"></i> ใบเสร็จของผู้ป่วย HN: <%= HN %>
+                    </h2>
+                    <button class="btn-billing primary" onclick="showCreateBillForm()">
+                        <i class="fas fa-plus"></i> สร้างใบเสร็จใหม่
+                    </button>
+                </div>
+
+                <% if (bills && bills.length > 0) { %>
+                    <div class="bills-grid">
+                        <% bills.forEach(function(bill) { %>
+                            <div class="bill-card">
+                                <div class="bill-header">
+                                    <div class="bill-info">
+                                        <h3>ใบเสร็จ #<%= bill.billId %></h3>
+                                        <span class="bill-date">
+                                            <i class="fas fa-calendar"></i>
+                                            <%= new Date(bill.created_at).toLocaleDateString('th-TH') %>
+                                        </span>
+                                    </div>
+                                    <div class="bill-status">
+                                        <% if (bill.status === 'paid') { %>
+                                            <span class="status-badge status-paid">
+                                                <i class="fas fa-check"></i> ชำระแล้ว
+                                            </span>
+                                        <% } else if (bill.status === 'pending') { %>
+                                            <span class="status-badge status-pending">
+                                                <i class="fas fa-clock"></i> รอดำเนินการ
+                                            </span>
+                                        <% } else { %>
+                                            <span class="status-badge status-cancelled">
+                                                <i class="fas fa-times"></i> ยกเลิก
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                
+                                <div class="bill-body">
+                                    <div class="bill-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">จำนวนบริการ:</span>
+                                            <span class="detail-value"><%= bill.serviceCount %> รายการ</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ยอดรวม:</span>
+                                            <span class="detail-value amount">
+                                                <i class="fas fa-baht"></i>
+                                                <%= bill.totalAmount.toLocaleString('th-TH') %>
+                                            </span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ส่วนลด:</span>
+                                            <span class="detail-value discount">
+                                                <i class="fas fa-percentage"></i>
+                                                <%= bill.discount || 0 %>%
+                                            </span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">ยอดสุทธิ:</span>
+                                            <span class="detail-value net-amount">
+                                                <i class="fas fa-baht"></i>
+                                                <%= bill.netAmount.toLocaleString('th-TH') %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bill-actions">
+                                    <a href="/billingDetail/<%= bill.billId %>" class="btn-view">
+                                        <i class="fas fa-eye"></i> ดูรายละเอียด
+                                    </a>
+                                    <% if (bill.status === 'pending') { %>
+                                        <button class="btn-pay" onclick="updatePaymentStatus('<%= bill.billId %>', 'paid')">
+                                            <i class="fas fa-credit-card"></i> ชำระเงิน
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <h3 class="empty-state-title">ยังไม่มีใบเสร็จ</h3>
+                        <p class="empty-state-text">
+                            ยังไม่มีใบเสร็จสำหรับผู้ป่วย HN: <%= HN %><br>
+                            คลิกปุ่ม "สร้างใบเสร็จใหม่" เพื่อเริ่มต้น
+                        </p>
+                        <button class="btn-billing primary" onclick="showCreateBillForm()">
+                            <i class="fas fa-plus"></i> สร้างใบเสร็จใหม่
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Create Bill Form Modal -->
+            <div id="createBillModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-plus"></i> สร้างใบเสร็จใหม่</h3>
+                        <button class="close-btn" onclick="hideCreateBillForm()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form class="modal-body" action="/billing/<%= HN %>" method="POST">
+                        <div class="form-group">
+                            <label class="form-label">บริการที่ให้</label>
+                            <div class="services-list" id="servicesList">
+                                <!-- Services will be populated by JavaScript -->
+                            </div>
+                            <button type="button" class="btn-add-service" onclick="addService()">
+                                <i class="fas fa-plus"></i> เพิ่มบริการ
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ส่วนลด (%)</label>
+                            <input type="number" name="discount" class="form-control" min="0" max="100" value="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">หมายเหตุ</label>
+                            <textarea name="notes" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="hideCreateBillForm()">
+                                <i class="fas fa-times"></i> ยกเลิก
+                            </button>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> สร้างใบเสร็จ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-state-title">ค้นหาผู้ป่วยเพื่อจัดการค่าใช้จ่าย</h3>
+                <p class="empty-state-text">
+                    กรอกข้อมูลในช่องค้นหาด้านบนเพื่อค้นหาผู้ป่วยและจัดการค่าใช้จ่าย
+                </p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/billing.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>

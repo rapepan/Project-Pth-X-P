@@ -9,28 +9,40 @@
     <link rel="stylesheet" href="/css/patientexamination.css">
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-user-md"></i> ระบบตรวจร่างกายผู้ป่วย</h1>
+        <!-- Page Header -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-user-md"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
     </header>
 
     <!-- Navigation -->
-    <nav>
+    <nav class="nav">
+        <div class="nav-content">
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <% if (patient) { %>
+        <% if (typeof patient !== 'undefined' && patient) { %>
             <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% } else { %>
-            <a href="/examinationroom"><i class="fas fa-diagnoses"></i> ห้องตรวจ</a>
+            <a href="/examinationroom"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% } %>
-        <a href="#" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-        <a href="#"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-        <a href="#"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-        <a href="#"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
-        <a href="#"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
+        <% if (typeof patient !== 'undefined' && patient) { %>
+            <a href="/patientexamination/<%= patient.HN %>" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <a href="/examinationHistory/<%= patient.HN %>"><i class="fas fa-history"></i> ประวัติการตรวจ</a>
+        <% } %>
+        </div>
     </nav>
 
     <div class="container">
         <!-- Error Messages -->
-        <% if (errors && errors.length > 0) { %>
+        <% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
             <div class="notice error">
                 <i class="fas fa-exclamation-triangle"></i>
                 <ul>
@@ -42,7 +54,7 @@
         <% } %>
 
         <!-- Success/Info Messages -->
-        <% if (message) { %>
+        <% if (typeof message !== 'undefined' && message) { %>
             <div class="notice fade-in">
                 <i class="fas fa-info-circle"></i> 
                 <span><%= message %></span>
@@ -50,7 +62,7 @@
         <% } %>
 
         <!-- Main Form -->
-        <% if (patient) { %>
+        <% if (typeof patient !== 'undefined' && patient) { %>
             <form action="/patientexamination/<%= patient.HN %>" method="POST" id="examinationForm">
         <% } else { %>
             <form action="/patientexamination" method="POST" id="examinationForm">
@@ -69,10 +81,10 @@
                                 <i class="fas fa-user"></i>
                                 ชื่อผู้ป่วย
                             </div>
-                            <input type="text" name="patientName" class="info-input" 
-                                   value="<%= patient ? (patient.fname + ' ' + patient.lname) : '' %>" 
+                            <input type="text" name="patient_name" class="info-input" 
+                                   value="<%= (typeof patient !== 'undefined' && patient) ? (patient.fname + ' ' + patient.lname) : '' %>" 
                                    placeholder="กรอกชื่อผู้ป่วย" 
-                                   <%= patient ? 'readonly' : '' %>>
+                                   <%= (typeof patient !== 'undefined' && patient) ? 'readonly' : '' %>>
                         </div>
                         <div class="info-group">
                             <div class="info-label">
@@ -80,18 +92,9 @@
                                 อายุ
                             </div>
                             <input type="number" name="age" class="info-input" 
-                                   value="<%= patient ? patient.age : '' %>" 
+                                   value="<%= (typeof patient !== 'undefined' && patient) ? patient.age : '' %>" 
                                    placeholder="อายุ"
-                                   <%= patient ? 'readonly' : '' %>>
-                        </div>
-                        <div class="info-group">
-                            <div class="info-label">
-                                <i class="fas fa-venus-mars"></i>
-                                เพศ
-                            </div>
-                            <input type="text" name="gender" class="info-input" 
-                                   value="<% if (patient) { %><% if (patient.gender === 'male') { %>ชาย<% } else if (patient.gender === 'female') { %>หญิง<% } else { %><%= patient.gender || 'ไม่ระบุ' %><% } %><% } else { %>ไม่ระบุ<% } %>" 
-                                   readonly>
+                                   <%= (typeof patient !== 'undefined' && patient) ? 'readonly' : '' %>>
                         </div>
                     </div>
                 </div>
@@ -268,15 +271,15 @@
 
             <!-- Action Buttons -->
             <div class="button-group">
-                <button type="button" class="secondary" onclick="clearForm()">
+                <button type="button" class="btn-examination secondary" onclick="clearForm()">
                     <i class="fas fa-eraser"></i>
                     ล้างข้อมูล
                 </button>
-                <button type="submit" class="primary">
+                <button type="submit" class="btn-examination primary">
                     <i class="fas fa-save"></i>
                     บันทึกข้อมูล
                 </button>
-                <button type="button" class="tertiary" onclick="printForm()">
+                <button type="button" class="btn-examination tertiary" onclick="printForm()">
                     <i class="fas fa-print"></i>
                     พิมพ์รายงาน
                 </button>

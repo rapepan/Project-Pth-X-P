@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/examinationroom.css">
+    <link rel="stylesheet" href="/css/diagnosis.css">
+
+</head>
+<body>
+    <!-- Sticky Header - ใช้ธีมเดียวกับ index.css -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-diagnoses"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (patient) { %>
+            <a href="/diagnosis/<%= patient.HN %>" class="active"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+        <% } else { %>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>
+                <i class="fas fa-diagnoses"></i>
+                <%= title %>
+            </h1>
+        </div>
+
+        <% if (errors && errors.length > 0) { %>
+            <div class="error-message fade-in">
+                <strong><i class="fas fa-exclamation-triangle"></i> พบข้อผิดพลาด:</strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem;">
+                    <% errors.forEach(error => { %>
+                        <li><%= error %></li>
+                    <% }); %>
+                </ul>
+            </div>
+        <% } %>
+
+        <% if (patient) { %>
+            <!-- Patient Info Card -->
+            <div class="patient-card fade-in">
+                <div class="patient-info-grid">
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-id-card"></i> HN</div>
+                        <div class="info-value"><%= patient.HN %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-user"></i> ชื่อ-นามสกุล</div>
+                        <div class="info-value"><%= patient.fname %> <%= patient.lname %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-birthday-cake"></i> อายุ</div>
+                        <div class="info-value"><%= patient.age %> ปี</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-venus-mars"></i> เพศ</div>
+                        <div class="info-value"><%= patient.gender %></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnosis Form -->
+            <form action="/diagnosis/<%= patient.HN %>" method="POST">
+                <!-- Basic Information -->
+                <div class="form-section fade-in" style="animation-delay: 0.1s;">
+                    <h3><i class="fas fa-info-circle"></i> ข้อมูลพื้นฐาน</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-user"></i> ชื่อผู้ป่วย <span class="required">*</span>
+                            </label>
+                            <input type="text" name="patientName" value="<%= patient.fname %> <%= patient.lname %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> วันที่วินิจฉัย</label>
+                            <input type="date" name="diagnosisDate" value="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chief Complaint -->
+                <div class="form-section fade-in" style="animation-delay: 0.2s;">
+                    <h3><i class="fas fa-comment-medical"></i> อาการสำคัญ (Chief Complaint)</h3>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-notes-medical"></i> อาการที่มาพบแพทย์ <span class="required">*</span>
+                        </label>
+                        <textarea name="chiefComplaint" required placeholder="ระบุอาการสำคัญที่ผู้ป่วยมาพบ..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Present Illness -->
+                <div class="form-section fade-in" style="animation-delay: 0.3s;">
+                    <h3><i class="fas fa-file-medical-alt"></i> ประวัติอาการปัจจุบัน (Present Illness)</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-history"></i> รายละเอียดอาการ</label>
+                        <textarea name="presentIllness" placeholder="ระบุรายละเอียดของอาการปัจจุบัน เช่น เริ่มเมื่อไหร่ ลักษณะอาการ..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Past History -->
+                <div class="form-section fade-in" style="animation-delay: 0.4s;">
+                    <h3><i class="fas fa-clipboard-list"></i> ประวัติโรคในอดีต (Past History)</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-hospital"></i> ประวัติการรักษา/โรคประจำตัว</label>
+                        <textarea name="pastHistory" placeholder="ระบุประวัติการรักษาในอดีต โรคประจำตัว การผ่าตัด..."></textarea>
+                    </div>
+                </div>
+
+                <!-- ICD-10 Code -->
+                <div class="form-section fade-in" style="animation-delay: 0.5s;">
+                    <h3><i class="fas fa-code"></i> รหัส ICD-10</h3>
+                    <div class="form-grid">
+                        <div class="form-group icd10-search">
+                            <label><i class="fas fa-search"></i> ค้นหารหัส ICD-10</label>
+                            <input type="text" id="icd10Search" placeholder="ค้นหารหัสหรือชื่อโรค...">
+                            <div class="icd10-results" id="icd10Results"></div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-barcode"></i> รหัส ICD-10</label>
+                            <input type="text" name="icd10Code" id="icd10Code" placeholder="เช่น M54.5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-alt"></i> คำอธิบาย</label>
+                        <input type="text" name="icd10Description" id="icd10Description" placeholder="คำอธิบายรหัส ICD-10">
+                    </div>
+                </div>
+
+                <!-- Diagnosis Details -->
+                <div class="form-section fade-in" style="animation-delay: 0.6s;">
+                    <h3><i class="fas fa-stethoscope"></i> รายละเอียดการวินิจฉัย</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> ประเภทการวินิจฉัย</label>
+                            <select name="diagnosisType">
+                                <option value="primary">Primary (หลัก)</option>
+                                <option value="secondary">Secondary (รอง)</option>
+                                <option value="differential">Differential (แยกโรค)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-exclamation-triangle"></i> ระดับความรุนแรง</label>
+                            <select name="severity">
+                                <option value="mild">Mild (เล็กน้อย)</option>
+                                <option value="moderate" selected>Moderate (ปานกลาง)</option>
+                                <option value="severe">Severe (รุนแรง)</option>
+                                <option value="critical">Critical (วิกฤต)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prognosis & Treatment Plan -->
+                <div class="form-section fade-in" style="animation-delay: 0.7s;">
+                    <h3><i class="fas fa-chart-line"></i> พยากรณ์โรคและแผนการรักษา</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-heartbeat"></i> พยากรณ์โรค (Prognosis)</label>
+                        <textarea name="prognosis" placeholder="ระบุพยากรณ์โรคและผลการรักษาที่คาดว่าจะได้..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clipboard-check"></i> แผนการรักษา (Treatment Plan)</label>
+                        <textarea name="treatmentPlan" placeholder="ระบุแผนการรักษา เช่น การบำบัด ยา ข้อแนะนำ..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Special Considerations -->
+                <div class="form-section fade-in" style="animation-delay: 0.8s;">
+                    <h3><i class="fas fa-lightbulb"></i> ข้อควรพิจารณาพิเศษ</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-dots"></i> ข้อควรระวัง/ข้อแนะนำพิเศษ</label>
+                        <textarea name="specialConsiderations" placeholder="ระบุข้อควรระวังพิเศษหรือข้อแนะนำเพิ่มเติม..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</label>
+                        <textarea name="notes" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="btn-group fade-in" style="animation-delay: 0.9s;">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> บันทึกการวินิจฉัย
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="window.history.back()">
+                        <i class="fas fa-times"></i> ยกเลิก
+                    </button>
+                </div>
+            </form>
+
+        <% } else { %>
+            <div class="no-patient-section fade-in">
+                <div class="no-patient-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>ยังไม่ได้เลือกผู้ป่วย</h2>
+                <p>กรุณาเลือกผู้ป่วยเพื่อเริ่มการวินิจฉัย</p>
+                <div class="no-patient-actions">
+                    <button class="action-btn primary" onclick="window.location.href='/patients'">
+                        <i class="fas fa-search"></i>
+                        <span>ค้นหาผู้ป่วย</span>
+                    </button>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <script src="/js/diagnosis.js"></script>
+</body>
+</html>

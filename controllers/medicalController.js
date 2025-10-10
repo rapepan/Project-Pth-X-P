@@ -162,6 +162,8 @@ class MedicalController {
         }
 
         console.log("Medical record saved successfully:", result.insertId);
+        
+        
         res.redirect(`/medicalHistory/${HN}?success=true`);
       });
     });

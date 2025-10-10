@@ -1,212 +1,390 @@
-const PatientModel = require('../models/patientModel');
 const ExaminationModel = require('../models/examinationModel');
+const PatientModel = require('../models/patientModel');
 
 class ExaminationController {
-  // แสดงฟอร์มตรวจร่างกาย
+  // แสดงหน้าระบบตรวจร่างกายผู้ป่วย
   static showPatientExamination(req, res) {
     const HN = req.params.HN;
-
+    
     if (!HN) {
-      return res.render("patientexamination", {
-        title: "ระบบตรวจร่างกายผู้ป่วย",
-        patient: null,
-        user: req.user,
-        errors: [],
-        message: "กรุณาเลือกผู้ป่วยก่อน"
+      return res.status(400).render('error', { 
+        title: 'ข้อผิดพลาด',
+        statusCode: 400,
+        message: "ไม่พบรหัสผู้ป่วย",
+        error: null 
       });
     }
 
-    PatientModel.getPatientByHN(HN, (err, results) => {
-      if (err) {
-        console.error("Error fetching patient:", err);
-        return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
-      }
-
-      if (results.length === 0) {
-        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
-      }
-
-      res.render("patientexamination", {
-        title: "ระบบตรวจร่างกายผู้ป่วย",
-        patient: results[0],
-        user: req.user,
-        errors: [],
-        message: null
-      });
-    });
-  }
-
-// บันทึกข้อมูลการตรวจร่างกาย
-static savePatientExamination(req, res) {
-  const HN = req.params.HN;
-  const examinationData = req.body;
-
-  console.log("Received examination data:", examinationData);
-
-  const errors = [];
-  if (!examinationData.patientName || examinationData.patientName.trim() === '') {
-    errors.push('กรุณากรอกชื่อผู้ป่วย');
-  }
-  if (!examinationData.observation || examinationData.observation.trim() === '') {
-    errors.push('กรุณากรอก Observation');
-  }
-  if (!examinationData.palpation || examinationData.palpation.trim() === '') {
-    errors.push('กรุณากรอก Palpation');
-  }
-
-  if (errors.length > 0) {
-    return PatientModel.getPatientByHN(HN, (err, results) => {
-      if (err || results.length === 0) {
-        return res.status(500).send("เกิดข้อผิดพลาด");
-      }
-      return res.render("patientexamination", {
-        title: "ระบบตรวจร่างกายผู้ป่วย",
-        patient: results[0],
-        user: req.user,
-        errors,
-        message: null,
-        formData: examinationData
-      });
-    });
-  }
-
-  const saveData = {
-    HN,
-    patientName: examinationData.patientName,
-    observation: examinationData.observation,
-    palpation: examinationData.palpation,
-
-    rom: {
-      WNL: examinationData.romWNL === '1' || examinationData.romWNL === true,
-      Weakness: examinationData.romWeakness === '1' || examinationData.romWeakness === true,
-      note: examinationData.romNotes || ''
-    },
-    mmt: {
-      Normal: examinationData.mmtNormal === '1' || examinationData.mmtNormal === true,
-      Limited: examinationData.mmtLimited === '1' || examinationData.mmtLimited === true,
-      note: examinationData.mmtNotes || ''
-    },
-    accessory: {
-      Normal: examinationData.accessoryNormal === '1' || examinationData.accessoryNormal === true,
-      Hypermobility: examinationData.accessoryHypermobility === '1' || examinationData.accessoryHypermobility === true,
-      note: examinationData.accessoryNotes || ''
-    },
-    sensory: {
-      Pinprick: examinationData.pinprick === '1' || examinationData.pinprick === true,
-      LightTouch: examinationData.lightTouch === '1' || examinationData.lightTouch === true,
-      note: examinationData.sensoryTest || ''
-    },
-    reflex: {
-      Normal: examinationData.normalReflex === '1' || examinationData.normalReflex === true,
-      Abnormal: examinationData.abnormalReflex === '1' || examinationData.abnormalReflex === true,
-      note: examinationData.deepTendonReflex || ''
-    },
-    transfer: {
-      Independent: examinationData.transferIndependent === '1' || examinationData.transferIndependent === true,
-      Dependent: examinationData.transferDependent === '1' || examinationData.transferDependent === true,
-      note: examinationData.transferNotes || ''
-    },
-    ambulation: {
-      Independent: examinationData.ambulationIndependent === '1' || examinationData.ambulationIndependent === true,
-      Dependent: examinationData.ambulationDependent === '1' || examinationData.ambulationDependent === true,
-      note: examinationData.ambulationNotes || ''
-    },
-    notes: examinationData.notes || ''
-  };
-
-  console.log("Saving examination record with data:", saveData);
-
-  ExaminationModel.createExaminationRecord(saveData, (err, result) => {
-    if (err) {
-      console.error("Database error saving examination record:", err);
-      return PatientModel.getPatientByHN(HN, (err, results) => {
-        if (err || results.length === 0) {
-          return res.status(500).send("เกิดข้อผิดพลาด");
-        }
-        return res.render("patientexamination", {
-          title: "ระบบตรวจร่างกายผู้ป่วย",
-          patient: results[0],
-          user: req.user,
-          errors: ['เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message],
-          message: null,
-          formData: examinationData
-        });
-      });
-    }
-
-    console.log("Examination record saved successfully:", result.insertId);
-    res.redirect(`/examinationroom/${HN}?success=examination`);
-  });
-}
-
-  // แสดงประวัติการตรวจร่างกาย
-  static showExaminationHistory(req, res) {
-    const HN = req.params.HN;
-
+    // ดึงข้อมูลผู้ป่วย
     PatientModel.getPatientByHN(HN, (err, patientResults) => {
       if (err) {
-        console.error("Error fetching patient:", err);
-        return res.status(500).send("ไม่สามารถดึงข้อมูลผู้ป่วยได้");
+        return res.status(500).render('error', { 
+          title: 'ข้อผิดพลาด',
+          statusCode: 500,
+          message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
+          error: err 
+        });
       }
 
       if (patientResults.length === 0) {
-        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+        return res.status(404).render('error', { 
+          title: 'ไม่พบข้อมูล',
+          statusCode: 404,
+          message: "ไม่พบข้อมูลผู้ป่วย",
+          error: null 
+        });
       }
 
-      ExaminationModel.getAllExaminationHistory(HN, (err, examinationResults) => {
+      const patient = patientResults[0];
+
+      // ดึงข้อมูลการตรวจที่ผ่านมา
+      ExaminationModel.getPatientExaminations(HN, (err, examinations) => {
         if (err) {
-          console.error("Error fetching examination history:", err);
-          return res.status(500).send("ไม่สามารถดึงประวัติการตรวจร่างกายได้");
+          return res.status(500).render('error', { 
+            title: 'ข้อผิดพลาด',
+            statusCode: 500,
+            message: "ไม่สามารถดึงข้อมูลการตรวจได้",
+            error: err 
+          });
         }
 
-        res.render("examinationHistory", {
-          title: "ประวัติการตรวจร่างกาย",
-          patient: patientResults[0],
-          examinations: examinationResults,
-          user: req.user
+        res.render("patientexamination", {
+          title: "ระบบตรวจร่างกายผู้ป่วย",
+          patient: patient,
+          examinations: examinations || [],
+          user: req.user,
+          errors: null,
+          message: null
         });
       });
     });
   }
 
-  // แสดงรายละเอียดการตรวจร่างกายตาม ID
-  static showExaminationDetail(req, res) {
-    const { HN, examId } = req.params;
+  // บันทึกการตรวจร่างกายผู้ป่วย
+  static savePatientExamination(req, res) {
+    const HN = req.params.HN || req.body.HN;
+    
+    if (!HN) {
+      return res.status(400).render('error', { 
+        title: 'ข้อผิดพลาด',
+        statusCode: 400,
+        message: "ไม่พบรหัสผู้ป่วย",
+        error: null 
+      });
+    }
 
-    PatientModel.getPatientByHN(HN, (err, patientResults) => {
-      if (err || patientResults.length === 0) {
-        return res.status(404).send("ไม่พบข้อมูลผู้ป่วย");
+    const examinationData = req.body;
+
+    // สร้างข้อมูลการตรวจ
+    const saveData = {
+      HN: HN,
+      patient_name: examinationData.patient_name || examinationData.patientName,
+      observation: examinationData.observation || '',
+      palpation: examinationData.palpation || '',
+      rom_wnl: examinationData.romWNL ? 1 : 0,
+      rom_weakness: examinationData.romWeakness ? 1 : 0,
+      rom_notes: examinationData.romNotes || '',
+      mmt_normal: examinationData.mmtNormal ? 1 : 0,
+      mmt_limited: examinationData.mmtLimited ? 1 : 0,
+      mmt_notes: examinationData.mmtNotes || '',
+      accessory_normal: examinationData.accessoryNormal ? 1 : 0,
+      accessory_hypermobility: examinationData.accessoryHypermobility ? 1 : 0,
+      accessory_notes: examinationData.accessoryNotes || '',
+      pinprick: examinationData.pinprick ? 1 : 0,
+      light_touch: examinationData.lightTouch ? 1 : 0,
+      sensory_test: examinationData.sensoryTest || '',
+      normal_reflex: examinationData.normalReflex ? 1 : 0,
+      abnormal_reflex: examinationData.abnormalReflex ? 1 : 0,
+      deep_tendon_reflex: examinationData.deepTendonReflex || '',
+      transfer_independent: examinationData.transferIndependent ? 1 : 0,
+      transfer_dependent: examinationData.transferDependent ? 1 : 0,
+      transfer_notes: examinationData.transferNotes || '',
+      ambulation_independent: examinationData.ambulationIndependent ? 1 : 0,
+      ambulation_dependent: examinationData.ambulationDependent ? 1 : 0,
+      ambulation_notes: examinationData.ambulationNotes || '',
+      notes: examinationData.notes || ''
+    };
+
+    ExaminationModel.createExaminationRecord(saveData, (err, result) => {
+      if (err) {
+        console.error("Error saving examination:", err);
+        return res.redirect(`/patientexamination/${HN}?error=${encodeURIComponent(err.message)}`);
       }
 
-      ExaminationModel.getExaminationById(examId, (err, examResults) => {
-        if (err || examResults.length === 0) {
-          return res.status(404).send("ไม่พบข้อมูลการตรวจร่างกาย");
-        }
+      res.redirect(`/patientexamination/${HN}?success=บันทึกการตรวจร่างกายเรียบร้อย`);
+    });
+  }
 
-        res.render("examinationDetail", {
-          title: "รายละเอียดการตรวจร่างกาย",
-          patient: patientResults[0],
-          examination: examResults[0],
-          user: req.user
+  // แสดงหน้าห้องตรวจ
+  static showExaminationRoom(req, res) {
+    const HN = req.params.HN;
+    
+    if (HN) {
+      ExaminationModel.getPatientExaminations(HN, (err, examinations) => {
+        if (err) {
+          return res.status(500).render('error', { 
+            message: "ไม่สามารถดึงข้อมูลได้",
+            error: err 
+          });
+        }
+        
+        res.render("examinationroom", {
+          title: "ห้องตรวจ",
+          HN: HN,
+          examinations: examinations || [],
+          success: req.query.success,
+          error: req.query.error
         });
+      });
+    } else {
+      res.render("examinationroom", {
+        title: "ห้องตรวจ",
+        HN: null,
+        examinations: [],
+        success: req.query.success,
+        error: req.query.error
+      });
+    }
+  }
+
+  // บันทึกการตรวจ
+  static saveExamination(req, res) {
+    const HN = req.params.HN;
+    const examinationData = req.body;
+
+    ExaminationModel.createExamination(HN, examinationData, (err, result) => {
+      if (err) {
+        return res.redirect(`/examinationroom/${HN}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom/${HN}?success=บันทึกการตรวจเรียบร้อย`);
+    });
+  }
+
+  // แสดงประวัติการตรวจ
+  static showExaminationHistory(req, res) {
+    const HN = req.params.HN;
+
+    ExaminationModel.getPatientExaminationHistory(HN, (err, examinationList) => {
+      if (err) {
+        return res.status(500).render('error', {
+          message: "ไม่สามารถดึงข้อมูลได้",
+          error: err
+        });
+      }
+
+      res.render("examinationHistory", {
+        title: "ประวัติการตรวจ",
+        HN: HN,
+        patient: { HN: HN },
+        examinations: examinationList || [],
+        examinationList: examinationList || [],
+        success: req.query.success,
+        error: req.query.error
       });
     });
   }
 
-  // พิมพ์รายงานการตรวจร่างกาย
-  static printExaminationReport(req, res) {
+  // แสดงรายละเอียดการตรวจ
+  static showExaminationDetail(req, res) {
+    const examId = req.params.examId;
+    
+    ExaminationModel.getExaminationById(examId, (err, examination) => {
+      if (err) {
+        return res.status(500).render('error', { 
+          message: "ไม่สามารถดึงข้อมูลได้",
+          error: err 
+        });
+      }
+      
+      if (!examination) {
+        return res.status(404).render('error', { 
+          message: "ไม่พบข้อมูลการตรวจ",
+          error: null 
+        });
+      }
+      
+      res.render("examinationDetail", {
+        title: "รายละเอียดการตรวจ",
+        examination: examination,
+        success: req.query.success,
+        error: req.query.error
+      });
+    });
+  }
+
+  // แสดงการตรวจล่าสุด
+  static getLatestExamination(req, res) {
+    const HN = req.params.HN;
+
+    ExaminationModel.getLatestExamination(HN, (err, examination) => {
+      if (err) {
+        return res.redirect(`/examinationroom/${HN}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom/${HN}?success=ดึงข้อมูลเรียบร้อย&latest=${JSON.stringify(examination)}`);
+    });
+  }
+
+  // แสดงการตรวจตามวันที่
+  static getExaminationsByDate(req, res) {
+    const { date } = req.body;
+
+    ExaminationModel.getExaminationsByDate(date, (err, examinations) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=ดึงข้อมูลเรียบร้อย&examinations=${JSON.stringify(examinations)}`);
+    });
+  }
+
+  // แสดงวันที่ที่มีการตรวจ
+  static getExaminationDates(req, res) {
+    const HN = req.params.HN;
+
+    ExaminationModel.getExaminationDates(HN, (err, dates) => {
+      if (err) {
+        return res.redirect(`/examinationroom/${HN}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom/${HN}?success=ดึงข้อมูลเรียบร้อย&dates=${JSON.stringify(dates)}`);
+    });
+  }
+
+  // ค้นหาการตรวจ
+  static searchExaminations(req, res) {
+    const { searchTerm, searchType } = req.body;
+
+    ExaminationModel.searchExaminations(searchTerm, searchType, (err, examinations) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=ค้นหาสำเร็จ&examinations=${JSON.stringify(examinations)}`);
+    });
+  }
+
+  // สถิติการตรวจ
+  static getExaminationStatistics(req, res) {
+    const HN = req.params.HN;
+
+    ExaminationModel.getExaminationStatistics(HN, (err, statistics) => {
+      if (err) {
+        return res.redirect(`/examinationroom/${HN}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom/${HN}?success=ดึงสถิติเรียบร้อย&statistics=${JSON.stringify(statistics)}`);
+    });
+  }
+
+  // อัปเดตการตรวจ
+  static updateExamination(req, res) {
+    const examId = req.params.examId;
+    const updateData = req.body;
+
+    ExaminationModel.updateExamination(examId, updateData, (err, result) => {
+      if (err) {
+        return res.redirect(`/examinationDetail/${req.params.HN}/${examId}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationDetail/${req.params.HN}/${examId}?success=อัปเดตเรียบร้อย`);
+    });
+  }
+
+  // ลบการตรวจ
+  static deleteExamination(req, res) {
     const examId = req.params.examId;
 
-    ExaminationModel.getExaminationById(examId, (err, results) => {
-      if (err || results.length === 0) {
-        return res.status(404).send("ไม่พบข้อมูลการตรวจร่างกาย");
+    ExaminationModel.deleteExamination(examId, (err, result) => {
+      if (err) {
+        return res.redirect(`/examinationHistory/${req.params.HN}?error=${encodeURIComponent(err.message)}`);
       }
+      res.redirect(`/examinationHistory/${req.params.HN}?success=ลบเรียบร้อย`);
+    });
+  }
 
-      res.render("examinationPrint", {
-        title: "พิมพ์รายงานการตรวจร่างกาย",
-        examination: results[0],
-        layout: false // No layout for print view
+  // เปรียบเทียบการตรวจ
+  static compareExaminations(req, res) {
+    const { examId1, examId2 } = req.body;
+
+    ExaminationModel.compareExaminations(examId1, examId2, (err, comparison) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=เปรียบเทียบเรียบร้อย&comparison=${JSON.stringify(comparison)}`);
+    });
+  }
+
+  // สรุปการตรวจรายเดือน
+  static getMonthlySummary(req, res) {
+    const { year, month } = req.body;
+
+    ExaminationModel.getMonthlySummary(year, month, (err, summary) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=ดึงสรุปเรียบร้อย&summary=${JSON.stringify(summary)}`);
+    });
+  }
+
+  // สรุปการตรวจรายปี
+  static getYearlySummary(req, res) {
+    const year = req.params.year;
+
+    ExaminationModel.getYearlySummary(year, (err, summary) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=ดึงสรุปเรียบร้อย&summary=${JSON.stringify(summary)}`);
+    });
+  }
+
+  // ตรวจสอบความถูกต้อง
+  static validateExamination(req, res) {
+    const examinationData = req.body;
+
+    ExaminationModel.validateExamination(examinationData, (err, validation) => {
+      if (err) {
+        return res.redirect(`/examinationroom?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom?success=ตรวจสอบเรียบร้อย&validation=${JSON.stringify(validation)}`);
+    });
+  }
+
+  // แสดงเทมเพลตการตรวจ
+  static showExaminationTemplates(req, res) {
+    ExaminationModel.getExaminationTemplates((err, templates) => {
+      if (err) {
+        return res.status(500).render('error', { 
+          message: "ไม่สามารถดึงข้อมูลได้",
+          error: err 
+        });
+      }
+      
+      res.render("examinationTemplates", {
+        title: "เทมเพลตการตรวจ",
+        templates: templates || [],
+        success: req.query.success,
+        error: req.query.error
       });
+    });
+  }
+
+  // บันทึกเทมเพลตการตรวจ
+  static saveExaminationTemplate(req, res) {
+    const templateData = req.body;
+
+    ExaminationModel.saveExaminationTemplate(templateData, (err, result) => {
+      if (err) {
+        return res.redirect(`/examinationTemplates?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationTemplates?success=บันทึกเทมเพลตเรียบร้อย`);
+    });
+  }
+
+  // ติดตามความก้าวหน้า
+  static getProgressTracking(req, res) {
+    const HN = req.params.HN;
+
+    ExaminationModel.getProgressTracking(HN, (err, progress) => {
+      if (err) {
+        return res.redirect(`/examinationroom/${HN}?error=${encodeURIComponent(err.message)}`);
+      }
+      res.redirect(`/examinationroom/${HN}?success=ดึงข้อมูลความก้าวหน้าเรียบร้อย&progress=${JSON.stringify(progress)}`);
     });
   }
 }

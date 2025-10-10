@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/examinationHistory.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ประวัติการตรวจร่างกาย</h1>
+        
+        <% if (patient) { %>
+        <div class="patient-info">
+            <h2><%= patient.fname %> <%= patient.lname %> (HN: <%= patient.HN %>)</h2>
+        </div>
+        
+        <% if (examinations && examinations.length > 0) { %>
+        <div class="examination-list">
+            <% examinations.forEach((exam, index) => { %>
+            <div class="examination-item">
+                <h3>การตรวจครั้งที่ <%= index + 1 %></h3>
+                <p><strong>วันที่:</strong> <%= new Date(exam.created_at).toLocaleDateString('th-TH') %></p>
+                <p><strong>Observation:</strong> <%= exam.observation %></p>
+                <p><strong>Palpation:</strong> <%= exam.palpation %></p>
+                
+                <div class="actions">
+                    <a href="/examinationDetail/<%= patient.HN %>/<%= exam.id %>" class="btn btn-primary">ดูรายละเอียด</a>
+                    <a href="/examinationPrint/<%= exam.id %>" class="btn btn-secondary">พิมพ์รายงาน</a>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } else { %>
+        <p>ยังไม่มีประวัติการตรวจร่างกาย</p>
+        <% } %>
+        
+        <div class="actions">
+            <a href="/patientexamination/<%= patient.HN %>" class="btn btn-primary">ตรวจร่างกายใหม่</a>
+            <a href="/examinationroom/<%= patient.HN %>" class="btn btn-back">กลับ</a>
+        </div>
+        <% } else { %>
+        <p>ไม่พบข้อมูลผู้ป่วย</p>
+        <% } %>
+    </div>
+</body>
+</html>

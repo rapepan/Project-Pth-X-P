@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Google Fonts สำหรับฟอนต์ไทย -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS ของเรา -->
+    <link rel="stylesheet" href="/css/ptData.css">
+    
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                <%= title %>
+            </h1>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (patient) { %>
+            <a href="/ptdata/<%= patient.HN %>" class="active"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+        <% } else { %>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
+        <!-- Alert Messages -->
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <%= error %>
+            </div>
+        <% } %>
+
+
+        <!-- PT Data Section -->
+        <% if (HN) { %>
+            <div class="ptdata-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-database"></i> ข้อมูลกายภาพบำบัดของผู้ป่วย HN: <%= HN %>
+                    </h2>
+                    <div class="header-actions">
+                        <button class="btn-ptdata primary" onclick="showProgressChart()">
+                            <i class="fas fa-chart-bar"></i> กราฟความก้าวหน้า
+                        </button>
+                        <button class="btn-ptdata secondary" onclick="showCreatePTDataForm()">
+                            <i class="fas fa-plus"></i> เพิ่มข้อมูลใหม่
+                        </button>
+                    </div>
+                </div>
+
+
+                <% if (ptData && ptData.length > 0) { %>
+                    <div class="ptdata-grid">
+                        <% ptData.forEach(function(data) { %>
+                            <div class="ptdata-card">
+                                <div class="ptdata-header">
+                                    <div class="ptdata-info">
+                                        <h3><%= data.assessmentType %></h3>
+                                        <span class="ptdata-date">
+                                            <i class="fas fa-calendar"></i>
+                                            <%= new Date(data.assessmentDate).toLocaleDateString('th-TH') %>
+                                        </span>
+                                    </div>
+                                    <div class="ptdata-status">
+                                        <span class="status-badge status-<%= data.status || 'active' %>">
+                                            <i class="fas fa-<%= getStatusIcon(data.status) %>"></i>
+                                            <%= getStatusName(data.status) %>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="ptdata-body">
+                                    <div class="ptdata-metrics">
+                                        <% if (data.measurements) { %>
+                                            <% Object.entries(data.measurements).forEach(([key, value]) => { %>
+                                                <div class="metric-item">
+                                                    <span class="metric-label"><%= getMetricLabel(key) %>:</span>
+                                                    <span class="metric-value">
+                                                        <%= value %> <%= getMetricUnit(key) %>
+                                                    </span>
+                                                </div>
+                                            <% }); %>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <% if (data.observations) { %>
+                                        <div class="ptdata-observations">
+                                            <h4><i class="fas fa-eye"></i> การสังเกต</h4>
+                                            <p><%= data.observations %></p>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <% if (data.recommendations) { %>
+                                        <div class="ptdata-recommendations">
+                                            <h4><i class="fas fa-lightbulb"></i> คำแนะนำ</h4>
+                                            <p><%= data.recommendations %></p>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="ptdata-actions">
+                                    <a href="/ptDataDetail/<%= HN %>/<%= data.dataId %>" class="btn-view">
+                                        <i class="fas fa-eye"></i> ดูรายละเอียด
+                                    </a>
+                                    <a href="/ptData/goals/<%= HN %>" class="btn-goals">
+                                        <i class="fas fa-target"></i> เป้าหมาย
+                                    </a>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="empty-state-title">ยังไม่มีข้อมูลกายภาพบำบัด</h3>
+                        <p class="empty-state-text">
+                            ยังไม่มีข้อมูลกายภาพบำบัดสำหรับผู้ป่วย HN: <%= HN %><br>
+                            คลิกปุ่ม "เพิ่มข้อมูลใหม่" เพื่อเริ่มต้น
+                        </p>
+                        <button class="btn-ptdata secondary" onclick="showCreatePTDataForm()">
+                            <i class="fas fa-plus"></i> เพิ่มข้อมูลใหม่
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Create PT Data Form Modal -->
+            <div id="createPTDataModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-plus"></i> เพิ่มข้อมูลกายภาพบำบัดใหม่</h3>
+                        <button class="btn-ptdata tertiary" onclick="hideCreatePTDataForm()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form class="modal-body" action="/ptData/<%= HN %>" method="POST">
+                        <div class="form-group">
+                            <label class="form-label">ประเภทการประเมิน *</label>
+                            <select name="assessmentType" class="form-control" required>
+                                <option value="">เลือกประเภทการประเมิน</option>
+                                <option value="ROM">การเคลื่อนไหวของข้อต่อ</option>
+                                <option value="MMT">ความแข็งแรงของกล้ามเนื้อ</option>
+                                <option value="Pain">การประเมินความเจ็บปวด</option>
+                                <option value="Function">การประเมินการทำงาน</option>
+                                <option value="Balance">การประเมินการทรงตัว</option>
+                                <option value="Gait">การประเมินการเดิน</option>
+                                <option value="Other">อื่นๆ</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">วันที่ประเมิน *</label>
+                            <input type="date" name="assessmentDate" class="form-control" required value="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ผู้ประเมิน</label>
+                            <input type="text" name="assessor" class="form-control" placeholder="ชื่อผู้ประเมิน">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ค่าที่วัดได้</label>
+                            <div class="measurements-grid" id="measurementsGrid">
+                                <!-- Measurements will be added dynamically -->
+                            </div>
+                            <button type="button" class="btn-ptdata success" onclick="addMeasurement()">
+                                <i class="fas fa-plus"></i> เพิ่มการวัด
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">การสังเกต</label>
+                            <textarea name="observations" class="form-control" rows="3" placeholder="บันทึกการสังเกตต่างๆ"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">คำแนะนำ</label>
+                            <textarea name="recommendations" class="form-control" rows="3" placeholder="คำแนะนำสำหรับผู้ป่วย"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">สถานะ</label>
+                            <select name="status" class="form-control">
+                                <option value="active">ใช้งาน</option>
+                                <option value="completed">เสร็จสิ้น</option>
+                                <option value="pending">รอดำเนินการ</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-ptdata secondary" onclick="hideCreatePTDataForm()">
+                                <i class="fas fa-times"></i> ยกเลิก
+                            </button>
+                            <button type="submit" class="btn-ptdata primary">
+                                <i class="fas fa-save"></i> บันทึกข้อมูล
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Progress Chart Modal -->
+            <div id="progressChartModal" class="modal">
+                <div class="modal-content chart-modal">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-chart-bar"></i> กราฟความก้าวหน้า</h3>
+                        <button class="close-btn" onclick="hideProgressChart()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="chart-container">
+                            <canvas id="progressChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #667eea;"></span>
+                                <span>ความแข็งแรง</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #4ecdc4;"></span>
+                                <span>การเคลื่อนไหว</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #ff6b6b;"></span>
+                                <span>ความเจ็บปวด</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-state-title">ค้นหาผู้ป่วยเพื่อบันทึกข้อมูลกายภาพบำบัด</h3>
+                <p class="empty-state-text">
+                    กรอกข้อมูลในช่องค้นหาด้านบนเพื่อค้นหาผู้ป่วยและบันทึกข้อมูลกายภาพบำบัด
+                </p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/ptData.js"></script>
+    <script src="/js/notifications.js"></script>
+</body>
+</html>
+
+<script>
+// Helper functions for EJS
+function getStatusIcon(status) {
+    const icons = {
+        'active': 'play',
+        'completed': 'check',
+        'pending': 'clock',
+        'cancelled': 'times'
+    };
+    return icons[status] || 'question';
+}
+
+function getStatusName(status) {
+    const names = {
+        'active': 'ใช้งาน',
+        'completed': 'เสร็จสิ้น',
+        'pending': 'รอดำเนินการ',
+        'cancelled': 'ยกเลิก'
+    };
+    return names[status] || 'ไม่ระบุ';
+}
+
+function getMetricLabel(key) {
+    const labels = {
+        'strength': 'ความแข็งแรง',
+        'rom': 'การเคลื่อนไหว',
+        'pain': 'ความเจ็บปวด',
+        'balance': 'การทรงตัว',
+        'gait': 'การเดิน',
+        'function': 'การทำงาน'
+    };
+    return labels[key] || key;
+}
+
+function getMetricUnit(key) {
+    const units = {
+        'strength': '/5',
+        'rom': '°',
+        'pain': '/10',
+        'balance': 'วินาที',
+        'gait': 'ก้าว/นาที',
+        'function': '%'
+    };
+    return units[key] || '';
+}
+</script>

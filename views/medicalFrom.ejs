@@ -9,8 +9,25 @@
     <link rel="stylesheet" href="/css/medicalFrom.css">
 </head>
 <body>
-    <div class="container">
-        <h1><i class="fas fa-clipboard-list"></i> ซักประวัติ</h1>
+        <!-- Page Header -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-clipboard-list"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="hero-section">
+            <h1><i class="fas fa-clipboard-list"></i> ซักประวัติ</h1>
+        </div>
         <% if (patient) { %>
         <div class="patient-entry">
             <div class="patient-row">
@@ -92,63 +109,14 @@
             </div>
           
             <button type="submit">
-                <i class="fas fa-save"></i> บันทึกข้อมูล
+                <i></i> บันทึกข้อมูล
             </button>
             <button type="button" class="button2" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> ย้อนกลับ
+                <i></i> ย้อนกลับ
             </button>
         </form>
     </div>
 
-    <script>
-        // คำนวณ BMI อัตโนมัติ
-        function calculateBMI() {
-            const weight = parseFloat(document.getElementById("weight").value);
-            const height = parseFloat(document.getElementById("height").value);
-            
-            if (weight > 0 && height > 0) {
-                const heightInMeters = height / 100;
-                const bmi = weight / (heightInMeters * heightInMeters);
-                document.getElementById("bmi").value = bmi.toFixed(2);
-            }
-        }
-
-        // เพิ่ม event listeners
-        document.getElementById("weight").addEventListener("input", calculateBMI);
-        document.getElementById("height").addEventListener("input", calculateBMI);
-
-        // ไม่ต้อง append หน่วยเข้าไปในค่า - ให้ส่งเป็นตัวเลขล้วนๆ
-        document.getElementById("historyForm").addEventListener("submit", function(event) {
-            // ตรวจสอบค่าว่างก่อนส่ง
-            const requiredFields = ['weight', 'height', 'bloodPressure', 'pulse', 'o2Sat', 'respiratoryRate', 'symptoms', 'currentHistory', 'pastHistory'];
-            
-            for (let field of requiredFields) {
-                const element = document.getElementById(field);
-                if (!element.value.trim()) {
-                    event.preventDefault();
-                    alert(`กรุณากรอก${element.placeholder}`);
-                    element.focus();
-                    return false;
-                }
-            }
-            
-            // คำนวณ BMI ก่อนส่ง
-            calculateBMI();
-            
-            console.log("Submitting form with data:", {
-                weight: document.getElementById("weight").value,
-                height: document.getElementById("height").value,
-                bloodPressure: document.getElementById("bloodPressure").value,
-                pulse: document.getElementById("pulse").value,
-                o2Sat: document.getElementById("o2Sat").value,
-                respiratoryRate: document.getElementById("respiratoryRate").value,
-                bmi: document.getElementById("bmi").value
-            });
-        });
-
-        function goBack() {
-            window.history.back();
-        }
-    </script>
+    <script src="/js/medicalFrom.js"></script>
 </body>
 </html>

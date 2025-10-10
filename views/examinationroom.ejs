@@ -10,8 +10,18 @@
 </head>
 <body>
     <!-- Page Header -->
-    <header>
-        <h1><i class="fas fa-stethoscope"></i> <%= title %></h1>
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-stethoscope"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
     </header>
 
     <!-- Navigation -->
@@ -20,71 +30,193 @@
         <a href="#" class="active"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (patient) { %>
             <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+            <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+            <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
+            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
-            <a href="/patientexamination"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <a href="/patients"><i class="fas fa-search"></i> ค้นหาผู้ป่วย</a>
         <% } %>
-        <a href="#"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-        <a href="#"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-        <a href="#"><i class="fas fa-notes-medical"></i> ข้อมูลทางกายภาพบำบัด</a>
-        <a href="#"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
     </nav>
 
     <div class="container">
-        
         <% if (patient) { %>
             <!-- Patient Information Card -->
-            <div class="patient-entry fade-in">
-                <div class="patient-row">
-                    <div class="patient-label">
-                        <i class="fas fa-user"></i> 
-                        ชื่อ-นามสกุลผู้ป่วย
+            <div class="patient-card fade-in">
+                <div class="patient-info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-id-card"></i> HN
+                        </div>
+                        <div class="info-value"><%= patient.HN %></div>
                     </div>
-                    <div class="patient-value">
-                        <a href="/medicalFrom/<%= patient.HN %>">
-                            <i class="fas fa-external-link-alt"></i>
-                            <%= patient.fname %> <%= patient.lname %>
-                        </a>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i> ชื่อ-นามสกุล
+                        </div>
+                        <div class="info-value">
+                            <div class="info-value"><%= patient.fname %> <%= patient.lname %></div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-birthday-cake"></i> อายุ
+                        </div>
+                        <div class="info-value"><%= patient.age %> ปี</div>
+                    </div>
+                </div>
+                
+                <!-- Medical History Summary -->
+                <div class="medical-summary">
+                    <h3><i class="fas fa-clipboard-list"></i> สรุปประวัติทางการแพทย์</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">โรคประจำตัว:</span>
+                            <span class="summary-value"><%= patient.chronic_diseases || '-' %></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">ประวัติแพ้:</span>
+                            <span class="summary-value"><%= patient.allergy_history || '-' %></span>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Action Buttons -->
-            <div class="fade-in" style="animation-delay: 0.2s;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <button onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
-                        <i class="fas fa-file-medical"></i> 
-                        ดูประวัติผู้ป่วย
-                    </button>
-                    <button onclick="window.location.href='/patientexamination/<%= patient.HN %>'" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
-                        <i class="fas fa-user-md"></i> 
-                        ตรวจร่างกาย
-                    </button>
+            <!-- Quick Actions -->
+            <div class="section-header fade-in" style="animation-delay: 0.2s;">
+                <i class="fas fa-tasks"></i>
+                <h2>การดำเนินการ</h2>
+            </div>
+
+            <div class="action-grid fade-in" style="animation-delay: 0.3s;">
+                <button class="action-btn primary" onclick="window.location.href='/medicalFrom/<%= patient.HN %>'">
+                    <i class="fas fa-file-medical"></i>
+                    <span>ซักประวัติ</span>
+                    <small>บันทึกข้อมูลพื้นฐาน</small>
+                </button>
+                
+                <button class="action-btn success" onclick="window.location.href='/patientexamination/<%= patient.HN %>'">
+                    <i class="fas fa-user-md"></i>
+                    <span>ตรวจร่างกาย</span>
+                    <small>การตรวจทางกายภาพ</small>
+                </button>
+                
+                <button class="action-btn info" onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
+                    <i class="fas fa-history"></i>
+                    <span>ประวัติการรักษา</span>
+                    <small>ดูข้อมูลย้อนหลัง</small>
+                </button>
+                
+                <button class="action-btn warning" onclick="window.location.href='/examinationHistory/<%= patient.HN %>'">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>ประวัติการตรวจ</span>
+                    <small>ผลการตรวจร่างกาย</small>
+                </button>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="section-header fade-in" style="animation-delay: 0.4s;">
+                <i class="fas fa-clock"></i>
+                <h2>กิจกรรมล่าสุด</h2>
+            </div>
+
+            <div class="activity-timeline fade-in" style="animation-delay: 0.5s;">
+                <div class="timeline-item">
+                    <div class="timeline-marker success"></div>
+                    <div class="timeline-content">
+                        <h4>เข้าสู่ระบบ</h4>
+                        <p>ผู้ป่วยเข้าสู่ระบบการรักษา</p>
+                        <span class="timeline-time"><%= new Date().toLocaleString('th-TH') %></span>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker info"></div>
+                    <div class="timeline-content">
+                        <h4>รอการตรวจ</h4>
+                        <p>พร้อมสำหรับการตรวจร่างกาย</p>
+                        <span class="timeline-time">รอการดำเนินการ</span>
+                    </div>
                 </div>
             </div>
             
         <% } else { %>
-            <!-- No Patient Data Notice -->
-            <div class="notice fade-in">
-                <i class="fas fa-exclamation-circle"></i> 
-                ไม่พบข้อมูลผู้ป่วยในระบบ
+            <!-- No Patient Selected -->
+            <div class="no-patient-section fade-in">
+                <div class="no-patient-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>ยังไม่ได้เลือกผู้ป่วย</h2>
+                <p>กรุณาเลือกผู้ป่วยเพื่อเริ่มการตรวจ</p>
+                <div class="no-patient-actions">
+                    <button class="action-btn primary" onclick="window.location.href='/patients'">
+                        <i class="fas fa-search"></i>
+                        <span>ค้นหาผู้ป่วย</span>
+                    </button>
+                    <button class="action-btn success" onclick="window.location.href='/patients/add'">
+                        <i class="fas fa-user-plus"></i>
+                        <span>เพิ่มผู้ป่วยใหม่</span>
+                    </button>
+                </div>
             </div>
         <% } %>
     </div>
 
-    <!-- Add some JavaScript for enhanced interactions -->
+    <!-- Enhanced JavaScript -->
     <script>
-        // Add loading state to button clicks
         document.addEventListener('DOMContentLoaded', function() {
+            // Update current time
+            function updateTime() {
+                const now = new Date();
+                const timeString = now.toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                const timeElement = document.getElementById('current-time');
+                if (timeElement) {
+                    timeElement.textContent = timeString;
+                }
+            }
+            
+            // Update time every second
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // Enhanced button interactions
             const buttons = document.querySelectorAll('button');
             buttons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
                     if (!this.disabled) {
-                        this.style.opacity = '0.7';
+                        // Add ripple effect
+                        const ripple = document.createElement('span');
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        const x = e.clientX - rect.left - size / 2;
+                        const y = e.clientY - rect.top - size / 2;
+                        
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = x + 'px';
+                        ripple.style.top = y + 'px';
+                        ripple.classList.add('ripple');
+                        
+                        this.appendChild(ripple);
+                        
+                        // Remove ripple after animation
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 600);
+                        
+                        // Loading state
+                        this.style.opacity = '0.8';
                         const originalHTML = this.innerHTML;
                         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลด...';
                         this.disabled = true;
                         
-                        // Restore button after a delay if navigation doesn't happen
+                        // Restore button after delay
                         setTimeout(() => {
                             this.style.opacity = '1';
                             this.innerHTML = originalHTML;
@@ -93,10 +225,63 @@
                     }
                 });
             });
-            
-            // Add smooth scroll behavior for better UX
+
+            // Add smooth scroll behavior
             document.documentElement.style.scrollBehavior = 'smooth';
+
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case '1':
+                            e.preventDefault();
+                            const medicalBtn = document.querySelector('button[onclick*="medicalFrom"]');
+                            if (medicalBtn) medicalBtn.click();
+                            break;
+                        case '2':
+                            e.preventDefault();
+                            const examBtn = document.querySelector('button[onclick*="examinationroom"]');
+                            if (examBtn) examBtn.click();
+                            break;
+                        case '3':
+                            e.preventDefault();
+                            const historyBtn = document.querySelector('button[onclick*="medicalHistory"]');
+                            if (historyBtn) historyBtn.click();
+                            break;
+                    }
+                }
+            });
+
+            // Add tooltips for keyboard shortcuts
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach((btn, index) => {
+                const shortcuts = ['Ctrl+1', 'Ctrl+2', 'Ctrl+3', 'Ctrl+4'];
+                if (shortcuts[index]) {
+                    btn.title = `คีย์ลัด: ${shortcuts[index]}`;
+                }
+            });
         });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.6);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

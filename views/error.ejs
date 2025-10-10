@@ -3,69 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'เกิดข้อผิดพลาด' %></title>
-    <style>
-        body {
-            font-family: 'Sarabun', Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        .error-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .error-icon {
-            font-size: 60px;
-            color: #e74c3c;
-            margin-bottom: 20px;
-        }
-        .error-title {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        .error-message {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 5px;
-        }
-        .btn:hover {
-            background-color: #2980b9;
-        }
-    </style>
+    <title><%= title %> - <%= statusCode || 'Error' %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/error.css">
 </head>
 <body>
     <div class="error-container">
-        <div class="error-icon">⚠️</div>
-        <h1 class="error-title"><%= title || 'เกิดข้อผิดพลาด' %></h1>
-        <p class="error-message"><%= message || 'เกิดข้อผิดพลาดในระบบ' %></p>
-        
-        <a href="/index" class="btn">กลับหน้าหลัก</a>
-        <a href="javascript:history.back()" class="btn">ย้อนกลับ</a>
-        
-        <% if (error && process.env.NODE_ENV === 'development') { %>
-            <div style="margin-top: 30px; text-align: left; background: #f8f8f8; padding: 15px; border-radius: 5px;">
-                <h3>Debug Info:</h3>
-                <pre style="font-size: 12px; overflow-x: auto;"><%= error.stack %></pre>
+        <div class="error-content">
+            <%
+            const code = statusCode || 500;
+            let icon = 'fas fa-exclamation-triangle';
+            let colorClass = 'error';
+
+            if (code === 404) {
+                icon = 'fas fa-search';
+                colorClass = 'not-found';
+            } else if (code === 403 || title.includes('ไม่มีสิทธิ์')) {
+                icon = 'fas fa-shield-alt';
+                colorClass = 'forbidden';
+            } else if (code >= 500) {
+                icon = 'fas fa-exclamation-triangle';
+                colorClass = 'server-error';
+            }
+            %>
+
+            <div class="error-icon <%= colorClass %>">
+                <i class="<%= icon %>"></i>
             </div>
-        <% } %>
+
+            <h1 class="error-code"><%= code %></h1>
+            <h2 class="error-title"><%= title %></h2>
+            <p class="error-message"><%= message %></p>
+
+            <div class="error-actions">
+                <a href="/index" class="btn-primary">
+                    <i class="fas fa-home"></i> กลับหน้าหลัก
+                </a>
+                <a href="javascript:history.back()" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> กลับหน้าก่อนหน้า
+                </a>
+            </div>
+
+            <% if (error && process.env.NODE_ENV === 'development') { %>
+                <div class="error-details">
+                    <h3>รายละเอียดข้อผิดพลาด (Development Mode):</h3>
+                    <pre><%= error.stack || JSON.stringify(error, null, 2) %></pre>
+                </div>
+            <% } %>
+        </div>
     </div>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .error-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .error-content {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .error-icon.not-found {
+            color: #3b82f6;
+        }
+
+        .error-icon.forbidden {
+            color: #ef4444;
+        }
+
+        .error-icon.server-error {
+            color: #f59e0b;
+        }
+
+        .error-code {
+            font-size: 72px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .error-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 12px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+        .error-details {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .error-details h3 {
+            color: #ef4444;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .error-details pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .error-content {
+                padding: 30px 20px;
+            }
+
+            .error-code {
+                font-size: 48px;
+            }
+
+            .error-title {
+                font-size: 22px;
+            }
+
+            .error-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
 </body>
 </html>

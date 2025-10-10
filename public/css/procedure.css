@@ -1,0 +1,848 @@
+/* ========== Procedure Page CSS - 5!*5@5"'*'"2! ========== */
+
+/* ========== CSS Variables ========== */
+:root {
+    --primary-color: #00897B;
+    --primary-light: #4DB6AC;
+    --primary-dark: #00695C;
+    --secondary-color: #FF8A65;
+    --success-color: #66BB6A;
+    --warning-color: #FFA726;
+    --danger-color: #EF5350;
+    --info-color: #42A5F5;
+    --bg-light: #F0FFF0;
+    --bg-white: #FFFFFF;
+    --bg-gradient: linear-gradient(135deg, #E8F5E9 0%, #E0F2F1 50%, #F5F5F5 100%);
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --text-light: #90a4ae;
+    --border-color: #e0e0e0;
+    --border-light: #f0f0f0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 16px 40px rgba(0,0,0,0.16);
+    --shadow-hover: 0 12px 32px rgba(0,137,123,0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== Base Styles ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Sarabun', 'Prompt', 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    line-height: 1.7;
+    min-height: 100vh;
+}
+
+/* ========== Animations ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.15); }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ========== Header ========== */
+.header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 2rem 0;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    gap: 2rem;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 .fas {
+    font-size: 2.2rem;
+    animation: heartbeat 2s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.user-info:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.user-info span {
+    font-weight: 500;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== Navigation ========== */
+nav {
+    background: white;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin: 0 auto 2rem;
+    max-width: 1400px;
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+}
+
+nav a {
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+nav a:hover {
+    color: var(--primary-color);
+    background: rgba(0,137,123,0.05);
+}
+
+nav a.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(0,137,123,0.08);
+}
+
+/* ========== Main Container ========== */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 2.5rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* ========== Alert Messages ========== */
+.alert {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.5s ease-out;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    border-left: 4px solid var(--success-color);
+    color: #2E7D32;
+}
+
+.alert-error {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    border-left: 4px solid var(--danger-color);
+    color: #C62828;
+}
+
+/* ========== Procedures Section ========== */
+.procedures-section {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.section-title .fas {
+    color: var(--primary-color);
+}
+
+/* ========== Procedures Grid ========== */
+.procedures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* ========== Procedure Card ========== */
+.procedure-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+    animation: slideIn 0.5s ease-out;
+}
+
+.procedure-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.procedure-header {
+    background: linear-gradient(135deg, rgba(0, 137, 123, 0.05) 0%, rgba(77, 182, 172, 0.05) 100%);
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--primary-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.procedure-info h3 {
+    color: var(--primary-dark);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.procedure-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.procedure-date .fas {
+    color: var(--info-color);
+}
+
+.procedure-type {
+    flex-shrink: 0;
+}
+
+.type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--bg-light);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-light);
+}
+
+.type-badge .fas {
+    font-size: 1rem;
+}
+
+/* Different procedure types */
+.type-badge.type-manual {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    color: #2E7D32;
+    border-color: #66BB6A;
+}
+
+.type-badge.type-electrotherapy {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    color: #E65100;
+    border-color: #FFA726;
+}
+
+.type-badge.type-exercise {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    color: #1565C0;
+    border-color: #42A5F5;
+}
+
+.type-badge.type-thermal {
+    background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%);
+    color: #C2185B;
+    border-color: #EC407A;
+}
+
+/* ========== Procedure Body ========== */
+.procedure-body {
+    padding: 1.5rem;
+}
+
+.procedure-details {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 120px;
+    font-size: 0.95rem;
+}
+
+.detail-value {
+    color: var(--text-primary);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-value .fas {
+    color: var(--primary-color);
+}
+
+/* Status colors */
+.status-excellent {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.status-good {
+    color: var(--info-color);
+    font-weight: 600;
+}
+
+.status-fair {
+    color: var(--warning-color);
+    font-weight: 600;
+}
+
+.status-poor {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.status-unknown {
+    color: var(--text-light);
+}
+
+/* ========== Procedure Notes ========== */
+.procedure-notes {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+    margin-top: 1rem;
+}
+
+.procedure-notes h4 {
+    color: var(--primary-dark);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.procedure-notes h4 .fas {
+    color: var(--primary-color);
+}
+
+.procedure-notes p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========== Procedure Actions ========== */
+.procedure-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-light);
+    border-top: 1px solid var(--border-light);
+}
+
+.btn-view,
+.btn-history {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-view {
+    background: linear-gradient(135deg, var(--info-color) 0%, #1976D2 100%);
+}
+
+.btn-history {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+}
+
+.btn-view:hover,
+.btn-history:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========== Button Procedure ========== */
+.btn-procedure {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-family: inherit;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-procedure.primary {
+    background: linear-gradient(135deg, var(--success-color) 0%, #388E3C 100%);
+    color: white;
+}
+
+.btn-procedure.secondary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.btn-procedure.tertiary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btn-procedure:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-procedure:active {
+    transform: translateY(-1px);
+}
+
+/* ========== Empty State ========== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.empty-state-icon {
+    font-size: 5rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+    font-size: 1.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: var(--text-light);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+/* ========== Modal ========== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 700px;
+    animation: modalSlideIn 0.4s ease-out;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-header .btn-procedure {
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    box-shadow: none;
+}
+
+.modal-header .btn-procedure:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: none;
+}
+
+.modal-body {
+    padding: 2rem;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* ========== Form Styles ========== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: var(--transition);
+    background: var(--bg-white);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 137, 123, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-light);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-light);
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 1200px) {
+    .procedures-grid {
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    }
+}
+
+@media (max-width: 968px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .main-container {
+        padding: 1.5rem;
+    }
+
+    .procedures-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .procedure-header {
+        flex-direction: column;
+    }
+
+    .procedure-type {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    nav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    nav a {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .main-container {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 1rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-procedure {
+        width: 100%;
+    }
+
+    .procedure-actions {
+        flex-direction: column;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+    }
+
+    .empty-state {
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========== Print Styles ========== */
+@media print {
+    .header,
+    nav,
+    .btn-procedure,
+    .procedure-actions,
+    .alert,
+    .modal {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .main-container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .procedure-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+    }
+}

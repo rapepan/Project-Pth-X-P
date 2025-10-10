@@ -9,7 +9,8 @@ class AuthController {
     }
     res.render("login", { 
       title: "เข้าสู่ระบบ",
-      message: req.query.message || null 
+      message: req.query.message || null,
+      error: req.query.error || null
     });
   }
 
@@ -21,13 +22,14 @@ class AuthController {
     res.render("register", { 
       title: "สมัครสมาชิก",
       message: null,
-      errors: []
+      errors: [],
+      formData: {}
     });
   }
 
   // สมัครสมาชิก
   static register(req, res) {
-    const { username, password, confirmPassword, email, fullname } = req.body;
+    const { username, password, confirmPassword, email, fullname, role } = req.body;
     const errors = [];
 
     // Validation
@@ -49,6 +51,10 @@ class AuthController {
 
     if (!fullname || fullname.trim() === '') {
       errors.push('กรุณากรอกชื่อ-นามสกุล');
+    }
+
+    if (!role || !['admin', 'user'].includes(role)) {
+      errors.push('กรุณาเลือกระดับผู้ใช้');
     }
 
     if (errors.length > 0) {
@@ -84,8 +90,8 @@ class AuthController {
 
         return res.render("register", {
           title: "สมัครสมาชิก",
-          message: errorMessage,
-          errors: [],
+          message: null,
+          errors: [errorMessage],
           formData: req.body
         });
       }
@@ -104,10 +110,10 @@ class AuthController {
 
         const insertUserQuery = `
           INSERT INTO users (username, password, email, fullname, role, created_at) 
-          VALUES (?, ?, ?, ?, 'user', NOW())
+          VALUES (?, ?, ?, ?, ?, NOW())
         `;
         
-        db.query(insertUserQuery, [username, hashedPassword, email, fullname], (err, result) => {
+        db.query(insertUserQuery, [username, hashedPassword, email, fullname, role], (err, result) => {
           if (err) {
             console.error("Error inserting user:", err);
             return res.render("register", {
@@ -118,7 +124,7 @@ class AuthController {
             });
           }
 
-          res.redirect("/login?message=สมัครสมาชิกเรียบร้อยแล้ว กรุณาเข้าสู่ระบบ");
+          res.redirect("/login?message=สมัครสมาชิกเรียบร้อยแล้วกรุณาเข้าสู่ระบบ");
         });
       });
     });
@@ -128,7 +134,7 @@ class AuthController {
   static logout(req, res, next) {
     req.logout((err) => {
       if (err) return next(err);
-      res.redirect("/login?message=ออกจากระบบเรียบร้อยแล้ว");
+      res.redirect("/login?error=ออกจากระบบเรียบร้อยแล้ว");
     });
   }
 

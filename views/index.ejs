@@ -5,20 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    
-    <!-- Google Fonts สำหรับฟอนต์ไทย -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS ของเรา -->
     <link rel="stylesheet" href="/css/index.css">
-    
+
 </head>
 
 <body>
-    <header>
+    <!-- Sticky Header -->
+    <header class="sticky-header">
         <div class="header-content">
             <div class="logo-section">
                 <h1>
@@ -29,57 +24,163 @@
             <div class="logout-section">
                 <a href="/logout" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
-                    ออกจากระบบ
+                    <span>ออกจากระบบ</span>
                 </a>
             </div>
         </div>
     </header>
-    
+
     <div class="main-container">
-        <div class="welcome-section">
-            <h2>ยินดีต้อนรับสู่ระบบคลินิกกายภาพบำบัด</h2>
-            <p>เลือกเมนูด้านล่างเพื่อเริ่มใช้งาน</p>
+        <!-- Hero Welcome Section -->
+        <div class="hero-section">
+            <div>
+                <h2 class="hero-title">ยินดีต้อนรับคุณ <%= user.fullname || user.username %></h2>
+                <p class="hero-subtitle">สู่ระบบบริหารจัดการคลินิกกายภาพบำบัด</p>
+                <div class="hero-decoration">
+                    <div class="decoration-circle circle-1"></div>
+                    <div class="decoration-circle circle-2"></div>
+                    <div class="decoration-circle circle-3"></div>
+                </div>
+            </div>
         </div>
-        
+
+        <!-- Quick Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card" data-delay="0.1">
+                <div class="stat-icon patients-stat">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-number">-</h3>
+                    <p class="stat-label">ผู้ป่วยทั้งหมด</p>
+                </div>
+            </div>
+            <div class="stat-card" data-delay="0.2">
+                <div class="stat-icon appointments-stat">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-number">-</h3>
+                    <p class="stat-label">นัดหมายวันนี้</p>
+                </div>
+            </div>
+            <div class="stat-card" data-delay="0.3">
+                <div class="stat-icon treatments-stat">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-number">-</h3>
+                    <p class="stat-label">การรักษาเดือนนี้</p>
+                </div>
+            </div>
+            <div class="stat-card" data-delay="0.4">
+                <div class="stat-icon revenue-stat">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-number">-</h3>
+                    <p class="stat-label">รายได้เดือนนี้</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Section Header -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-th-large"></i>
+                เมนูหลัก
+            </h2>
+            <p class="section-subtitle">เลือกเมนูด้านล่างเพื่อเริ่มใช้งาน</p>
+        </div>
+
+        <!-- Menu Grid with Enhanced Cards -->
         <div class="menu-grid">
             <!-- ลงทะเบียนผู้ป่วยใหม่ -->
-            <div class="menu-card" onclick="window.location.href='/patients/add'">
+            <div class="menu-card patients-card" data-delay="0.1" onclick="window.location.href='/patients/add'">
+                <div class="card-decoration"></div>
                 <div class="icon-wrapper">
                     <i class="fas fa-user-plus"></i>
                 </div>
-                <h3>ลงทะเบียนผู้ป่วยใหม่</h3>
-                <p>เพิ่มข้อมูลผู้ป่วยใหม่เข้าสู่ระบบ</p>
-                <a href="/patients/add" class="btn-action">เริ่มลงทะเบียน</a>
+                <div class="card-content">
+                    <h3>ลงทะเบียนผู้ป่วยใหม่</h3>
+                    <p>เพิ่มข้อมูลผู้ป่วยใหม่เข้าสู่ระบบ พร้อมบันทึกข้อมูลส่วนตัวและประวัติการรักษา</p>
+                </div>
+                <a href="/patients/add" class="btn-action">
+                    <span>เริ่มลงทะเบียน</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            
+
             <!-- ค้นหาข้อมูลผู้ป่วย -->
-            <div class="menu-card" onclick="window.location.href='/patients'">
+            <div class="menu-card search-card" data-delay="0.2" onclick="window.location.href='/patients'">
+                <div class="card-decoration"></div>
                 <div class="icon-wrapper">
                     <i class="fas fa-search"></i>
                 </div>
-                <h3>ค้นหาข้อมูลผู้ป่วย</h3>
-                <p>ค้นหาและจัดการข้อมูลผู้ป่วย</p>
-                <a href="/patients" class="btn-action">ค้นหาผู้ป่วย</a>
-            </div>
-            
-            <!-- ห้องตรวจ -->
-            <!-- <div class="menu-card" onclick="window.location.href='/examinationroom'">
-                <div class="icon-wrapper">
-                    <i class="fas fa-stethoscope"></i>
+                <div class="card-content">
+                    <h3>ค้นหาข้อมูลผู้ป่วย</h3>
+                    <p>ค้นหาและจัดการข้อมูลผู้ป่วย ดูรายละเอียด และแก้ไขข้อมูลที่จำเป็น</p>
                 </div>
-                <h3>ห้องตรวจ</h3>
-                <p>บันทึกการตรวจและการรักษา</p>
-                <a href="/examinationroom" class="btn-action">เข้าห้องตรวจ</a>
-            </div> -->
-            
+                <a href="/patients" class="btn-action">
+                    <span>ค้นหาผู้ป่วย</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
             <!-- ประวัติการรักษา -->
-            <div class="menu-card" onclick="window.location.href='/medicaHistorydate'">
+            <div class="menu-card history-card" data-delay="0.3" onclick="window.location.href='/medicaHistorydate'">
+                <div class="card-decoration"></div>
                 <div class="icon-wrapper">
                     <i class="fas fa-file-medical"></i>
                 </div>
-                <h3>ประวัติการรักษา</h3>
-                <p>ดูประวัติการรักษาของผู้ป่วย</p>
-                <a href="/medicaHistorydate" class="btn-action">ดูประวัติ</a>
+                <div class="card-content">
+                    <h3>ประวัติการรักษา</h3>
+                    <p>ดูประวัติการรักษาของผู้ป่วย ตรวจสอบการรักษาย้อนหลัง และดาวน์โหลดรายงาน</p>
+                </div>
+                <a href="/medicaHistorydate" class="btn-action">
+                    <span>ดูประวัติ</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Placeholder for future feature -->
+            <div class="menu-card coming-soon-card" data-delay="0.4">
+                <div class="card-decoration"></div>
+                <div class="icon-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="card-content">
+                    <h3>ระบบนัดหมาย</h3>
+                    <p>จัดการนัดหมายผู้ป่วย ดูตารางนัดหมาย และส่งการแจ้งเตือน</p>
+                </div>
+                <div class="coming-soon-badge">
+                    <i class="fas fa-clock"></i>
+                    <span>เร็วๆ นี้</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Info Footer Section -->
+        <div class="info-footer">
+            <div class="info-content">
+                <div class="info-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="info-text">
+                        <h4>ความปลอดภัย</h4>
+                        <p>ข้อมูลได้รับการเข้ารหัสและปกป้องอย่างปลอดภัย</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-headset"></i>
+                    <div class="info-text">
+                        <h4>ฝ่ายสนับสนุน</h4>
+                        <p>ติดต่อฝ่ายสนับสนุน 24/7 หากมีข้อสงสัย</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 ระบบบริหารจัดการคลินิกกายภาพบำบัด. All rights reserved.</p>
             </div>
         </div>
     </div>

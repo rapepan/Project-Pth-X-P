@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+        .print-header { text-align: center; margin-bottom: 20px; }
+        .print-content { margin: 20px 0; }
+        .print-section { margin: 15px 0; }
+        .print-label { font-weight: bold; }
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-header">
+        <h1>รายงานการตรวจร่างกาย</h1>
+        <p>โรงพยาบาล</p>
+    </div>
+    
+    <div class="print-content">
+        <% if (examination) { %>
+        <div class="print-section">
+            <h3>ข้อมูลผู้ป่วย</h3>
+            <p><span class="print-label">HN:</span> <%= examination.HN %></p>
+            <p><span class="print-label">ชื่อ-นามสกุล:</span> <%= examination.patient_name %></p>
+            <p><span class="print-label">วันที่ตรวจ:</span> <%= new Date(examination.created_at).toLocaleDateString('th-TH') %></p>
+        </div>
+        
+        <div class="print-section">
+            <h3>ผลการตรวจ</h3>
+            <p><span class="print-label">Observation:</span> <%= examination.observation %></p>
+            <p><span class="print-label">Palpation:</span> <%= examination.palpation %></p>
+        </div>
+        
+        <% if (examination.rom) { %>
+        <div class="print-section">
+            <h4>ROM (Range of Motion)</h4>
+            <p>WNL: <%= examination.rom.WNL ? 'ใช่' : 'ไม่' %></p>
+            <p>Weakness: <%= examination.rom.Weakness ? 'ใช่' : 'ไม่' %></p>
+            <% if (examination.rom.note) { %>
+            <p><span class="print-label">หมายเหตุ:</span> <%= examination.rom.note %></p>
+            <% } %>
+        </div>
+        <% } %>
+        
+        <% if (examination.notes) { %>
+        <div class="print-section">
+            <h4>หมายเหตุเพิ่มเติม</h4>
+            <p><%= examination.notes %></p>
+        </div>
+        <% } %>
+        <% } %>
+    </div>
+    
+    <div class="no-print" style="margin-top: 20px;">
+        <button onclick="window.print()" class="btn btn-primary">พิมพ์</button>
+        <button onclick="window.close()" class="btn btn-secondary">ปิด</button>
+    </div>
+</body>
+</html>

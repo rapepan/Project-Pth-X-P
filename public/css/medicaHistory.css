@@ -1,38 +1,54 @@
-/* ========== CSS Variables ========== */
+/* ========== CSS Variables - ใช้ธีมเดียวกับ index.css ========== */
 :root {
     --primary-color: #00897B;
     --primary-light: #4DB6AC;
     --primary-dark: #00695C;
-    --primary-hover: #00695C;
     --secondary-color: #FF8A65;
-    --danger-color: #EF5350;
-    --danger-hover: #D32F2F;
-    --warning-color: #FFA726;
-    --info-color: #42A5F5;
     --success-color: #66BB6A;
+    --warning-color: #FFA726;
+    --danger-color: #EF5350;
+    --info-color: #42A5F5;
     --bg-light: #F0FFF0;
-    --text-primary: #333;
-    --text-secondary: #666;
+    --bg-white: #FFFFFF;
+    --bg-gradient: linear-gradient(135deg, #E8F5E9 0%, #E0F2F1 50%, #F5F5F5 100%);
+    --text-primary: #2c3e50;
+    --text-secondary: #546e7a;
+    --text-light: #90a4ae;
     --border-color: #e0e0e0;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
-    --shadow-lg: 0 8px 16px rgba(0,0,0,0.16);
+    --border-light: #f0f0f0;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --shadow-xl: 0 16px 40px rgba(0,0,0,0.16);
+    --shadow-hover: 0 12px 32px rgba(0,137,123,0.15);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========== Base Styles ========== */
-body {
-    font-family: 'Sarabun', 'Prompt', 'Helvetica Neue', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #E0F2F1 0%, #F5F5F5 100%);
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
+/* Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: 'Sarabun', 'Prompt', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    line-height: 1.7;
+    min-height: 100vh;
 }
 
 /* ========== Page Header ========== */
@@ -87,44 +103,45 @@ header h1 .fas {
 
 /* ========== Navigation ========== */
 nav {
-    background-color: #333;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+    background: white;
+    box-shadow: var(--shadow-md);
     position: sticky;
     top: 0;
     z-index: 100;
-    margin-bottom: 2rem;
+    margin: 0 auto 2rem;
+    max-width: 1400px;
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 nav a {
-    display: inline-block;
-    color: white;
-    padding: 14px 20px;
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    position: relative;
+    font-weight: 500;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
 }
 
-nav a:hover,
+nav a:hover {
+    color: var(--primary-color);
+    background: rgba(0,137,123,0.05);
+}
+
 nav a.active {
-    background-color: rgba(255,255,255,0.1);
-    transform: translateY(-2px);
-}
-
-nav a.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(0,137,123,0.08);
 }
 
 nav a .fas {
-    margin-right: 0.5rem;
+    font-size: 1rem;
 }
 
 /* ========== Container ========== */
@@ -265,7 +282,7 @@ button {
     width: 100%;
     padding: 1rem 2rem;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: white;
+    color: rgb(255, 255, 255);
     font-size: 1.1rem;
     border: none;
     border-radius: 12px;
@@ -296,7 +313,7 @@ button .fas {
 }
 
 button a {
-    color: white;
+    color: rgb(0, 228, 38);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -309,13 +326,13 @@ button a {
 /* Button Variants */
 .button2,
 .button3 {
-    background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-hover) 100%);
-    box-shadow: 0 4px 12px rgba(239,83,80,0.3);
+    background: #00897B;
+    box-shadow: #4DB6AC;
 }
 
 .button2:hover,
 .button3:hover {
-    box-shadow: 0 6px 20px rgba(239,83,80,0.4);
+    box-shadow: #4DB6AC;
 }
 
 /* ========== Notice Messages ========== */

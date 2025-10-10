@@ -7,14 +7,13 @@ const pool = mysql.createPool({
   // การตั้งค่าพื้นฐาน
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT) || 3306,
+  port: parseInt(process.env.DB_PORT),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   
   // สำคัญ! การตั้งค่าสำหรับภาษาไทย
   charset: process.env.DB_CHARSET || 'utf8mb4',
-  collation: process.env.DB_COLLATION || 'utf8mb4_unicode_ci',
   
   // Timezone
   timezone: process.env.DB_TIMEZONE || '+07:00',
@@ -54,9 +53,9 @@ pool.getConnection((err, connection) => {
   console.log("   Charset:", process.env.DB_CHARSET || 'utf8mb4');
   
   // ตรวจสอบ timezone
-  connection.query('SELECT NOW() as now', (err, results) => {
+  connection.query('SELECT NOW()', (err, results) => {
     if (!err && results.length > 0) {
-      console.log("   Current Time:", new Date(results[0].now).toLocaleString('th-TH'));
+      console.log("   Current Time:", new Date(results[0]['NOW()']).toLocaleString('th-TH'));
     }
   });
   

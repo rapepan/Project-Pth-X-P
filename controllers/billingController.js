@@ -109,6 +109,13 @@ class BillingController {
     const HN = req.params.HN;
     const billingData = req.body;
 
+    console.log('=== BILLING CREATE DEBUG ===');
+    console.log('HN:', HN);
+    console.log('billingData:', billingData);
+    console.log('selectedServices:', billingData.selectedServices);
+    console.log('paymentMethod:', billingData.paymentMethod);
+    console.log('totalAmount:', billingData.totalAmount);
+
     if (!HN || !billingData) {
       return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ข้อมูลไม่ครบถ้วน')}`);
     }
@@ -148,7 +155,8 @@ class BillingController {
         BillingModel.createBill(processedData, (err, result) => {
           if (err) {
             console.error('Error creating bill:', err);
-            return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ไม่สามารถสร้างใบเสร็จได้')}`);
+            console.error('Processed data:', processedData);
+            return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ไม่สามารถสร้างใบเสร็จได้: ' + err.message)}`);
           }
 
           // อัปเดตสถานะหัตถการให้เป็น "billed"

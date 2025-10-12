@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCheckboxBehaviors();
     setupInputVisibility();
     setupDetailInputToggle(); // เพิ่มฟังก์ชันใหม่
+    setupSubOptionsToggle(); // เพิ่มฟังก์ชันสำหรับ sub-options
     setupFormValidation();
     setupAnimations();
     preventEnterSubmit();
@@ -107,6 +108,7 @@ function setupDetailInputToggle() {
         const relatedInputs = document.querySelectorAll(`.detail-input[data-toggle="${checkboxId}"]`);
 
         if (relatedInputs.length > 0) {
+            console.log(`Found ${relatedInputs.length} related inputs for ${checkboxId}`);
             // เริ่มต้น: ซ่อน input ถ้า checkbox ยังไม่ถูกเลือก
             relatedInputs.forEach(input => {
                 if (checkbox.checked) {
@@ -135,6 +137,62 @@ function setupDetailInputToggle() {
                         }, 300);
                     }
                 });
+            });
+        }
+    });
+}
+
+// Setup sub-options toggle - แสดง/ซ่อนตัวเลือกย่อยเมื่อเลือก checkbox หลัก
+function setupSubOptionsToggle() {
+    // หา checkbox หลักทั้งหมดที่มี sub-options
+    const mainCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    
+    mainCheckboxes.forEach(checkbox => {
+        const checkboxId = checkbox.id;
+        
+        // หา sub-options-container ที่มี data-parent ตรงกับ checkbox id นี้
+        const subOptionsContainer = document.querySelector(`.sub-options-container[data-parent="${checkboxId}"]`);
+        
+        if (subOptionsContainer) {
+            // เริ่มต้น: ซ่อน sub-options ถ้า checkbox ยังไม่ถูกเลือก
+            if (checkbox.checked) {
+                subOptionsContainer.style.display = 'block';
+                subOptionsContainer.style.opacity = '1';
+            } else {
+                subOptionsContainer.style.display = 'none';
+                subOptionsContainer.style.opacity = '0';
+            }
+            
+            // เพิ่ม event listener สำหรับการเปลี่ยนแปลง
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // แสดง sub-options พร้อม animation
+                    subOptionsContainer.style.display = 'block';
+                    subOptionsContainer.classList.add('slide-down');
+                    subOptionsContainer.classList.remove('slide-up');
+                } else {
+                    // ซ่อน sub-options พร้อม animation
+                    subOptionsContainer.classList.add('slide-up');
+                    subOptionsContainer.classList.remove('slide-down');
+                    
+                    setTimeout(() => {
+                        subOptionsContainer.style.display = 'none';
+                    }, 300);
+                    
+                    // ล้างค่าทุก checkbox และ input ใน sub-options
+                    const subCheckboxes = subOptionsContainer.querySelectorAll('input[type="checkbox"]');
+                    const subInputs = subOptionsContainer.querySelectorAll('input[type="text"]');
+                    
+                    subCheckboxes.forEach(subCheckbox => {
+                        subCheckbox.checked = false;
+                        // Trigger change event เพื่อซ่อน detail inputs
+                        subCheckbox.dispatchEvent(new Event('change'));
+                    });
+                    
+                    subInputs.forEach(subInput => {
+                        subInput.value = '';
+                    });
+                }
             });
         }
     });

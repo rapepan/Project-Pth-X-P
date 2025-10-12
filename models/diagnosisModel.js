@@ -4,34 +4,29 @@ class DiagnosisModel {
 
   // บันทึกการวินิจฉัย
   static createDiagnosis(data, callback) {
-    // Convert ICD-10 codes array to JSON string
-    const icd10CodesJson = JSON.stringify(data.icd10Codes || []);
+    // Get the first ICD-10 code from the array (since DB only supports single code)
+    const firstIcd10 = data.icd10Codes && data.icd10Codes.length > 0 ? data.icd10Codes[0] : null;
     
     const insertQuery = `
       INSERT INTO diagnosis (
         HN, patient_name, diagnosis_date,
-        chief_complaint, present_illness, past_history,
-        icd10_codes, diagnosis_type,
-        severity, prognosis, treatment_plan,
-        special_considerations, created_by, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        icd10_code, icd10_description,
+        prognosis, treatment_plan,
+        special_considerations, notes, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
       data.HN,
       data.patientName,
       data.diagnosisDate || new Date(),
-      data.chiefComplaint || '',
-      data.presentIllness || '',
-      data.pastHistory || '',
-      icd10CodesJson,
-      data.diagnosisType || 'primary',
-      data.severity || 'moderate',
+      firstIcd10 ? firstIcd10.code : null,
+      firstIcd10 ? firstIcd10.description : null,
       data.prognosis || '',
       data.treatmentPlan || '',
       data.specialConsiderations || '',
-      data.createdBy || null,
-      data.notes || ''
+      data.notes || '',
+      data.createdBy || null
     ];
 
     db.query(insertQuery, values, callback);
@@ -39,18 +34,14 @@ class DiagnosisModel {
 
   // อัปเดตการวินิจฉัย
   static updateDiagnosis(id, data, callback) {
-    // Convert ICD-10 codes array to JSON string
-    const icd10CodesJson = JSON.stringify(data.icd10Codes || []);
+    // Get the first ICD-10 code from the array (since DB only supports single code)
+    const firstIcd10 = data.icd10Codes && data.icd10Codes.length > 0 ? data.icd10Codes[0] : null;
     
     const updateQuery = `
       UPDATE diagnosis
       SET 
-        chief_complaint = ?,
-        present_illness = ?,
-        past_history = ?,
-        icd10_codes = ?,
-        diagnosis_type = ?,
-        severity = ?,
+        icd10_code = ?,
+        icd10_description = ?,
         prognosis = ?,
         treatment_plan = ?,
         special_considerations = ?,
@@ -60,12 +51,8 @@ class DiagnosisModel {
     `;
 
     const values = [
-      data.chiefComplaint || '',
-      data.presentIllness || '',
-      data.pastHistory || '',
-      icd10CodesJson,
-      data.diagnosisType || 'primary',
-      data.severity || 'moderate',
+      firstIcd10 ? firstIcd10.code : null,
+      firstIcd10 ? firstIcd10.description : null,
       data.prognosis || '',
       data.treatmentPlan || '',
       data.specialConsiderations || '',
@@ -88,10 +75,13 @@ class DiagnosisModel {
       if (err) return callback(err);
       if (results.length > 0) {
         const diagnosis = results[0];
-        // Parse ICD-10 codes JSON
-        try {
-          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
-        } catch (e) {
+        // Convert single ICD-10 code to array format for compatibility
+        if (diagnosis.icd10_code) {
+          diagnosis.icd10_codes = [{
+            code: diagnosis.icd10_code,
+            description: diagnosis.icd10_description
+          }];
+        } else {
           diagnosis.icd10_codes = [];
         }
       }
@@ -110,11 +100,14 @@ class DiagnosisModel {
     `;
     db.query(query, [HN], (err, results) => {
       if (err) return callback(err);
-      // Parse ICD-10 codes JSON for each diagnosis
+      // Convert single ICD-10 code to array format for compatibility
       results.forEach(diagnosis => {
-        try {
-          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
-        } catch (e) {
+        if (diagnosis.icd10_code) {
+          diagnosis.icd10_codes = [{
+            code: diagnosis.icd10_code,
+            description: diagnosis.icd10_description
+          }];
+        } else {
           diagnosis.icd10_codes = [];
         }
       });
@@ -136,10 +129,13 @@ class DiagnosisModel {
       if (err) return callback(err);
       if (results.length > 0) {
         const diagnosis = results[0];
-        // Parse ICD-10 codes JSON
-        try {
-          diagnosis.icd10_codes = diagnosis.icd10_codes ? JSON.parse(diagnosis.icd10_codes) : [];
-        } catch (e) {
+        // Convert single ICD-10 code to array format for compatibility
+        if (diagnosis.icd10_code) {
+          diagnosis.icd10_codes = [{
+            code: diagnosis.icd10_code,
+            description: diagnosis.icd10_description
+          }];
+        } else {
           diagnosis.icd10_codes = [];
         }
       }

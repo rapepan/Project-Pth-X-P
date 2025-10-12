@@ -75,33 +75,65 @@ class ExaminationController {
 
     const examinationData = req.body;
 
-    // สร้างข้อมูลการตรวจ
+    // สร้างข้อมูลการตรวจตามโครงสร้างที่ถูกต้อง
     const saveData = {
       HN: HN,
-      patient_name: examinationData.patient_name || examinationData.patientName,
+      patient_name: examinationData.patient_name || '',
       observation: examinationData.observation || '',
       palpation: examinationData.palpation || '',
+      
+      // ROM Data
       rom_wnl: examinationData.romWNL ? 1 : 0,
       rom_weakness: examinationData.romWeakness ? 1 : 0,
-      rom_notes: examinationData.romNotes || '',
+      rom_notes: examinationData.romNotes1 || '',
+      
+      // MMT Data
       mmt_normal: examinationData.mmtNormal ? 1 : 0,
       mmt_limited: examinationData.mmtLimited ? 1 : 0,
-      mmt_notes: examinationData.mmtNotes || '',
+      mmt_notes: examinationData.mmtNotes1 || '',
+      
+      // Accessory Movement Data
       accessory_normal: examinationData.accessoryNormal ? 1 : 0,
       accessory_hypermobility: examinationData.accessoryHypermobility ? 1 : 0,
-      accessory_notes: examinationData.accessoryNotes || '',
-      pinprick: examinationData.pinprick ? 1 : 0,
-      light_touch: examinationData.lightTouch ? 1 : 0,
-      sensory_test: examinationData.sensoryTest || '',
-      normal_reflex: examinationData.normalReflex ? 1 : 0,
-      abnormal_reflex: examinationData.abnormalReflex ? 1 : 0,
-      deep_tendon_reflex: examinationData.deepTendonReflex || '',
+      accessory_notes: [
+        examinationData.accessoryHypomobility ? 'Hypomobility: ' + (examinationData.accessoryNotes1 || '') : '',
+        examinationData.accessoryHypermobility ? 'Hypermobility: ' + (examinationData.accessoryNotes2 || '') : ''
+      ].filter(item => item !== '').join('; ') || '',
+      
+      // Sensory Data - Pinprick
+      pinprick: examinationData.sensoryPinprick ? 1 : 0,
+      light_touch: examinationData.sensoryLightTouch ? 1 : 0,
+      sensory_test: [
+        examinationData.pinprickIntact ? 'Pinprick Intact: ' + (examinationData.pinprickNotes1 || '') : '',
+        examinationData.pinprickImpair ? 'Pinprick Impair: ' + (examinationData.pinprickNotes2 || '') : '',
+        examinationData.pinprickLoss ? 'Pinprick Loss: ' + (examinationData.pinprickNotes3 || '') : '',
+        examinationData.lightTouchIntact ? 'Light Touch Intact' : '',
+        examinationData.lightTouchImpair ? 'Light Touch Impair: ' + (examinationData.lightTouchNotes1 || '') : '',
+        examinationData.lightTouchLoss ? 'Light Touch Loss: ' + (examinationData.lightTouchNotes2 || '') : ''
+      ].filter(item => item !== '').join('; ') || '',
+      
+      // Reflex Data
+      normal_reflex: examinationData.normalDTR ? 1 : 0,
+      abnormal_reflex: examinationData.abnormalDTR ? 1 : 0,
+      deep_tendon_reflex: [
+        examinationData.normalDTR ? 'Normal: ' + (examinationData.deepTendonReflexNotes1 || '') : '',
+        examinationData.abnormalDTR ? 'Abnormal: ' + (examinationData.deepTendonReflexNotes2 || '') : ''
+      ].filter(item => item !== '').join('; ') || '',
+      
+      // Transfer Data
       transfer_independent: examinationData.transferIndependent ? 1 : 0,
       transfer_dependent: examinationData.transferDependent ? 1 : 0,
-      transfer_notes: examinationData.transferNotes || '',
+      transfer_notes: examinationData.transferNotes2 || '',
+      
+      // Ambulation Data
       ambulation_independent: examinationData.ambulationIndependent ? 1 : 0,
       ambulation_dependent: examinationData.ambulationDependent ? 1 : 0,
-      ambulation_notes: examinationData.ambulationNotes || '',
+      ambulation_notes: [
+        examinationData.ambulationHandFree ? 'Hand-Free' : '',
+        examinationData.ambulationWith ? 'With: ' + (examinationData.ambulationNotes1 || '') : '',
+        examinationData.ambulationDependent ? 'Dependent: ' + (examinationData.ambulationNotes2 || '') : ''
+      ].filter(item => item !== '').join('; ') || '',
+      
       notes: examinationData.notes || ''
     };
 

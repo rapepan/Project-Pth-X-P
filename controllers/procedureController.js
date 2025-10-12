@@ -135,13 +135,13 @@ class ProcedureController {
     // ดึงข้อมูลผู้ป่วยจากฐานข้อมูล
     const db = require('../config/db');
     const patientQuery = "SELECT fname, lname FROM patient WHERE HN = ?";
-    
+
     db.query(patientQuery, [HN], (err, patientResults) => {
       if (err) {
         console.error('Error fetching patient:', err);
         return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถดึงข้อมูลผู้ป่วยได้')}`);
       }
-      
+
       // เตรียมชื่อผู้ป่วย
       let patientName = 'ผู้ป่วยไม่ระบุชื่อ';
       if (patientResults && patientResults.length > 0) {
@@ -151,40 +151,57 @@ class ProcedureController {
           patientName = 'ผู้ป่วยไม่ระบุชื่อ';
         }
       }
-      
+
+      // สร้างรายการชื่อบริการจาก selectedServices
+      const serviceNames = selectedServices.map(s => s.service_name).join(', ');
+
       // เตรียมข้อมูลหัตถการให้ครบถ้วน
       const completeProcedureData = {
         HN: HN,
         patient_name: patientName,
         procedure_date: getCurrentDate(), // YYYY-MM-DD format
         procedure_code: procedureData.procedureCode || 'PT001',
-        procedure_name: procedureData.procedureName || 'หัตถการกายภาพบำบัด',
-        body_part: procedureData.bodyPart || 'ไม่ระบุส่วนร่างกาย',
-        technique: procedureData.techniques || 'การบำบัดด้วยบริการที่เลือก',
+        procedure_name: serviceNames || 'หัตถการกายภาพบำบัด',
+        technique: procedureData.techniques || serviceNames || 'การบำบัดด้วยบริการที่เลือก',
         duration_minutes: parseInt(procedureData.duration) || 30,
-        therapist_name: procedureData.therapist || null, // เก็บชื่อผู้ทำการรักษา
-        notes: procedureData.notes || '', // ไม่เจนข้อมูลอัตโนมัติ ให้ผู้ใช้ใส่เอง
-        created_by: req.user ? (req.user.fullname || req.user.username || req.user.email || 'ไม่ระบุชื่อผู้ใช้') : null
+        therapist_name: procedureData.therapist || null,
+        notes: procedureData.notes || '',
+        created_by: req.user ? (req.user.fullname || req.user.username || req.user.email || 'ไม่ระบุผู้ใช้') : 'ไม่ระบุผู้ใช้'
       };
 
-
-      // บันทึกหัตถการ
-      ProcedureModel.createProcedure(completeProcedureData, (err, result) => {
+      // ตรวจสอบว่ามีหัตถการเดิมหรือไม่ (ดูจาก HN และ procedure_name)
+      ProcedureModel.checkExistingProcedure(HN, completeProcedureData.procedure_name, (err, existingProcedure) => {
         if (err) {
-          return res.redirect(`/procedure/${HN}?error=${encodeURIComponent(err.message)}`);
+          console.error('Error checking existing procedure:', err);
+          return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถตรวจสอบหัตถการเดิมได้')}`);
         }
 
-        // ส่งข้อมูลบริการไปยังหน้า billing
-        const billingData = {
-          HN: HN,
-          procedureId: result.insertId,
-          selectedServices: procedureData.selectedServices,
-          totalAmount: procedureData.totalAmount || 0
-        };
+        if (existingProcedure) {
+          // ถ้ามีหัตถการเดิม ให้บวกจำนวนครั้งเพิ่ม (ใช้ session_count)
+          const newSessionCount = parseInt(existingProcedure.session_count || 1) + 1;
+          const updatedNotes = `${existingProcedure.notes} | บันทึกเพิ่มครั้งที่ ${newSessionCount} - ${new Date().toLocaleDateString('th-TH')}`;
+          
+          ProcedureModel.updateProcedureSessionCount(existingProcedure.id, newSessionCount, updatedNotes, (err, result) => {
+            if (err) {
+              console.error('Error updating procedure session count:', err);
+              return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถอัปเดตจำนวนครั้งได้')}`);
+            }
 
-        // Redirect ไปหน้า billing พร้อมข้อมูล
-        const queryParams = new URLSearchParams(billingData).toString();
-        res.redirect(`/billing/${HN}?fromProcedure=true&${queryParams}`);
+            res.redirect(`/procedure/${HN}?success=${encodeURIComponent(`บันทึกหัตถการเรียบร้อยแล้ว (ครั้งที่ ${newSessionCount})`)}`);
+          });
+        } else {
+          // ถ้าไม่มีหัตถการเดิม ให้สร้างใหม่ (ครั้งที่ 1)
+          completeProcedureData.session_count = 1;
+          ProcedureModel.createProcedure(completeProcedureData, (err, result) => {
+            if (err) {
+              console.error('Error creating procedure:', err);
+              return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถบันทึกหัตถการได้')}`);
+            }
+
+            // บันทึกสำเร็จ - redirect กลับไปหน้า procedure พร้อมข้อความสำเร็จ
+            res.redirect(`/procedure/${HN}?success=${encodeURIComponent('บันทึกหัตถการเรียบร้อยแล้ว (ครั้งที่ 1)')}`);
+          });
+        }
       });
     });
   }

@@ -10,6 +10,20 @@
 </head>
 <body>
     <div class="container">
+        <% if (success) { %>
+            <div class="success-message fade-in">
+                <i class="fas fa-check-circle"></i>
+                <span><%= success %></span>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="error-message fade-in">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span><%= error %></span>
+            </div>
+        <% } %>
+        
         <h1>ประวัติการตรวจร่างกาย</h1>
         
         <% if (patient) { %>

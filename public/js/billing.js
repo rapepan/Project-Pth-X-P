@@ -1,360 +1,429 @@
 // billing.js - JavaScript สำหรับหน้าจัดการค่าใช้จ่าย
 
+// ฟังก์ชันอัปเดตยอดรวมของแต่ละบริการ
+function updateServiceTotal(input) {
+    const index = input.dataset.index;
+    const price = parseFloat(input.dataset.price);
+    const quantity = parseInt(input.value) || 0;
+    const total = price * quantity;
+    
+    // อัปเดตการแสดงผล
+    const totalDisplay = document.getElementById(`total_${index}`);
+    if (totalDisplay) {
+        totalDisplay.textContent = total.toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+    
+    // อัปเดตยอดรวมทั้งหมด
+    updateSubtotal();
+    updateSelectedServicesInput();
+}
+
+// ฟังก์ชันอัปเดตยอดรวมก่อนหักส่วนลด
+function updateSubtotal() {
+    let subtotal = 0;
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    
+    quantityInputs.forEach(input => {
+        const price = parseFloat(input.dataset.price);
+        const quantity = parseInt(input.value) || 0;
+        subtotal += price * quantity;
+    });
+    
+    // อัปเดตการแสดงผล
+    const subtotalElement = document.getElementById('subtotalAmount');
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    
+    if (subtotalElement) {
+        subtotalElement.textContent = subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+    
+    if (subtotalDisplay) {
+        subtotalDisplay.textContent = subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+    
+    // อัปเดตการคำนวณส่วนลดและภาษี
+    updateDiscountCalculation();
+}
+
+// ฟังก์ชันอัปเดตการคำนวณส่วนลด
+function updateDiscountCalculation() {
+    const discountType = document.getElementById('discountType');
+    const discountInput = document.getElementById('discountAmount');
+    const reasonInput = document.getElementById('discountReason');
+    
+    if (!discountType || !discountInput || !reasonInput) return;
+    
+    if (discountType.value === 'none') {
+        discountInput.disabled = true;
+        reasonInput.disabled = true;
+        discountInput.value = 0;
+        reasonInput.value = '';
+    } else {
+        discountInput.disabled = false;
+        reasonInput.disabled = false;
+    }
+    
+    updateTotalCalculation();
+}
+
+// ฟังก์ชันอัปเดตการคำนวณยอดรวมทั้งหมด
+function updateTotalCalculation() {
+    const subtotalElement = document.getElementById('subtotalDisplay');
+    if (!subtotalElement) return;
+    
+    const subtotal = parseFloat(subtotalElement.textContent.replace(/,/g, ''));
+    const discountType = document.getElementById('discountType');
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    
+    let afterDiscount = subtotal;
+    if (discountType && discountType.value === 'percentage') {
+        afterDiscount = subtotal - (subtotal * discountAmount / 100);
+    } else if (discountType && discountType.value === 'fixed') {
+        afterDiscount = subtotal - discountAmount;
+    }
+    
+        // ไม่มีภาษี
+        const taxAmount = 0;
+        const finalTotal = afterDiscount;
+    
+    // ไม่แสดงภาษี
+    
+    // แสดง/ซ่อนส่วนลด
+    const discountLine = document.getElementById('discountLine');
+    const discountDisplay = document.getElementById('discountDisplay');
+    
+    if (discountLine && discountDisplay) {
+        if (discountType && discountType.value !== 'none' && discountAmount > 0) {
+            discountLine.style.display = 'flex';
+            if (discountType.value === 'percentage') {
+                discountDisplay.textContent = `-${discountAmount}%`;
+            } else {
+                discountDisplay.textContent = `-${discountAmount.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+            }
+        } else {
+            discountLine.style.display = 'none';
+        }
+    }
+    
+    const finalTotalDisplay = document.getElementById('finalTotalDisplay');
+    if (finalTotalDisplay) {
+        finalTotalDisplay.textContent = finalTotal.toLocaleString('th-TH', {minimumFractionDigits: 2});
+    }
+}
+
+// ฟังก์ชันอัปเดต selectedServices input
+function updateSelectedServicesInput() {
+    const selectedServicesInput = document.getElementById('selectedServicesInput');
+    if (!selectedServicesInput) return;
+    
+    try {
+        const originalServices = JSON.parse(selectedServicesInput.value);
+        const updatedServices = originalServices.map((service, index) => {
+            const quantityInput = document.querySelector(`input[name="quantity_${index}"]`);
+            const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : service.quantity || 1;
+            
+            return {
+                ...service,
+                quantity: quantity
+            };
+        });
+        
+        selectedServicesInput.value = JSON.stringify(updatedServices);
+    } catch (error) {
+        console.error('Error updating selected services:', error);
+    }
+}
+
+// ฟังก์ชันตรวจสอบฟอร์มก่อนส่ง
+function validateForm() {
+    const selectedServicesInput = document.getElementById('selectedServicesInput');
+    if (!selectedServicesInput || !selectedServicesInput.value) {
+        alert('ไม่พบข้อมูลบริการ กรุณาลองใหม่อีกครั้ง');
+        return false;
+    }
+    
+    try {
+        const services = JSON.parse(selectedServicesInput.value);
+        if (!services || services.length === 0) {
+            alert('กรุณาเลือกบริการอย่างน้อย 1 รายการ');
+            return false;
+        }
+        
+        // ตรวจสอบว่ามีบริการที่มีจำนวนมากกว่า 0
+        const validServices = services.filter(service => service.quantity > 0);
+        if (validServices.length === 0) {
+            alert('กรุณาระบุจำนวนบริการอย่างน้อย 1 รายการ');
+            return false;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error validating form:', error);
+        alert('ข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+        return false;
+    }
+}
+
+// ฟังก์ชันแสดงตัวอย่างใบเสร็จ
+function previewBill() {
+    // TODO: Implement bill preview functionality
+    alert('ฟีเจอร์แสดงตัวอย่างใบเสร็จกำลังพัฒนา');
+}
+
+// ฟังก์ชันพิมพ์ใบเสร็จ
+function printBill() {
+    // TODO: Implement print functionality
+    alert('ฟีเจอร์พิมพ์ใบเสร็จกำลังพัฒนา');
+}
+
+// ฟังก์ชันส่งอีเมลใบเสร็จ
+function emailBill() {
+    // TODO: Implement email functionality
+    alert('ฟีเจอร์ส่งอีเมลใบเสร็จกำลังพัฒนา');
+}
+
+// ฟังก์ชันบันทึกเป็น PDF
+function saveAsPDF() {
+    // TODO: Implement PDF save functionality
+    alert('ฟีเจอร์บันทึกเป็น PDF กำลังพัฒนา');
+}
+
+// ฟังก์ชันเพิ่ม hidden input สำหรับ totalAmount
+function addTotalAmountInput() {
+    const form = document.getElementById('billingForm');
+    if (!form) return;
+    
+    // ลบ input เดิมถ้ามี
+    const existingInput = form.querySelector('input[name="totalAmount"]');
+    if (existingInput) {
+        existingInput.remove();
+    }
+    
+    // เพิ่ม input ใหม่
+    const finalTotalDisplay = document.getElementById('finalTotalDisplay');
+    if (finalTotalDisplay) {
+        const totalAmount = parseFloat(finalTotalDisplay.textContent.replace(/,/g, '')) || 0;
+        
+        const totalAmountInput = document.createElement('input');
+        totalAmountInput.type = 'hidden';
+        totalAmountInput.name = 'totalAmount';
+        totalAmountInput.value = totalAmount;
+        
+        form.appendChild(totalAmountInput);
+    }
+}
+
+// Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Billing page loaded');
+    // อัปเดตการคำนวณเมื่อโหลดหน้า
+    updateDiscountCalculation();
     
-    // Initialize page
-    initializeBilling();
-    
-    // Add event listeners
-    setupEventListeners();
-});
-
-// Initialize billing page
-function initializeBilling() {
-    // Load services for dropdown
-    loadServices();
-    
-    // Initialize form validation
-    setupFormValidation();
-    
-    // Load any existing data
-    loadExistingData();
-}
-
-// Setup event listeners
-function setupEventListeners() {
-    // Modal close on outside click
-    document.addEventListener('click', function(e) {
-        const modal = document.getElementById('createBillModal');
-        if (e.target === modal) {
-            hideCreateBillForm();
-        }
-    });
-    
-    // ESC key to close modal
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            hideCreateBillForm();
-        }
-    });
-    
-    // Auto-calculate totals
-    document.addEventListener('input', function(e) {
-        if (e.target.name === 'servicePrice' || e.target.name === 'discount') {
-            calculateTotal();
-        }
-    });
-}
-
-// Show create bill form modal
-function showCreateBillForm() {
-    const modal = document.getElementById('createBillModal');
-    if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        // Focus first input
-        const firstInput = modal.querySelector('input, select');
-        if (firstInput) {
-            setTimeout(() => firstInput.focus(), 100);
-        }
-    }
-}
-
-// Hide create bill form modal
-function hideCreateBillForm() {
-    const modal = document.getElementById('createBillModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        
-        // Clear form
-        clearCreateBillForm();
-    }
-}
-
-// Load services for dropdown
-function loadServices() {
-    // Mock services data - ในระบบจริงจะดึงจาก API
-    const services = [
-        { id: 1, name: 'การตรวจประเมิน', price: 500 },
-        { id: 2, name: 'การรักษาด้วยไฟฟ้า', price: 300 },
-        { id: 3, name: 'การนวด', price: 400 },
-        { id: 4, name: 'การออกกำลังกาย', price: 350 },
-        { id: 5, name: 'การประคบร้อน/เย็น', price: 200 },
-        { id: 6, name: 'การดึงคอ/หลัง', price: 450 },
-        { id: 7, name: 'การตรวจความแข็งแรง', price: 250 },
-        { id: 8, name: 'การฝึกการทรงตัว', price: 380 }
-    ];
-    
-    // Store services globally for use in forms
-    window.availableServices = services;
-}
-
-// Add service to bill
-function addService() {
-    const servicesList = document.getElementById('servicesList');
-    if (!servicesList) return;
-    
-    const serviceCount = servicesList.children.length;
-    const serviceItem = document.createElement('div');
-    serviceItem.className = 'service-item';
-    serviceItem.innerHTML = `
-        <select name="services[${serviceCount}][serviceId]" class="form-control" required>
-            <option value="">เลือกบริการ</option>
-            ${window.availableServices.map(service => 
-                `<option value="${service.id}" data-price="${service.price}">${service.name} - ${service.price.toLocaleString()} บาท</option>`
-            ).join('')}
-        </select>
-        <input type="number" name="services[${serviceCount}][quantity]" class="form-control" 
-               placeholder="จำนวน" min="1" value="1" required>
-        <button type="button" class="btn-remove" onclick="removeService(this)">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-    
-    servicesList.appendChild(serviceItem);
-    
-    // Add event listener for price calculation
-    const select = serviceItem.querySelector('select');
-    select.addEventListener('change', calculateTotal);
-    
-    const quantity = serviceItem.querySelector('input[type="number"]');
-    quantity.addEventListener('input', calculateTotal);
-}
-
-// Remove service from bill
-function removeService(button) {
-    const serviceItem = button.closest('.service-item');
-    if (serviceItem) {
-        serviceItem.remove();
-        calculateTotal();
-    }
-}
-
-// Calculate total amount
-function calculateTotal() {
-    const services = document.querySelectorAll('.service-item');
-    let totalAmount = 0;
-    
-    services.forEach(service => {
-        const select = service.querySelector('select');
-        const quantity = service.querySelector('input[type="number"]');
-        
-        if (select.value && quantity.value) {
-            const price = parseFloat(select.selectedOptions[0].dataset.price) || 0;
-            const qty = parseFloat(quantity.value) || 0;
-            totalAmount += price * qty;
-        }
-    });
-    
-    // Apply discount
-    const discountInput = document.querySelector('input[name="discount"]');
-    const discount = parseFloat(discountInput?.value) || 0;
-    const discountAmount = (totalAmount * discount) / 100;
-    const netAmount = totalAmount - discountAmount;
-    
-    // Update display (if exists)
-    updateTotalDisplay(totalAmount, discountAmount, netAmount);
-}
-
-// Update total display
-function updateTotalDisplay(total, discount, net) {
-    // Remove existing total display
-    const existingTotal = document.querySelector('.total-display');
-    if (existingTotal) {
-        existingTotal.remove();
-    }
-    
-    // Create new total display
-    const totalDisplay = document.createElement('div');
-    totalDisplay.className = 'total-display';
-    totalDisplay.innerHTML = `
-        <div class="total-summary">
-            <div class="total-item">
-                <span>ยอดรวม:</span>
-                <span class="amount">${total.toLocaleString()} บาท</span>
-            </div>
-            <div class="total-item">
-                <span>ส่วนลด (${document.querySelector('input[name="discount"]').value || 0}%):</span>
-                <span class="discount">${discount.toLocaleString()} บาท</span>
-            </div>
-            <div class="total-item total-net">
-                <span>ยอดสุทธิ:</span>
-                <span class="net-amount">${net.toLocaleString()} บาท</span>
-            </div>
-        </div>
-    `;
-    
-    // Insert before form actions
-    const formActions = document.querySelector('.form-actions');
-    if (formActions) {
-        formActions.parentNode.insertBefore(totalDisplay, formActions);
-    }
-}
-
-// Update payment status
-function updatePaymentStatus(billId, status) {
-    if (!confirm(`คุณต้องการ${status === 'paid' ? 'ชำระเงิน' : 'เปลี่ยนสถานะ'}ใบเสร็จนี้หรือไม่?`)) {
-        return;
-    }
-    
-    // Create form and submit
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/billing/${billId}/status`;
-    
-    const statusInput = document.createElement('input');
-    statusInput.type = 'hidden';
-    statusInput.name = 'status';
-    statusInput.value = status;
-    
-    form.appendChild(statusInput);
-    document.body.appendChild(form);
-    form.submit();
-}
-
-// Setup form validation
-function setupFormValidation() {
-    const forms = document.querySelectorAll('form');
-    
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!validateForm(this)) {
+    // เพิ่ม event listener สำหรับฟอร์ม
+    const billingForm = document.getElementById('billingForm');
+    if (billingForm) {
+        billingForm.addEventListener('submit', function(e) {
+            if (!validateForm()) {
                 e.preventDefault();
                 return false;
             }
+            
+            // เพิ่ม totalAmount input ก่อนส่งฟอร์ม
+            addTotalAmountInput();
+            
+            // แสดง loading state
+            const submitButton = billingForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสร้างใบเสร็จ...';
+            }
+        });
+    }
+    
+    // เพิ่ม event listener สำหรับการเปลี่ยนแปลงส่วนลด
+    const discountTypeSelect = document.getElementById('discountType');
+    if (discountTypeSelect) {
+        discountTypeSelect.addEventListener('change', updateDiscountCalculation);
+    }
+    
+    const discountAmountInput = document.getElementById('discountAmount');
+    if (discountAmountInput) {
+        discountAmountInput.addEventListener('input', updateTotalCalculation);
+    }
+    
+    // เพิ่ม event listener สำหรับการเปลี่ยนแปลงจำนวน
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    quantityInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            updateServiceTotal(this);
         });
     });
-}
-
-// Validate form
-function validateForm(form) {
-    let isValid = true;
-    const requiredFields = form.querySelectorAll('[required]');
     
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            showFieldError(field, 'กรุณากรอกข้อมูลนี้');
-            isValid = false;
-        } else {
-            clearFieldError(field);
-        }
-    });
-    
-    // Validate services
-    const services = form.querySelectorAll('.service-item');
-    if (services.length === 0) {
-        showAlert('กรุณาเพิ่มบริการอย่างน้อย 1 รายการ', 'error');
-        isValid = false;
-    }
-    
-    return isValid;
-}
-
-// Show field error
-function showFieldError(field, message) {
-    clearFieldError(field);
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'field-error';
-    errorDiv.textContent = message;
-    errorDiv.style.color = '#dc3545';
-    errorDiv.style.fontSize = '0.8rem';
-    errorDiv.style.marginTop = '0.25rem';
-    
-    field.parentNode.appendChild(errorDiv);
-    field.style.borderColor = '#dc3545';
-}
-
-// Clear field error
-function clearFieldError(field) {
-    const errorDiv = field.parentNode.querySelector('.field-error');
-    if (errorDiv) {
-        errorDiv.remove();
-    }
-    field.style.borderColor = '';
-}
-
-// Clear create bill form
-function clearCreateBillForm() {
-    const servicesList = document.getElementById('servicesList');
-    if (servicesList) {
-        servicesList.innerHTML = '';
-    }
-    
-    const form = document.querySelector('#createBillModal form');
-    if (form) {
-        form.reset();
-    }
-    
-    const totalDisplay = document.querySelector('.total-display');
-    if (totalDisplay) {
-        totalDisplay.remove();
-    }
-}
-
-// Load existing data
-function loadExistingData() {
-    // Load any existing form data from localStorage or server
-    const savedData = localStorage.getItem('billingFormData');
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            populateForm(data);
-        } catch (e) {
-            console.error('Error loading saved data:', e);
-        }
-    }
-}
-
-// Populate form with data
-function populateForm(data) {
-    // Implement form population logic
-    console.log('Populating form with data:', data);
-}
-
-// Save form data
-function saveFormData() {
-    const form = document.querySelector('#createBillModal form');
-    if (!form) return;
-    
-    const formData = new FormData(form);
-    const data = {};
-    
-    for (let [key, value] of formData.entries()) {
-        data[key] = value;
-    }
-    
-    localStorage.setItem('billingFormData', JSON.stringify(data));
-}
-
-// Show alert message
-function showAlert(message, type = 'info') {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.innerHTML = `
-        <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
-        ${message}
-    `;
-    
-    const container = document.querySelector('.main-container');
-    if (container) {
-        container.insertBefore(alertDiv, container.firstChild);
+    // Auto-calculate tax when subtotal changes
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    if (subtotalDisplay) {
+        // Use MutationObserver to watch for changes in subtotal
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                    updateTotalCalculation();
+                }
+            });
+        });
         
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
+        observer.observe(subtotalDisplay, {
+            childList: true,
+            characterData: true,
+            subtree: true
+        });
+    }
+});
+
+// ฟังก์ชันการชำระเงิน
+function processPayment() {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
+    
+    let amountReceived = 0;
+    let change = 0;
+    
+    // สำหรับเงินสด ต้องตรวจสอบจำนวนเงินที่รับ
+    if (paymentMethod === 'cash') {
+        amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+        
+        // Validation
+        if (amountReceived < finalTotal) {
+            alert('จำนวนเงินที่รับต้องไม่น้อยกว่ายอดรวม');
+            return;
+        }
+        
+        // Calculate change
+        if (amountReceived > finalTotal) {
+            change = amountReceived - finalTotal;
+        }
+    } else {
+        // สำหรับวิธีอื่น ให้จำนวนเงินที่รับเท่ากับยอดรวม
+        amountReceived = finalTotal;
+    }
+    
+    // Show payment status
+    document.getElementById('paymentStatusSection').style.display = 'block';
+    
+    // Update payment status display
+    const methodNames = {
+        'cash': 'เงินสด',
+        'transfer': 'โอนเงิน',
+        'card': 'บัตรเครดิต/เดบิต',
+        'insurance': 'ประกันสุขภาพ'
+    };
+    
+    document.getElementById('paymentMethodDisplay').textContent = methodNames[paymentMethod] || paymentMethod;
+    
+    // แสดงจำนวนเงินที่รับเฉพาะเมื่อชำระเงินสด
+    if (paymentMethod === 'cash') {
+        document.getElementById('amountReceivedDisplay').textContent = `จำนวนเงินที่รับ: ${amountReceived.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท<br>`;
+        if (change > 0) {
+            document.getElementById('changeDisplay').textContent = `เงินทอน: ${change.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
+        } else {
+            document.getElementById('changeDisplay').textContent = '';
+        }
+    } else {
+        // สำหรับวิธีอื่น ไม่แสดงจำนวนเงินที่รับ
+        document.getElementById('amountReceivedDisplay').textContent = '';
+        document.getElementById('changeDisplay').textContent = '';
+    }
+    
+    // Enable create bill button
+    document.getElementById('createBillBtn').disabled = false;
+    document.getElementById('createBillBtn').classList.add('enabled');
+    
+    // Hide payment button and disable inputs
+    document.getElementById('paymentBtn').style.display = 'none';
+    document.getElementById('amountReceived').disabled = true;
+    
+    // Show success message
+    showNotification('ชำระเงินเรียบร้อยแล้ว สามารถสร้างใบเสร็จได้', 'success');
+}
+
+// Event listener สำหรับการเปลี่ยนแปลงวิธีการชำระเงิน
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    const amountReceivedInput = document.getElementById('amountReceived');
+    const amountReceivedGroup = document.getElementById('amountReceivedGroup');
+    const changeGroup = document.getElementById('changeGroup');
+    const changeAmountInput = document.getElementById('changeAmount');
+    
+    if (paymentMethodSelect) {
+        paymentMethodSelect.addEventListener('change', function() {
+            if (this.value === 'cash') {
+                // แสดงช่องกรอกจำนวนเงินสำหรับเงินสด
+                amountReceivedGroup.style.display = 'block';
+                amountReceivedInput.disabled = false;
+                amountReceivedInput.required = true;
+                amountReceivedInput.focus();
+            } else {
+                // ซ่อนช่องกรอกจำนวนเงินสำหรับวิธีอื่น
+                amountReceivedGroup.style.display = 'none';
+                amountReceivedInput.disabled = true;
+                amountReceivedInput.required = false;
+                amountReceivedInput.value = 0;
+                changeGroup.style.display = 'none';
             }
-        }, 5000);
+        });
+    }
+    
+    if (amountReceivedInput) {
+        amountReceivedInput.addEventListener('input', function() {
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            if (paymentMethod === 'cash') {
+                const amountReceived = parseFloat(this.value) || 0;
+                const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
+                
+                if (amountReceived > finalTotal) {
+                    const change = amountReceived - finalTotal;
+                    changeGroup.style.display = 'block';
+                    changeAmountInput.value = change.toFixed(2);
+                } else {
+                    changeGroup.style.display = 'none';
+                }
+            }
+        });
+    }
+});
+
+// Handle view bill button
+document.addEventListener('DOMContentLoaded', function() {
+    const viewBillBtn = document.getElementById('viewBillBtn');
+    if (viewBillBtn) {
+        // Extract bill ID from URL if available
+        const urlParams = new URLSearchParams(window.location.search);
+        const billId = urlParams.get('billId');
+        if (billId) {
+            viewBillBtn.href = `/billing/detail/${billId}`;
+        }
+    }
+});
+
+// Print bill function
+function printBill() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const billId = urlParams.get('billId');
+    if (billId) {
+        window.open(`/billing/detail/${billId}?print=true`, '_blank');
+    } else {
+        alert('ไม่พบใบเสร็จที่จะพิมพ์');
     }
 }
 
-// Export functions for global access
-window.showCreateBillForm = showCreateBillForm;
-window.hideCreateBillForm = hideCreateBillForm;
-window.addService = addService;
-window.removeService = removeService;
-window.updatePaymentStatus = updatePaymentStatus;
+// Export functions for global use
+window.updateServiceTotal = updateServiceTotal;
+window.updateSubtotal = updateSubtotal;
+window.updateDiscountCalculation = updateDiscountCalculation;
+window.updateTotalCalculation = updateTotalCalculation;
+window.updateSelectedServicesInput = updateSelectedServicesInput;
+window.validateForm = validateForm;
+window.previewBill = previewBill;
+window.printBill = printBill;
+window.emailBill = emailBill;
+window.saveAsPDF = saveAsPDF;
+window.processPayment = processPayment;
+window.addTotalAmountInput = addTotalAmountInput;

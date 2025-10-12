@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - <%= statusCode || 'Error' %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'Error' %> - <%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/error.css">
@@ -19,7 +19,7 @@
             if (code === 404) {
                 icon = 'fas fa-search';
                 colorClass = 'not-found';
-            } else if (code === 403 || title.includes('ไม่มีสิทธิ์')) {
+            } else if (code === 403 || (title && title.includes('ไม่มีสิทธิ์'))) {
                 icon = 'fas fa-shield-alt';
                 colorClass = 'forbidden';
             } else if (code >= 500) {
@@ -33,7 +33,7 @@
             </div>
 
             <h1 class="error-code"><%= code %></h1>
-            <h2 class="error-title"><%= title %></h2>
+            <h2 class="error-title"><%= title || 'เกิดข้อผิดพลาด' %></h2>
             <p class="error-message"><%= message %></p>
 
             <div class="error-actions">

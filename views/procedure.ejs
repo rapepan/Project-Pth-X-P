@@ -33,6 +33,7 @@
         <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (patient) { %>
             <a href="/procedure/<%= patient.HN %>"  class="active"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
         <% } %>
     </nav>
@@ -88,9 +89,32 @@
                     </div>
                     
                     <form class="modal-body" action="/procedure/<%= HN %>" method="POST">
-                        <div class="form-group">
-                            <label class="form-label">ชื่อการรักษา *</label>
-                            <input type="text" name="procedureName" class="form-control" required placeholder="กรอกชื่อการรักษา">
+                        <!-- ส่วนเลือกบริการ -->
+                        <div class="services-section" data-services='<%= JSON.stringify(services || []) %>'>
+                            <h4 class="services-title">
+                                <i class="fas fa-search"></i> เลือกบริการ
+                            </h4>
+                            
+                            <!-- ช่องค้นหาบริการ -->
+                            <div class="service-search-container">
+                                <div class="search-input-wrapper">
+                                    <input type="text" id="serviceSearch" class="service-search-input" placeholder="พิมพ์ชื่อบริการเพื่อค้นหา...">
+                                    <i class="fas fa-search search-icon"></i>
+                                </div>
+                                <div id="serviceDropdown" class="service-dropdown" style="display: none;"></div>
+                            </div>
+                            
+                            <!-- รายการบริการที่เลือก -->
+                            <div class="selected-services">
+                                <h5 class="selected-title">บริการที่เลือก:</h5>
+                                <div id="selectedServicesList" class="selected-services-list">
+                                    <div class="no-selection">
+                                        <p><i class="fas fa-info-circle"></i> ยังไม่ได้เลือกบริการ</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="selectedServices" id="selectedServicesInput" value="">
                         </div>
                         
                         <div class="form-row">
@@ -121,38 +145,6 @@
                             </select>
                         </div>
                         
-                        <!-- ส่วนเลือกบริการ -->
-                        <div class="services-section" data-services='<%= JSON.stringify(services || []) %>'>
-                            <h4 class="services-title">
-                                <i class="fas fa-search"></i> เลือกบริการ
-                            </h4>
-                            
-                            <!-- ช่องค้นหาบริการ -->
-                            <div class="service-search-container">
-                                <div class="search-input-wrapper">
-                                    <input type="text" id="serviceSearch" class="service-search-input" placeholder="พิมพ์ชื่อบริการเพื่อค้นหา...">
-                                    <i class="fas fa-search search-icon"></i>
-                                </div>
-                                <div id="serviceDropdown" class="service-dropdown" style="display: none;"></div>
-                            </div>
-                            
-                            <!-- รายการบริการที่เลือก -->
-                            <div class="selected-services">
-                                <h5 class="selected-title">บริการที่เลือก:</h5>
-                                <div id="selectedServicesList" class="selected-services-list">
-                                    <div class="no-selection">
-                                        <p><i class="fas fa-info-circle"></i> ยังไม่ได้เลือกบริการ</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="grand-total">
-                                <h4>ยอดรวมทั้งหมด: <span id="grandTotal">0</span> บาท</h4>
-                                <input type="hidden" name="totalAmount" id="totalAmountInput" value="0">
-                                <input type="hidden" name="selectedServices" id="selectedServicesInput" value="">
-                            </div>
-                        </div>
-                        
                         <div class="form-group">
                             <label class="form-label">หมายเหตุ</label>
                             <textarea name="notes" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม"></textarea>
@@ -163,7 +155,7 @@
                                 <i class="fas fa-times"></i> ยกเลิก
                             </button>
                             <button type="submit" class="btn-procedure primary">
-                                <i class="fas fa-save"></i> บันทึกและทำใบเสร็จ
+                                <i class="fas fa-save"></i> บันทึกหัตถการ
                             </button>
                         </div>
                     </form>
@@ -198,10 +190,8 @@
         const serviceSearchInput = document.getElementById('serviceSearch');
         const serviceDropdown = document.getElementById('serviceDropdown');
         const selectedServicesList = document.getElementById('selectedServicesList');
-        const grandTotalElement = document.getElementById('grandTotal');
-        const totalAmountInput = document.getElementById('totalAmountInput');
         const selectedServicesInput = document.getElementById('selectedServicesInput');
-        
+
         let selectedServices = [];
         let filteredServices = [];
         
@@ -243,7 +233,6 @@
                 serviceItem.innerHTML = `
                     <div class="service-info">
                         <h6 class="service-name">${service.service_name}</h6>
-                        <p class="service-price">${service.price} บาท / ${service.unit}</p>
                     </div>
                 `;
                 
@@ -266,16 +255,9 @@
                 alert('บริการนี้ถูกเลือกแล้ว');
                 return;
             }
-            
-            const serviceWithQuantity = {
-                ...service,
-                quantity: 1,
-                total: parseFloat(service.price)
-            };
-            
-            selectedServices.push(serviceWithQuantity);
+
+            selectedServices.push(service);
             updateSelectedServicesList();
-            updateGrandTotal();
         }
         
         // อัปเดตรายการบริการที่เลือก
@@ -286,65 +268,38 @@
                         <p><i class="fas fa-info-circle"></i> ยังไม่ได้เลือกบริการ</p>
                     </div>
                 `;
+                selectedServicesInput.value = '';
                 return;
             }
-            
+
             selectedServicesList.innerHTML = '';
-            
+
             selectedServices.forEach((service, index) => {
                 const serviceItem = document.createElement('div');
                 serviceItem.className = 'selected-service-item';
                 serviceItem.innerHTML = `
                     <div class="service-info">
                         <h6 class="service-name">${service.service_name}</h6>
-                        <p class="service-price">${service.price} บาท / ${service.unit}</p>
                     </div>
-                    <div class="service-quantity">
-                        <label>จำนวน:</label>
-                        <input type="number" min="1" value="${service.quantity}" 
-                               onchange="updateServiceQuantity(${index}, this.value)">
-                        <span class="unit">${service.unit}</span>
-                    </div>
-                    <div class="service-total">
-                        <span class="total-amount">${service.total.toLocaleString()} บาท</span>
+                    <div class="service-actions">
                         <button type="button" class="remove-btn" onclick="removeService(${index})">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 `;
-                
+
                 selectedServicesList.appendChild(serviceItem);
             });
+
+            // อัปเดต hidden input
+            selectedServicesInput.value = JSON.stringify(selectedServices);
         }
-        
-        // อัปเดตจำนวนบริการ
-        window.updateServiceQuantity = function(index, quantity) {
-            const service = selectedServices[index];
-            service.quantity = parseInt(quantity) || 1;
-            service.total = parseFloat(service.price) * service.quantity;
-            updateSelectedServicesList();
-            updateGrandTotal();
-        };
         
         // ลบบริการ
         window.removeService = function(index) {
             selectedServices.splice(index, 1);
             updateSelectedServicesList();
-            updateGrandTotal();
         };
-        
-        // อัปเดตยอดรวมทั้งหมด
-        function updateGrandTotal() {
-            let grandTotal = 0;
-            
-            selectedServices.forEach(service => {
-                grandTotal += service.total;
-            });
-            
-            grandTotalElement.textContent = grandTotal.toLocaleString();
-            totalAmountInput.value = grandTotal;
-            selectedServicesInput.value = JSON.stringify(selectedServices);
-        }
         
         // ตรวจสอบการเลือกบริการก่อนส่งฟอร์ม
         document.querySelector('form').addEventListener('submit', function(e) {

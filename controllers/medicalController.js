@@ -11,7 +11,8 @@ class MedicalController {
       return res.render("examinationroom", {
         title: "ห้องตรวจ",
         patient: null,
-        user: req.user
+        user: req.user,
+        query: req.query
       });
     }
 
@@ -28,7 +29,8 @@ class MedicalController {
       res.render("examinationroom", {
         title: "ห้องตรวจ",
         patient: results[0],
-        user: req.user
+        user: req.user,
+        query: req.query
       });
     });
   }

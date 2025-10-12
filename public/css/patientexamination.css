@@ -74,6 +74,32 @@ body {
     }
 }
 
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+}
+
 @keyframes pulse {
     0%, 100% {
         transform: scale(1);
@@ -91,6 +117,14 @@ body {
 
 .slide-in {
     animation: slideIn 0.5s ease-out;
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out forwards;
 }
 
 /* ========== Header ========== */
@@ -1112,7 +1146,44 @@ textarea.info-input2 {
 
     .btn-primary,
     .btn-secondary {
-        max-width: 100%;
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .form-section h3 {
+        font-size: 1.2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .radio-option {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .radio-option label {
+        font-size: 0.9rem;
+    }
+
+    .sub-options-container {
+        margin-left: 0.5rem;
+        padding-left: 0.75rem;
+        border-left-width: 2px;
+    }
+
+    .sub-options-container .radio-option {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-input {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
     }
 
     .header-content {
@@ -1124,6 +1195,56 @@ textarea.info-input2 {
 
     .main-container {
         padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .radio-option {
+        padding: 0.6rem;
+    }
+
+    .radio-option input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    .radio-option label {
+        font-size: 0.85rem;
+    }
+
+    .detail-input {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .sub-options-container {
+        padding-left: 0.5rem;
+        margin-left: 0.25rem;
+        border-left-width: 2px;
+    }
+
+    .sub-options-container .radio-option {
+        padding: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .main-container {
+        padding: 1rem;
     }
 
     nav {
@@ -1182,6 +1303,208 @@ textarea.info-input2 {
     .form-section {
         padding: 1rem;
     }
+}
+
+/* ========== Sub Options Styling ========== */
+.sub-options-container {
+    overflow: hidden;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-light);
+    background: linear-gradient(135deg, rgba(0,137,123,0.02) 0%, rgba(77,182,172,0.02) 100%);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    position: relative;
+}
+
+.sub-options-container::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    border-radius: 2px;
+}
+
+.sub-options-container .radio-option {
+    margin-bottom: 0.75rem;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    transition: var(--transition);
+}
+
+.sub-options-container .radio-option:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: var(--primary-light);
+    transform: translateX(5px);
+}
+
+.sub-options-container .radio-option.checked {
+    background: rgba(0,137,123,0.08);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.sub-options-container .detail-input-container {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.sub-options-container .detail-input-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 2px;
+    height: 20px;
+    background: var(--primary-light);
+    transform: translateY(-50%);
+    border-radius: 1px;
+}
+
+.sub-options-container .detail-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.sub-options-container .detail-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    outline: none;
+}
+
+/* ========== Enhanced Radio Options ========== */
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-white);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 0.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.radio-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,137,123,0.05), transparent);
+    transition: var(--transition-slow);
+}
+
+.radio-option:hover::before {
+    left: 100%;
+}
+
+.radio-option:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.radio-option.checked {
+    background: linear-gradient(135deg, rgba(0,137,123,0.08) 0%, rgba(77,182,172,0.08) 100%);
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+}
+
+.radio-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.radio-option input[type="checkbox"]:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.radio-option input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.radio-option label {
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex: 1;
+    transition: var(--transition);
+}
+
+.radio-option.checked label {
+    color: var(--primary-dark);
+    font-weight: 600;
+}
+
+/* ========== Detail Input Styling ========== */
+.detail-input-container {
+    margin-top: 0.75rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: var(--transition);
+    max-height: 100px;
+    overflow: visible;
+}
+
+.detail-input-container.show {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 100px;
+}
+
+.detail-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition);
+    background: var(--bg-white);
+    font-family: inherit;
+}
+
+.detail-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.detail-input::placeholder {
+    color: var(--text-light);
+    font-style: italic;
 }
 
 /* ========== Paper Form Style (ตามรูป) ========== */

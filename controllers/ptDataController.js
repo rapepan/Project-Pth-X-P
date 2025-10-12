@@ -9,6 +9,8 @@ class PTDataController {
       PTDataModel.getPatientPTData(HN, (err, ptData) => {
         if (err) {
           return res.status(500).render('error', {
+            title: "Error",
+            statusCode: 500,
             message: "ไม่สามารถดึงข้อมูลได้",
             error: err
           });

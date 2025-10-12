@@ -8,9 +8,8 @@ class ProcedureModel {
       INSERT INTO procedures (
         HN, patient_name, procedure_date,
         procedure_code, procedure_name,
-        body_part, technique,
-        duration_minutes,
-        therapist_name, notes, created_by
+        technique, duration_minutes,
+        therapist_name, notes, created_by, session_count
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -20,12 +19,12 @@ class ProcedureModel {
       data.procedure_date || new Date(),
       data.procedure_code || '',
       data.procedure_name || '',
-      data.body_part || '',
       data.technique || '',
       data.duration_minutes || 0,
-      data.therapist_name || null, // เก็บชื่อผู้ทำการรักษา
+      data.therapist_name || null,
       data.notes || '',
-      data.created_by || null
+      data.created_by || null,
+      data.session_count || 1
     ];
 
     db.query(insertQuery, values, callback);
@@ -35,21 +34,11 @@ class ProcedureModel {
   static updateProcedure(id, data, callback) {
     const updateQuery = `
       UPDATE procedures
-      SET 
+      SET
         procedure_name = ?,
-        procedure_type = ?,
-        body_part = ?,
         technique = ?,
-        equipment_used = ?,
         duration_minutes = ?,
-        pre_procedure_notes = ?,
-        procedure_details = ?,
-        post_procedure_notes = ?,
-        complications = ?,
-        follow_up_required = ?,
-        follow_up_date = ?,
-        treatment_session = ?,
-        total_sessions = ?,
+        therapist_name = ?,
         notes = ?,
         updated_at = NOW()
       WHERE id = ?
@@ -57,19 +46,9 @@ class ProcedureModel {
 
     const values = [
       data.procedureName || '',
-      data.procedureType || '',
-      data.bodyPart || '',
       data.technique || '',
-      JSON.stringify(data.equipmentUsed || []),
       data.durationMinutes || 0,
-      data.preProcedureNotes || '',
-      data.procedureDetails || '',
-      data.postProcedureNotes || '',
-      data.complications || '',
-      data.followUpRequired || false,
-      data.followUpDate || null,
-      data.treatmentSession || 1,
-      data.totalSessions || 1,
+      data.therapistName || null,
       data.notes || '',
       id
     ];
@@ -81,27 +60,14 @@ class ProcedureModel {
   static getProcedureById(id, callback) {
     const query = `
       SELECT p.*, 
-             u1.fullname as performer_name,
-             u2.fullname as assistant_name
+             u.fullname as created_by_name
       FROM procedures p
-      LEFT JOIN users u1 ON p.performed_by = u1.id
-      LEFT JOIN users u2 ON p.assisted_by = u2.id
+      LEFT JOIN users u ON p.created_by = u.id
       WHERE p.id = ?
     `;
     
     db.query(query, [id], (err, results) => {
       if (err) return callback(err);
-      
-      if (results.length > 0) {
-        const record = results[0];
-        if (record.equipment_used) {
-          try {
-            record.equipment_used = JSON.parse(record.equipment_used);
-          } catch {
-            record.equipment_used = [];
-          }
-        }
-      }
       
       callback(null, results);
     });
@@ -111,27 +77,15 @@ class ProcedureModel {
   static getAllProcedureHistory(HN, callback) {
     const query = `
       SELECT p.*, 
-             u1.fullname as performer_name,
-             u2.fullname as assistant_name
+             u.fullname as created_by_name
       FROM procedures p
-      LEFT JOIN users u1 ON p.performed_by = u1.id
-      LEFT JOIN users u2 ON p.assisted_by = u2.id
+      LEFT JOIN users u ON p.created_by = u.id
       WHERE p.HN = ?
       ORDER BY p.procedure_date DESC, p.created_at DESC
     `;
     
     db.query(query, [HN], (err, results) => {
       if (err) return callback(err);
-      
-      results.forEach(record => {
-        if (record.equipment_used) {
-          try {
-            record.equipment_used = JSON.parse(record.equipment_used);
-          } catch {
-            record.equipment_used = [];
-          }
-        }
-      });
       
       callback(null, results);
     });
@@ -141,11 +95,9 @@ class ProcedureModel {
   static getLatestProcedure(HN, callback) {
     const query = `
       SELECT p.*, 
-             u1.fullname as performer_name,
-             u2.fullname as assistant_name
+             u.fullname as created_by_name
       FROM procedures p
-      LEFT JOIN users u1 ON p.performed_by = u1.id
-      LEFT JOIN users u2 ON p.assisted_by = u2.id
+      LEFT JOIN users u ON p.created_by = u.id
       WHERE p.HN = ?
       ORDER BY p.procedure_date DESC, p.created_at DESC
       LIMIT 1
@@ -153,17 +105,6 @@ class ProcedureModel {
     
     db.query(query, [HN], (err, results) => {
       if (err) return callback(err);
-      
-      if (results.length > 0) {
-        const record = results[0];
-        if (record.equipment_used) {
-          try {
-            record.equipment_used = JSON.parse(record.equipment_used);
-          } catch {
-            record.equipment_used = [];
-          }
-        }
-      }
       
       callback(null, results);
     });
@@ -180,7 +121,7 @@ class ProcedureModel {
     const query = `
       SELECT 
         COUNT(*) as totalProcedures,
-        COUNT(DISTINCT procedure_type) as uniqueTypes,
+        COUNT(DISTINCT procedure_name) as uniqueTypes,
         SUM(duration_minutes) as totalDuration,
         AVG(duration_minutes) as avgDuration,
         DATE_FORMAT(MIN(procedure_date), '%Y-%m-%d') as firstProcedure,
@@ -194,10 +135,10 @@ class ProcedureModel {
   // หัตถการยอดนิยม
   static getPopularProcedures(limit = 20, callback) {
     const query = `
-      SELECT procedure_name, procedure_type, COUNT(*) as usage_count
+      SELECT procedure_name, COUNT(*) as usage_count
       FROM procedures
       WHERE procedure_name != ''
-      GROUP BY procedure_name, procedure_type
+      GROUP BY procedure_name
       ORDER BY usage_count DESC
       LIMIT ?
     `;
@@ -218,16 +159,15 @@ class ProcedureModel {
   static saveProcedureTemplate(data, callback) {
     const insertQuery = `
       INSERT INTO procedure_templates (
-        name, procedure_type, body_part, technique,
+        name, procedure_type, technique,
         equipment_used, duration_minutes, procedure_details,
         created_by, is_public
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
       data.name,
       data.procedureType || '',
-      data.bodyPart || '',
       data.technique || '',
       JSON.stringify(data.equipmentUsed || []),
       data.durationMinutes || 0,
@@ -248,15 +188,6 @@ class ProcedureModel {
     `;
     db.query(query, [HN], (err, results) => {
       if (err) return callback(err);
-      results.forEach(record => {
-        if (record.equipment_used) {
-          try { 
-            record.equipment_used = JSON.parse(record.equipment_used); 
-          } catch { 
-            record.equipment_used = []; 
-          }
-        }
-      });
       callback(null, results);
     });
   }
@@ -284,16 +215,15 @@ class ProcedureModel {
   static saveProcedureTemplate(data, callback) {
     const insertQuery = `
       INSERT INTO procedure_templates (
-        procedure_name, procedure_type, body_part,
+        procedure_name, procedure_type,
         technique, equipment_used, duration_minutes,
         notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
       data.procedureName,
       data.procedureType,
-      data.bodyPart,
       data.technique,
       JSON.stringify(data.equipmentUsed || []),
       data.durationMinutes,
@@ -306,11 +236,54 @@ class ProcedureModel {
   // นับจำนวนครั้งการรักษา
   static getTreatmentSessionCount(HN, callback) {
     const query = `
-      SELECT MAX(treatment_session) as current_session
+      SELECT COUNT(*) as current_session
       FROM procedures
       WHERE HN = ?
     `;
     db.query(query, [HN], callback);
+  }
+
+  // ตรวจสอบหัตถการเดิม
+  static checkExistingProcedure(HN, procedureName, callback) {
+    const query = `
+      SELECT * FROM procedures 
+      WHERE HN = ? AND procedure_name = ?
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+    db.query(query, [HN, procedureName], (err, results) => {
+      if (err) return callback(err);
+      callback(null, results.length > 0 ? results[0] : null);
+    });
+  }
+
+  // อัปเดตจำนวนครั้งของหัตถการ (ใช้ session_count)
+  static updateProcedureSessionCount(id, newSessionCount, updatedNotes, callback) {
+    const query = `
+      UPDATE procedures
+      SET
+        session_count = ?,
+        notes = ?,
+        updated_at = NOW()
+      WHERE id = ?
+    `;
+    db.query(query, [newSessionCount, updatedNotes, id], callback);
+  }
+
+  // ดึงข้อมูลหัตถการตามวันที่
+  static getProceduresByDate(HN, date, callback) {
+    const query = `
+      SELECT p.*, 
+             u.fullname as created_by_name
+      FROM procedures p
+      LEFT JOIN users u ON p.created_by = u.id
+      WHERE p.HN = ? AND DATE(p.procedure_date) = ?
+      ORDER BY p.created_at ASC
+    `;
+    db.query(query, [HN, date], (err, results) => {
+      if (err) return callback(err);
+      callback(null, results);
+    });
   }
 }
 

@@ -41,6 +41,13 @@
     </nav>
 
     <div class="container">
+        <% if (query && query.success === 'diagnosis') { %>
+            <div class="success-message fade-in">
+                <i class="fas fa-check-circle"></i>
+                <span>บันทึกการวินิจฉัยเรียบร้อยแล้ว</span>
+            </div>
+        <% } %>
+        
         <% if (patient) { %>
             <!-- Patient Information Card -->
             <div class="patient-card fade-in">

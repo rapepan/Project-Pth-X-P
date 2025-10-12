@@ -3,436 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ใบเสร็จ - <%= patientData ? `${patientData.fname} ${patientData.lname}` : 'ไม่ระบุผู้ป่วย' %></title>
+    <title><%= title %></title>
+    
+    <!-- Google Fonts สำหรับฟอนต์ไทย -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/billing-modal.css">
+    
+    <!-- CSS ของเรา -->
+    <link rel="stylesheet" href="/css/billing.css">
+    
 </head>
 <body>
-    <div class="billing-container">
-        <% if (fromProcedure && procedureServices && procedureServices.length > 0) { %>
-            <!-- ส่วนแสดงสถานะการชำระเงิน (ส่วนกลาง) -->
-            <div class="payment-status-section">
-                <div class="payment-status-card">
-                    <div class="payment-header">
-                        <div class="logo">
-                            <i class="fas fa-hospital"></i>
-                            <span>PTH-X-P</span>
-                        </div>
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-file-invoice-dollar"></i>
+                <%= title %>
+            </h1>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="/examinationroom/<%= HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% if (HN) { %>
+            <a href="/procedure/<%= HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+            <a href="/billing/<%= HN %>" class="active"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
+        <% } else { %>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
+        <!-- Alert Messages -->
+        <% if (success) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <%= success %>
+            </div>
+        <% } %>
+        
+        <% if (error) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <%= error %>
+            </div>
+        <% } %>
+
+        <!-- Patient Info Section -->
+        <div class="patient-info-section">
+            <div class="patient-info-card">
+                <div class="patient-header">
+                    <h2 class="patient-title">
+                        <i class="fas fa-user"></i> ข้อมูลผู้ป่วย
+                    </h2>
+                </div>
+                <div class="patient-details">
+                    <div class="patient-field">
+                        <label>หมายเลขผู้ป่วย (HN):</label>
+                        <span class="patient-value"><%= HN %></span>
                     </div>
-                    
-                    <div class="payment-content">
-                        <div class="payment-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <h1 class="payment-title">ใบเสร็จ</h1>
-                        <div class="payment-amount">
-                            ฿<%= parseFloat(totalAmount).toLocaleString() %>
-                        </div>
-                        <div class="payment-close">
-                            <a href="/patients" class="close-link">
-                                <i class="fas fa-times"></i>
-                            </a>
-                        </div>
+                    <div class="patient-field">
+                        <label>ชื่อ-นามสกุล:</label>
+                        <span class="patient-value"><%= patientName %></span>
                     </div>
-                    
-                    <div class="payment-details">
-                        <div class="detail-row">
-                            <span class="detail-label">เลขที่ใบเสร็จ:</span>
-                            <span class="detail-value" id="billNumber"><%= billNumber || '-' %></span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">วันที่ชำระ:</span>
-                            <span class="detail-value" id="paymentDate"><%= currentDate || '-' %></span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">วิธีการชำระ:</span>
-                            <span class="detail-value" id="paymentMethod">ยังไม่ชำระ</span>
-                        </div>
+                    <div class="patient-field">
+                        <label>วันที่ทำหัตถการ:</label>
+                        <span class="patient-value">
+                            <% if (billingDate) { %>
+                                <%= new Date(billingDate).toLocaleDateString('th-TH') %>
+                            <% } else if (procedureData) { %>
+                                <%= new Date(procedureData.procedure_date).toLocaleDateString('th-TH') %>
+                            <% } %>
+                        </span>
                     </div>
-                    
-                    <div class="payment-actions">
-                        <button class="btn btn-outline" id="downloadInvoiceBtn">
-                            <i class="fas fa-download"></i>
-                            ดาวน์โหลดใบแจ้งหนี้
-                        </button>
-                        <button class="btn btn-primary" id="downloadReceiptBtn">
-                            <i class="fas fa-receipt"></i>
-                            ดาวน์โหลดใบเสร็จ
-                        </button>
-                    </div>
-                    
-                    <div class="payment-footer">
-                        <span class="footer-text">Powered by PTH-X-P System</span>
-                        <div class="footer-links">
-                            <a href="#" class="footer-link">เงื่อนไข</a>
-                            <a href="#" class="footer-link">ความเป็นส่วนตัว</a>
+                    <% if (allProceduresData && allProceduresData.length > 0) { %>
+                        <div class="patient-field">
+                            <label>จำนวนหัตถการทั้งหมด:</label>
+                            <span class="patient-value"><%= allProceduresData.length %> รายการ</span>
                         </div>
-                    </div>
+                    <% } %>
                 </div>
             </div>
+        </div>
 
-            <!-- ส่วนแสดงรายละเอียดใบแจ้งหนี้ (ส่วนขวา) -->
-            <div class="invoice-details-section">
-                <div class="invoice-details-card">
-                    <div class="invoice-header">
-                        <div class="invoice-close">
-                            <a href="/patients" class="close-link">
-                                <i class="fas fa-times"></i> ปิดรายละเอียดใบแจ้งหนี้
+        <!-- No Procedures Message -->
+        <% if (!hasProcedures || !selectedServices || selectedServices.length === 0) { %>
+            <div class="no-procedures-section">
+                <div class="no-procedures-card">
+                    <div class="no-procedures-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="no-procedures-content">
+                        <h3 class="no-procedures-title">ไม่พบข้อมูลหัตถการ</h3>
+                        <p class="no-procedures-message">
+                            ไม่พบข้อมูลหัตถการสำหรับผู้ป่วย HN: <%= HN %> ในวันที่ <%= new Date(billingDate).toLocaleDateString('th-TH') %>
+                        </p>
+                        <div class="no-procedures-actions">
+                            <a href="/procedure/<%= HN %>" class="btn-create-procedure">
+                                <i class="fas fa-plus"></i> สร้างหัตถการใหม่
                             </a>
                         </div>
-                        <h2 class="invoice-title">ชำระเมื่อ <span id="invoicePaymentDate"><%= currentDate || '-' %></span></h2>
-                    </div>
-                    
-                    <div class="invoice-summary">
-                        <h3>สรุป</h3>
-                        <div class="summary-row">
-                            <span class="summary-label">ถึง:</span>
-                            <span class="summary-value">
-                                <% if (patientData) { %>
-                                    <%= patientData.fname %> <%= patientData.lname %><br>
-                                    <small>HN: <%= patientData.HN %></small>
-                                <% } else { %>
-                                    ไม่ระบุผู้ป่วย
-                                <% } %>
-                            </span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="summary-label">จาก:</span>
-                            <span class="summary-value">
-                                คลินิกกายภาพบำบัด PTH-X-P<br>
-                                <small>เลขที่ใบแจ้งหนี้: <span id="invoiceNumber"><%= billNumber || '-' %></span></small>
-                            </span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="summary-label">หมายเหตุ:</span>
-                            <span class="summary-value">ใบเสร็จจากการรักษา</span>
-                        </div>
-                    </div>
-                    
-                    <div class="invoice-items">
-                        <h3>รายการบริการ</h3>
-                        <div class="items-list">
-                            <% procedureServices.forEach(function(service) { %>
-                                <div class="item-row">
-                                    <div class="item-info">
-                                        <span class="item-name"><%= service.service_name %></span>
-                                        <span class="item-period">
-                                            <% 
-                                                const now = new Date();
-                                                const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-                                                const formatDate = (date) => {
-                                                    const day = String(date.getDate()).padStart(2, '0');
-                                                    const month = date.toLocaleDateString('th-TH', { month: 'short' }).toUpperCase();
-                                                    const year = date.getFullYear();
-                                                    return `${day} ${month} ${year}`;
-                                                };
-                                            %>
-                                            <%= formatDate(now) %> - <%= formatDate(nextMonth) %>
-                                        </span>
-                                    </div>
-                                    <div class="item-details">
-                                        <span class="item-qty">จำนวน <%= service.quantity %></span>
-                                        <span class="item-price">฿<%= parseFloat(service.price).toLocaleString() %></span>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        </div>
-                    </div>
-                    
-                    <div class="invoice-totals">
-                        <div class="total-row">
-                            <span class="total-label">ยอดรวมย่อย:</span>
-                            <span class="total-value" id="subtotal">฿<%= parseFloat(totalAmount).toLocaleString() %></span>
-                        </div>
-                        <div class="total-row">
-                            <span class="total-label">ยอดรวมไม่รวมภาษี:</span>
-                            <span class="total-value" id="totalExcludingTax">฿<%= parseFloat(totalAmount).toLocaleString() %></span>
-                        </div>
-                        <div class="total-row">
-                            <span class="total-label">VAT - ไทย (7%):</span>
-                            <span class="total-value" id="vatAmount">฿<%= (parseFloat(totalAmount) * 0.07).toLocaleString() %></span>
-                        </div>
-                        <div class="total-row total-row-main">
-                            <span class="total-label">ยอดรวมที่ต้องชำระ:</span>
-                            <span class="total-value" id="totalDue">฿<%= (parseFloat(totalAmount) * 1.07).toLocaleString() %></span>
-                        </div>
-                        <div class="total-row">
-                            <span class="total-label">จำนวนที่ชำระแล้ว:</span>
-                            <span class="total-value" id="amountPaid">฿0</span>
-                        </div>
-                        <div class="total-row">
-                            <span class="total-label">จำนวนคงเหลือ:</span>
-                            <span class="total-value" id="amountRemaining">฿<%= (parseFloat(totalAmount) * 1.07).toLocaleString() %></span>
-                        </div>
-                    </div>
-                    
-                    <div class="invoice-footer">
-                        <p class="contact-info">
-                            มีคำถาม? ติดต่อ คลินิกกายภาพบำบัด PTH-X-P
-                        </p>
                     </div>
                 </div>
             </div>
         <% } else { %>
-            <!-- หน้าเปล่าเมื่อไม่มีข้อมูล -->
-            <div class="empty-state">
-                <div class="empty-content">
-                    <i class="fas fa-file-invoice-dollar empty-icon"></i>
-                    <h2>ไม่มีข้อมูลใบเสร็จ</h2>
-                    <p>กรุณาเลือกบริการจากหน้า Procedure เพื่อสร้างใบเสร็จ</p>
-                    <a href="/patients" class="btn btn-primary">กลับไปหน้าผู้ป่วย</a>
+            <!-- Services Selection Section -->
+            <% if (selectedServices && selectedServices.length > 0) { %>
+                <div class="services-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-list-alt"></i> บริการที่เลือก
+                    </h2>
+                </div>
+                
+                <form action="/billing/<%= HN %>" method="POST" id="billingForm">
+                    <div class="services-table-container">
+                        <table class="services-table">
+                            <thead>
+                                <tr>
+                                    <th>รหัสบริการ</th>
+                                    <th>ชื่อบริการ</th>
+                                    <th>ราคา (บาท)</th>
+                                    <th>จำนวน</th>
+                                    <th>หน่วย</th>
+                                    <th>รวม (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicesTableBody">
+                                <% selectedServices.forEach((service, index) => { %>
+                                    <tr class="service-row" data-service-id="<%= service.id || index %>">
+                                        <td class="service-code"><%= service.service_code %></td>
+                                        <td class="service-name">
+                                            <strong><%= service.service_name %></strong>
+                                            <% if (service.category) { %>
+                                                <br><small class="service-category"><%= service.category %></small>
+                                            <% } %>
+                                        </td>
+                                        <td class="service-price">
+                                            <span class="price-display"><%= parseFloat(service.price).toLocaleString('th-TH', {minimumFractionDigits: 2}) %></span>
+                                        </td>
+                                        <td class="service-quantity">
+                                            <input type="number" 
+                                                   name="quantity_<%= index %>" 
+                                                   value="<%= service.quantity || 1 %>" 
+                                                   min="1" 
+                                                   max="999" 
+                                                   class="quantity-input"
+                                                   data-price="<%= service.price %>"
+                                                   data-index="<%= index %>"
+                                                   onchange="updateServiceTotal(this)">
+                                        </td>
+                                        <td class="service-unit"><%= service.unit %></td>
+                                        <td class="service-total">
+                                            <span class="total-display" id="total_<%= index %>">
+                                                <%= (parseFloat(service.price) * parseInt(service.quantity || 1)).toLocaleString('th-TH', {minimumFractionDigits: 2}) %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                            <tfoot>
+                                <tr class="subtotal-row">
+                                    <td colspan="5" class="subtotal-label">ยอดรวมก่อนหักส่วนลด:</td>
+                                    <td class="subtotal-amount" id="subtotalAmount">
+                                        <%= selectedServices.reduce((sum, service) => sum + (parseFloat(service.price) * parseInt(service.quantity || 1)), 0).toLocaleString('th-TH', {minimumFractionDigits: 2}) %>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Discount Section -->
+                    <div class="discount-section">
+                        <h3 class="discount-title">
+                            <i class="fas fa-percentage"></i> ส่วนลด
+                        </h3>
+                        <div class="discount-controls">
+                            <div class="discount-type-group">
+                                <label class="discount-type-label">ประเภทส่วนลด:</label>
+                                <select name="discountType" id="discountType" class="discount-select" onchange="updateDiscountCalculation()">
+                                    <option value="none">ไม่มีส่วนลด</option>
+                                    <option value="percentage">เปอร์เซ็นต์</option>
+                                    <option value="fixed">จำนวนเงินคงที่</option>
+                                </select>
+                            </div>
+                            <div class="discount-amount-group">
+                                <label class="discount-amount-label">จำนวนส่วนลด:</label>
+                                <input type="number" 
+                                       name="discountAmount" 
+                                       id="discountAmount" 
+                                       value="0" 
+                                       min="0" 
+                                       step="0.01"
+                                       class="discount-input"
+                                       onchange="updateDiscountCalculation()"
+                                       disabled>
+                            </div>
+                            <div class="discount-reason-group">
+                                <label class="discount-reason-label">เหตุผล:</label>
+                                <input type="text" 
+                                       name="discountReason" 
+                                       id="discountReason"
+                                       placeholder="ระบุเหตุผลส่วนลด"
+                                       class="discount-input"
+                                       disabled>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Total Section -->
+                    <div class="total-section">
+                        <div class="total-card">
+                            <h3 class="total-title">
+                                <i class="fas fa-receipt"></i> สรุปยอดเงิน
+                            </h3>
+                            <div class="total-breakdown">
+                                <div class="total-line">
+                                    <span class="total-label">ยอดรวมก่อนหักส่วนลด:</span>
+                                    <span class="total-value" id="subtotalDisplay">
+                                        <%= selectedServices.reduce((sum, service) => sum + (parseFloat(service.price) * parseInt(service.quantity || 1)), 0).toLocaleString('th-TH', {minimumFractionDigits: 2}) %>
+                                    </span>
+                                </div>
+                                <div class="total-line discount-line" id="discountLine" style="display: none;">
+                                    <span class="total-label">ส่วนลด:</span>
+                                    <span class="total-value discount-value" id="discountDisplay">0.00</span>
+                                </div>
+                                <div class="total-line final-total">
+                                    <span class="total-label"><strong>ยอดเงินรวมทั้งสิ้น:</strong></span>
+                                    <span class="total-value final-total-value" id="finalTotalDisplay">
+                                        <%= selectedServices.reduce((sum, service) => sum + (parseFloat(service.price) * parseInt(service.quantity || 1)), 0).toLocaleString('th-TH', {minimumFractionDigits: 2}) %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- Payment Method Section -->
+                     <div class="payment-section">
+                         <h3 class="payment-title">
+                             <i class="fas fa-credit-card"></i> วิธีการชำระเงิน
+                         </h3>
+                         <div class="payment-controls">
+                            <div class="payment-method-group">
+                                <label class="payment-method-label">วิธีการชำระเงิน:</label>
+                                <select name="paymentMethod" id="paymentMethod" class="payment-select">
+                                    <option value="transfer">โอนเงิน</option>
+                                    <option value="cash">เงินสด</option>
+                                    <option value="card">บัตรเครดิต/เดบิต</option>
+                                    <option value="insurance">ประกันสุขภาพ</option>
+                                </select>
+                            </div>
+                            
+                             <div class="insurance-type-group">
+                                 <label class="insurance-type-label">ประเภทประกัน:</label>
+                                 <select name="insuranceType" class="insurance-select">
+                                     <option value="none">ไม่มีประกัน</option>
+                                     <option value="social_security">ประกันสังคม</option>
+                                     <option value="private">ประกันเอกชน</option>
+                                     <option value="government">ประกันข้าราชการ</option>
+                                 </select>
+                             </div>
+                             <div class="amount-received-group" id="amountReceivedGroup" style="display: none;">
+                                 <label class="amount-received-label">จำนวนเงินที่รับ:</label>
+                                 <input type="number" 
+                                        name="amountReceived" 
+                                        id="amountReceived" 
+                                        value="0" 
+                                        min="0" 
+                                        step="0.01"
+                                        class="amount-received-input"
+                                        placeholder="0.00">
+                             </div>
+                             <div class="change-amount-group" id="changeGroup" style="display: none;">
+                                 <label class="change-amount-label">เงินทอน:</label>
+                                 <input type="number" 
+                                        id="changeAmount" 
+                                        value="0" 
+                                        step="0.01"
+                                        class="change-amount-input"
+                                        readonly>
+                             </div>
+                         </div>
+                         
+                         <!-- Payment Action Button -->
+                         <div class="payment-action">
+                             <button type="button" class="btn-payment" id="paymentBtn" onclick="processPayment()">
+                                 <i class="fas fa-money-bill-wave"></i> ยืนยันการชำระเงิน
+                             </button>
+                         </div>
+                     </div>
+
+                    <!-- Notes Section -->
+                    <div class="notes-section">
+                        <h3 class="notes-title">
+                            <i class="fas fa-sticky-note"></i> หมายเหตุ
+                        </h3>
+                        <textarea name="notes" 
+                                  class="notes-textarea" 
+                                  placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <!-- Hidden inputs for selected services -->
+                    <input type="hidden" name="selectedServices" id="selectedServicesInput" value="<%= JSON.stringify(selectedServices) %>">
+                    
+                    <!-- Hidden input for created by -->
+                    <input type="hidden" name="createdBy" value="<%= user ? user.fullname || user.username : '' %>">
+
+                     <!-- Payment Status Section -->
+                     <div class="payment-status-section" id="paymentStatusSection" style="display: none;">
+                         <div class="payment-status-card">
+                             <div class="payment-status-icon">
+                                 <i class="fas fa-check-circle"></i>
+                             </div>
+                             <div class="payment-status-content">
+                                 <h3 class="payment-status-title">ชำระเงินเรียบร้อยแล้ว</h3>
+                                 <p class="payment-status-message">
+                                     วิธีการชำระเงิน: <span id="paymentMethodDisplay"></span><br>
+                                     <span id="amountReceivedDisplay"></span>
+                                     <span id="changeDisplay"></span>
+                                 </p>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- Action Buttons -->
+                     <div class="action-buttons">
+                         <button type="button" class="btn-billing secondary" onclick="window.history.back()">
+                             <i class="fas fa-arrow-left"></i> กลับ
+                         </button>
+                         <button type="submit" class="btn-billing primary" id="createBillBtn" disabled>
+                             <i class="fas fa-file-invoice"></i> สร้างใบเสร็จ
+                         </button>
+                     </div>
+                     
+                     <!-- Success Message with Bill Link -->
+                     <% if (success && success.includes('สร้างใบเสร็จเรียบร้อยแล้ว')) { %>
+                         <div class="success-bill-section">
+                             <div class="success-bill-card">
+                                 <div class="success-bill-icon">
+                                     <i class="fas fa-check-circle"></i>
+                                 </div>
+                                 <div class="success-bill-content">
+                                     <!-- <h3 class="success-bill-title">สร้างใบเสร็จเรียบร้อยแล้ว!</h3> -->
+                                     <p class="success-bill-message">ใบเสร็จของคุณพร้อมใช้งานแล้ว</p>
+                                     <div class="success-bill-actions">
+                                         <a href="#" class="btn-view-bill" id="viewBillBtn">
+                                             <i class="fas fa-eye"></i> ดูใบเสร็จ
+                                         </a>
+                                         <button type="button" class="btn-print-bill" onclick="printBill()">
+                                             <i class="fas fa-print"></i> พิมพ์
+                                         </button>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     <% } %>
+                </form>
+            </div>
+            <% } else { %>
+                <!-- No Services Selected -->
+            <div class="no-services-section">
+                <div class="no-services-card">
+                    <div class="no-services-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="no-services-title">ไม่พบบริการที่เลือก</h3>
+                    <p class="no-services-text">
+                        กรุณาไปทำหัตถการก่อนเพื่อเลือกบริการที่ต้องการ
+                    </p>
+                    <div class="no-services-actions">
+                        <a href="/procedure/<%= HN %>" class="btn-billing primary">
+                            <i class="fas fa-hand-holding-medical"></i> ไปทำหัตถการ
+                        </a>
+                    </div>
                 </div>
             </div>
-        <% } %>
-
-        <!-- ฟอร์มสำหรับสร้างใบเสร็จ -->
-        <% if (fromProcedure && procedureServices && procedureServices.length > 0) { %>
-            <form id="createBillForm" method="POST" action="/billing/<%= HN %>" style="display: none;">
-                <input type="hidden" name="serviceItems" value='<%= JSON.stringify(procedureServices) %>'>
-                <input type="hidden" name="totalAmount" value="<%= totalAmount %>">
-                <input type="hidden" name="procedureId" value="<%= procedureId || '' %>">
-                <input type="hidden" name="paymentStatus" value="pending">
-                <input type="hidden" name="paymentMethod" value="">
-                <input type="hidden" name="discountAmount" value="0">
-                <input type="hidden" name="discountType" value="none">
-                <input type="hidden" name="discountReason" value="">
-                <input type="hidden" name="taxAmount" value="<%= parseFloat(totalAmount) * 0.07 %>">
-                <input type="hidden" name="insuranceType" value="none">
-                <input type="hidden" name="insuranceClaimAmount" value="0">
-                <input type="hidden" name="patientPaidAmount" value="0">
-                <input type="hidden" name="receiptNumber" value="">
-                <input type="hidden" name="notes" value="ใบเสร็จจากหัตถการ - สร้างอัตโนมัติจากระบบ">
-            </form>
-
-            <!-- ฟอร์มสำหรับอัปเดตการชำระเงิน -->
-            <form id="updatePaymentForm" method="POST" action="/billing/<%= HN %>/updatePayment" style="display: none;">
-                <input type="hidden" name="billId" id="updateBillId" value="">
-                <input type="hidden" name="status" id="updatePaymentStatus" value="paid">
-                <input type="hidden" name="paymentMethod" id="updatePaymentMethod" value="cash">
-                <input type="hidden" name="paymentDate" id="updatePaymentDate" value="">
-            </form>
+            <% } %>
         <% } %>
     </div>
 
-    <!-- ข้อมูลที่ส่งมาจาก server -->
-    <div id="billingData" 
-         data-hn="<%= HN %>"
-         data-from-procedure="<%= typeof fromProcedure !== 'undefined' ? fromProcedure : false %>"
-         data-procedure-services='<%- JSON.stringify(procedureServices || []) %>'
-         data-total-amount="<%= typeof totalAmount !== 'undefined' ? totalAmount : 0 %>"
-         data-patient-data='<%- JSON.stringify(patientData || {}) %>'
-         style="display: none;">
-    </div>
-
-    <script>
-        // ข้อมูลที่ส่งมาจาก server
-        const billingDataElement = document.getElementById('billingData');
-        const billingData = {
-            HN: billingDataElement.dataset.hn,
-            fromProcedure: billingDataElement.dataset.fromProcedure === 'true',
-            procedureServices: JSON.parse(billingDataElement.dataset.procedureServices),
-            totalAmount: parseFloat(billingDataElement.dataset.totalAmount) || 0,
-            patientData: JSON.parse(billingDataElement.dataset.patientData)
-        };
-
-        // สร้างใบเสร็จ
-        function createBill() {
-            const form = document.getElementById('createBillForm');
-            if (!form) {
-                console.error('Form not found');
-                return;
-            }
-
-            // แสดง loading state
-            const submitBtn = document.querySelector('.btn-primary');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสร้างใบเสร็จ...';
-            }
-
-            // สร้าง FormData จาก form
-            const formData = new FormData(form);
-
-            // ส่งข้อมูลผ่าน AJAX
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // อัปเดต UI ด้วยข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
-                    updateBillInfo(data.billId, data.billNumber);
-                    updateBillUI(data.billData);
-                    
-                    // แสดงข้อความสำเร็จ
-                    showSuccessMessage(data.message);
-                } else {
-                    showErrorMessage(data.error || 'เกิดข้อผิดพลาดในการสร้างใบเสร็จ');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ');
-            })
-            .finally(() => {
-                // ซ่อน loading state
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-check"></i> สร้างใบเสร็จเรียบร้อย';
-                }
-            });
-        }
-
-        // อัปเดตสถานะการชำระเงิน
-        function updatePaymentStatus(status, method = 'cash') {
-            const form = document.getElementById('updatePaymentForm');
-            if (form) {
-                document.getElementById('updatePaymentStatus').value = status;
-                document.getElementById('updatePaymentMethod').value = method;
-                document.getElementById('updatePaymentDate').value = new Date().toISOString().split('T')[0];
-                form.submit();
-            }
-        }
-
-        // ดาวน์โหลดใบแจ้งหนี้
-        function downloadInvoice() {
-            const billId = document.getElementById('updateBillId').value;
-            if (!billId) {
-                showErrorMessage('กรุณาสร้างใบเสร็จก่อน');
-                return;
-            }
-            
-            // เปิดหน้าต่างใหม่สำหรับดาวน์โหลด
-            window.open(`/billing/${billId}/download/invoice`, '_blank');
-        }
-
-        // ดาวน์โหลดใบเสร็จ
-        function downloadReceipt() {
-            const billId = document.getElementById('updateBillId').value;
-            if (!billId) {
-                showErrorMessage('กรุณาสร้างใบเสร็จก่อน');
-                return;
-            }
-            
-            // เปิดหน้าต่างใหม่สำหรับดาวน์โหลด
-            window.open(`/billing/${billId}/download/receipt`, '_blank');
-        }
-
-        // อัปเดตข้อมูลใบเสร็จเมื่อสร้างเสร็จ
-        function updateBillInfo(billId, billNumber) {
-            document.getElementById('billNumber').textContent = billNumber;
-            document.getElementById('invoiceNumber').textContent = billNumber;
-            document.getElementById('updateBillId').value = billId;
-            
-            const today = new Date().toLocaleDateString('th-TH');
-            document.getElementById('paymentDate').textContent = today;
-            document.getElementById('invoicePaymentDate').textContent = today;
-        }
-
-        // อัปเดต UI หลังสร้างใบเสร็จเสร็จ
-        function updateBillUI(billData) {
-            // อัปเดตสถานะการชำระเงิน
-            const paymentStatus = document.getElementById('paymentMethod');
-            if (paymentStatus) {
-                paymentStatus.textContent = billData.payment_status === 'paid' ? 'ชำระแล้ว' : 'ยังไม่ชำระ';
-            }
-
-            // อัปเดตจำนวนเงิน
-            const amountPaid = document.getElementById('amountPaid');
-            const amountRemaining = document.getElementById('amountRemaining');
-            
-            if (billData.payment_status === 'paid') {
-                if (amountPaid) amountPaid.textContent = '฿' + parseFloat(billData.total_amount).toLocaleString();
-                if (amountRemaining) amountRemaining.textContent = '฿0';
-            } else {
-                if (amountPaid) amountPaid.textContent = '฿0';
-                if (amountRemaining) amountRemaining.textContent = '฿' + parseFloat(billData.total_amount).toLocaleString();
-            }
-        }
-
-        // แสดงข้อความสำเร็จ
-        function showSuccessMessage(message) {
-            // สร้าง toast notification
-            const toast = document.createElement('div');
-            toast.className = 'toast success';
-            toast.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            // แสดง toast
-            setTimeout(() => toast.classList.add('show'), 100);
-            
-            // ซ่อน toast หลัง 3 วินาที
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        }
-
-        // แสดงข้อความผิดพลาด
-        function showErrorMessage(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast error';
-            toast.innerHTML = `
-                <i class="fas fa-exclamation-circle"></i>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 100);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 5000);
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // ดาวน์โหลดใบแจ้งหนี้
-            const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
-            if (downloadInvoiceBtn) {
-                downloadInvoiceBtn.addEventListener('click', downloadInvoice);
-            }
-
-            // ดาวน์โหลดใบเสร็จ
-            const downloadReceiptBtn = document.getElementById('downloadReceiptBtn');
-            if (downloadReceiptBtn) {
-                downloadReceiptBtn.addEventListener('click', downloadReceipt);
-            }
-
-            // ตรวจสอบ URL parameters สำหรับข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
-            const urlParams = new URLSearchParams(window.location.search);
-            const billId = urlParams.get('billId');
-            const billNumber = urlParams.get('billNumber');
-            
-            if (billId && billNumber) {
-                // อัปเดตข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
-                updateBillInfo(billId, billNumber);
-            } else if (billingData.fromProcedure && billingData.procedureServices.length > 0) {
-                // สร้างใบเสร็จอัตโนมัติเมื่อโหลดหน้า
-                setTimeout(createBill, 1000);
-            }
-        });
-
-        // ฟังก์ชันสำหรับอัปเดต UI เมื่อได้รับข้อมูลจาก server
-        window.updateBillingUI = function(billData) {
-            if (billData.billNumber) {
-                updateBillInfo(billData.id, billData.billNumber);
-            }
-            
-            if (billData.paymentStatus === 'paid') {
-                document.getElementById('paymentMethod').textContent = billData.paymentMethod || 'เงินสด';
-                document.getElementById('amountPaid').textContent = '฿' + parseFloat(billData.totalAmount).toLocaleString();
-                document.getElementById('amountRemaining').textContent = '฿0';
-            }
-        };
-    </script>
+    <!-- JavaScript -->
+    <script src="/js/notifications.js"></script>
+    <script src="/js/billing.js"></script>
 </body>
 </html>

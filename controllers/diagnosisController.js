@@ -52,7 +52,7 @@ class DiagnosisController {
       return res.status(400).send("ข้อมูลไม่ครบถ้วน");
     }
 
-    // Process multiple ICD-10 codes
+    // Process ICD-10 codes from form data
     const icd10Codes = [];
     if (diagnosisData.icd10Codes && Array.isArray(diagnosisData.icd10Codes)) {
       diagnosisData.icd10Codes.forEach(codeData => {
@@ -69,16 +69,11 @@ class DiagnosisController {
       HN,
       patientName: diagnosisData.patientName,
       diagnosisDate: diagnosisData.diagnosisDate || new Date(),
-      chiefComplaint: diagnosisData.chiefComplaint || '',
-      presentIllness: diagnosisData.presentIllness || '',
-      pastHistory: diagnosisData.pastHistory || '',
       icd10Codes: icd10Codes, // Array of ICD-10 codes
-      diagnosisType: diagnosisData.diagnosisType || 'primary',
-      severity: diagnosisData.severity || 'moderate',
       prognosis: diagnosisData.prognosis || '',
       treatmentPlan: diagnosisData.treatmentPlan || '',
       specialConsiderations: diagnosisData.specialConsiderations || '',
-      createdBy: req.user ? req.user.id : null,
+      createdBy: req.user ? req.user.fullname : null, // Use fullname instead of id since DB expects varchar
       notes: diagnosisData.notes || ''
     };
 

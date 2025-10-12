@@ -151,9 +151,7 @@ app.use("/", examinationRoutes);
 app.use("/", diagnosisRoutes);
 app.use("/", procedureRoutes);
 app.use("/", ptDataRoutes);
-app.use("/", billingRoutes);
-
-// ไม่ใช้ API - ใช้ form submit แทน
+app.use("/billing", billingRoutes);
 
 // ==================== Error Handling ====================
 

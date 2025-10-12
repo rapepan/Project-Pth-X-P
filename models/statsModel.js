@@ -84,11 +84,26 @@ class StatsModel {
     db.query(query, callback);
   }
 
+  // ดึงสถิติรายได้รายเดือน (12 เดือนล่าสุด) - เฉพาะบิลที่ชำระเงินแล้ว
+  static getMonthlyRevenueStats(callback) {
+    const query = `
+      SELECT 
+        DATE_FORMAT(bill_date, '%Y-%m') as month,
+        COALESCE(SUM(total_amount), 0) as revenue
+      FROM billing 
+      WHERE bill_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+      AND payment_status = 'paid'
+      GROUP BY DATE_FORMAT(bill_date, '%Y-%m')
+      ORDER BY month ASC
+    `;
+    db.query(query, callback);
+  }
+
   // ดึงข้อมูลสถิติทั้งหมดสำหรับหน้าแรก
   static getAllStats(callback) {
     const stats = {};
     let completed = 0;
-    const total = 7; // จำนวนฟังก์ชันที่จะเรียก
+    const total = 8; // จำนวนฟังก์ชันที่จะเรียก (เพิ่มรายได้รายเดือน)
 
     const checkComplete = () => {
       completed++;
@@ -143,6 +158,13 @@ class StatsModel {
     this.getThisMonthNewPatientsCount((err, result) => {
       if (err) return callback(err);
       stats.thisMonthNewPatientsDuplicate = result[0].thisMonth;
+      checkComplete();
+    });
+
+    // ดึงข้อมูลรายได้รายเดือน
+    this.getMonthlyRevenueStats((err, result) => {
+      if (err) return callback(err);
+      stats.monthlyRevenue = result || [];
       checkComplete();
     });
   }

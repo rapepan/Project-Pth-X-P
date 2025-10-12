@@ -119,6 +119,79 @@
         </div>
         <% } %>
 
+        <!-- Monthly Revenue Chart Section - แสดงเฉพาะ Admin -->
+        <% if (userRole === 'admin' && stats.monthlyRevenue && stats.monthlyRevenue.length > 0) { %>
+        <div class="monthly-revenue-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    รายได้รายเดือน (12 เดือนล่าสุด)
+                </h2>
+                <p class="section-subtitle">รายได้จากการชำระบิลแล้ว</p>
+            </div>
+            
+            <div class="revenue-chart-container">
+                <div class="revenue-grid">
+                    <% 
+                    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
+                                   'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                    const currentYear = new Date().getFullYear();
+                    const currentMonth = new Date().getMonth();
+                    
+                    // สร้างข้อมูล 12 เดือนล่าสุด
+                    const monthlyData = [];
+                    for (let i = 11; i >= 0; i--) {
+                        const date = new Date(currentYear, currentMonth - i, 1);
+                        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        const revenue = stats.monthlyRevenue.find(item => item.month === monthKey);
+                        monthlyData.push({
+                            month: monthKey,
+                            monthName: months[date.getMonth()],
+                            year: date.getFullYear(),
+                            revenue: revenue ? parseFloat(revenue.revenue) : 0
+                        });
+                    }
+                    
+                    monthlyData.forEach((data, index) => {
+                        const maxRevenue = Math.max(...monthlyData.map(d => d.revenue));
+                        const height = maxRevenue > 0 ? (data.revenue / maxRevenue) * 100 : 0;
+                        const heightPercent = Math.round(height);
+                    %>
+                    <div class="revenue-month-item" data-delay="<%= 0.8 + (index * 0.1) %>">
+                        <div class="revenue-bar-container">
+                            <div class="revenue-bar" style="--bar-height: <%= heightPercent %>%" 
+                                 title="<%= data.monthName %> <%= data.year %>: <%= data.revenue.toLocaleString() %> บาท">
+                                <div class="revenue-amount"><%= data.revenue.toLocaleString() %></div>
+                            </div>
+                        </div>
+                        <div class="month-label">
+                            <span class="month-name"><%= data.monthName %></span>
+                            <span class="year-name"><%= data.year %></span>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                
+                <div class="revenue-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-calculator"></i>
+                        <span class="summary-label">รวมรายได้ 12 เดือน:</span>
+                        <span class="summary-value">
+                            <%= monthlyData.reduce((sum, data) => sum + data.revenue, 0).toLocaleString() %> บาท
+                        </span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="summary-label">รายได้เฉลี่ยต่อเดือน:</span>
+                        <span class="summary-value">
+                            <%= Math.round(monthlyData.reduce((sum, data) => sum + data.revenue, 0) / 12).toLocaleString() %> บาท
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
         <!-- Menu Section Header -->
         <div class="section-header">
             <h2 class="section-title">

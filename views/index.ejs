@@ -64,17 +64,8 @@
                     <p class="stat-label">ผู้ป่วยทั้งหมด</p>
                 </div>
             </div>
-            <div class="stat-card" data-delay="0.3">
-                <div class="stat-icon appointments-stat">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-details">
-                    <h3 class="stat-number"><%= stats.todayExaminations || 0 %></h3>
-                    <p class="stat-label">นัดหมายวันนี้</p>
-                </div>
-            </div>
             <% if (userRole === 'admin') { %>
-            <div class="stat-card" data-delay="0.4">
+            <div class="stat-card" data-delay="0.3">
                 <div class="stat-icon treatments-stat">
                     <i class="fas fa-heartbeat"></i>
                 </div>
@@ -89,7 +80,7 @@
         <!-- Additional Stats Section - แสดงเฉพาะ Admin -->
         <% if (userRole === 'admin') { %>
         <div class="stats-section">
-            <div class="stat-card" data-delay="0.5">
+            <div class="stat-card" data-delay="0.4">
                 <div class="stat-icon revenue-stat">
                     <i class="fas fa-chart-line"></i>
                 </div>
@@ -98,7 +89,7 @@
                     <p class="stat-label">รายได้เดือนนี้ (บาท)</p>
                 </div>
             </div>
-            <div class="stat-card" data-delay="0.6">
+            <div class="stat-card" data-delay="0.5">
                 <div class="stat-icon billing-stat">
                     <i class="fas fa-receipt"></i>
                 </div>
@@ -107,7 +98,7 @@
                     <p class="stat-label">ใบเสร็จทั้งหมด</p>
                 </div>
             </div>
-            <div class="stat-card" data-delay="0.7">
+            <div class="stat-card" data-delay="0.6">
                 <div class="stat-icon new-patients-stat">
                     <i class="fas fa-user-plus"></i>
                 </div>
@@ -157,7 +148,7 @@
                         const height = maxRevenue > 0 ? (data.revenue / maxRevenue) * 100 : 0;
                         const heightPercent = Math.round(height);
                     %>
-                    <div class="revenue-month-item" data-delay="<%= 0.8 + (index * 0.1) %>">
+                    <div class="revenue-month-item" data-delay="<%= 0.7 + (index * 0.1) %>">
                         <div class="revenue-bar-container">
                             <div class="revenue-bar" style="--bar-height: <%= heightPercent %>%" 
                                  title="<%= data.monthName %> <%= data.year %>: <%= data.revenue.toLocaleString() %> บาท">

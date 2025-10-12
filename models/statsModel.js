@@ -103,7 +103,7 @@ class StatsModel {
   static getAllStats(callback) {
     const stats = {};
     let completed = 0;
-    const total = 8; // จำนวนฟังก์ชันที่จะเรียก (เพิ่มรายได้รายเดือน)
+    const total = 7; // จำนวนฟังก์ชันที่จะเรียก (ลบ todayExaminations)
 
     const checkComplete = () => {
       completed++;
@@ -126,12 +126,6 @@ class StatsModel {
       checkComplete();
     });
 
-    // ดึงจำนวนการตรวจในวันนี้ (นัดหมายวันนี้)
-    this.getTodayExaminationsCount((err, result) => {
-      if (err) return callback(err);
-      stats.todayExaminations = result[0].today;
-      checkComplete();
-    });
 
     // ดึงจำนวนการตรวจในเดือนนี้ (การรักษาเดือนนี้)
     this.getThisMonthExaminationsCount((err, result) => {

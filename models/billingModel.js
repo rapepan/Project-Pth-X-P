@@ -10,33 +10,36 @@ class BillingModel {
         diagnosis_id, procedure_ids, service_items,
         subtotal, discount_amount, discount_type, discount_reason,
         tax_amount, total_amount, payment_status, payment_method,
-        insurance_type, insurance_claim_amount, patient_paid_amount,
-        receipt_number, notes, created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        payment_date, insurance_type, insurance_claim_amount, patient_paid_amount,
+        receipt_number, cancel_reason, cancelled_at, notes, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
       data.HN,
-      data.patientName,
-      data.billDate || new Date(),
-      data.billNumber,
-      data.diagnosisId || null,
-      JSON.stringify(data.procedureIds || []),
-      JSON.stringify(data.serviceItems || []),
+      data.patient_name,
+      data.bill_date,
+      data.bill_number,
+      data.diagnosis_id || null,
+      JSON.stringify(data.procedure_ids || []),
+      JSON.stringify(data.service_items || []),
       data.subtotal || 0,
-      data.discountAmount || 0,
-      data.discountType || 'none',
-      data.discountReason || '',
-      data.taxAmount || 0,
-      data.totalAmount || 0,
-      data.paymentStatus || 'pending',
-      data.paymentMethod || '',
-      data.insuranceType || 'none',
-      data.insuranceClaimAmount || 0,
-      data.patientPaidAmount || 0,
-      data.receiptNumber || '',
+      data.discount_amount || 0,
+      data.discount_type || 'none',
+      data.discount_reason || '',
+      data.tax_amount || 0,
+      data.total_amount || 0,
+      data.payment_status || 'pending',
+      data.payment_method || '',
+      data.payment_date || null,
+      data.insurance_type || 'none',
+      data.insurance_claim_amount || 0,
+      data.patient_paid_amount || 0,
+      data.receipt_number || '',
+      data.cancel_reason || null,
+      data.cancelled_at || null,
       data.notes || '',
-      data.createdBy || null
+      data.created_by || null
     ];
 
     db.query(insertQuery, values, callback);
@@ -77,7 +80,7 @@ class BillingModel {
              p.fname as patient_fname, p.lname as patient_lname
       FROM billing b
       LEFT JOIN users u ON b.created_by = u.id
-      LEFT JOIN patients p ON b.HN = p.HN
+      LEFT JOIN patient p ON b.HN = p.HN
       WHERE b.id = ?
     `;
     
@@ -98,7 +101,7 @@ class BillingModel {
         });
       }
       
-      callback(null, results);
+      callback(null, results.length > 0 ? results[0] : null);
     });
   }
 
@@ -132,44 +135,6 @@ class BillingModel {
     });
   }
 
-  // สร้างใบเสร็จ
-  static createBill(data, callback) {
-    const insertQuery = `
-      INSERT INTO billing (
-        HN, patient_name, bill_date, bill_number,
-        diagnosis_id, procedure_ids, service_items,
-        subtotal, discount_amount, discount_type, discount_reason,
-        tax_amount, total_amount, payment_status, payment_method,
-        insurance_type, insurance_claim_amount, patient_paid_amount,
-        receipt_number, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-      data.HN,
-      data.patient_name,
-      data.bill_date || new Date(),
-      data.bill_number,
-      data.diagnosis_id || null,
-      JSON.stringify(data.procedure_ids || []),
-      JSON.stringify(data.service_items || []),
-      data.subtotal || 0,
-      data.discount_amount || 0,
-      data.discount_type || 'none',
-      data.discount_reason || '',
-      data.tax_amount || 0,
-      data.total_amount || 0,
-      data.payment_status || 'pending',
-      data.payment_method || '',
-      data.insurance_type || '',
-      data.insurance_claim_amount || 0,
-      data.patient_paid_amount || 0,
-      data.receipt_number || '',
-      data.notes || ''
-    ];
-
-    db.query(insertQuery, values, callback);
-  }
 
   // อัปเดตสถานะการชำระเงิน
   static updatePaymentStatus(billId, data, callback) {
@@ -514,7 +479,7 @@ class BillingModel {
   static checkInsurance(HN, callback) {
     const query = `
       SELECT insurance_type, insurance_id, insurance_expiry
-      FROM patients
+      FROM patient
       WHERE HN = ?
     `;
     db.query(query, [HN], callback);
@@ -602,7 +567,7 @@ class BillingModel {
     const query = `
       SELECT b.*, p.fname, p.lname, p.phone
       FROM billing b
-      LEFT JOIN patients p ON b.HN = p.HN
+      LEFT JOIN patient p ON b.HN = p.HN
       WHERE b.payment_status = 'pending'
       AND b.bill_date < DATE_SUB(NOW(), INTERVAL 30 DAY)
       ORDER BY b.bill_date ASC

@@ -54,7 +54,7 @@
         <% if (patient) { %>
 
             <!-- Patient Examination Form -->
-            <form action="/patientexamination/<%= patient.HN %>" method="POST">
+            <form action="/patientexamination/<%= patient.HN %>" method="POST" onkeydown="if(event.key === 'Enter' && event.target.type !== 'textarea') return false;">
                 <!-- Basic Information -->
                 <div class="form-section fade-in" style="animation-delay: 0.1s;">
                     <h3><i class="fas fa-info-circle"></i> ข้อมูลผู้ป่วย</h3>
@@ -82,12 +82,12 @@
                 <div class="form-section fade-in" style="animation-delay: 0.3s;">
                     <h3><i class="fas fa-eye"></i> การสังเกต (Observation) และการคลำ (Palpation)</h3>
                     <div class="form-group">
-                        <label><i class="fas fa-eye"></i> Observation</label>
-                        <textarea name="observation" rows="5" placeholder="Observation" required></textarea>
+                        <label><i class="fas fa-eye"></i> การสังเกต (Observation) <span class="required">*</span></label>
+                        <textarea name="observation" rows="6" placeholder="บันทึกผลการสังเกตอาการของผู้ป่วย" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-hand-paper"></i> Palpation</label>
-                        <textarea name="palpation" rows="5" placeholder="Palpation" required></textarea>
+                        <label><i class="fas fa-hand-paper"></i> การคลำ (Palpation) <span class="required">*</span></label>
+                        <textarea name="palpation" rows="6" placeholder="บันทึกผลการคลำตรวจ " required></textarea>
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@
                         <div class="radio-option">
                             <input type="checkbox" name="romWeakness" id="rom-weakness" value="1">
                             <label for="rom-weakness">Limited</label>
-                            <input type="text" name="romNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="romNotes1" class="detail-input" data-toggle="rom-weakness" placeholder="ระบุตำแหน่งและระดับการจำกัดการเคลื่อนไหว">
                         </div>
                     </div>
 
@@ -119,7 +119,7 @@
                         <div class="radio-option">
                             <input type="checkbox" name="mmtLimited" id="mmt-limited" value="1">
                             <label for="mmt-limited">Weakness</label>
-                            <input type="text" name="mmtNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="mmtNotes1" class="detail-input" data-toggle="mmt-limited" placeholder="ระบุกล้ามเนื้อและระดับความแข็งแรง (0-5)">
                         </div>
                     </div>
 
@@ -133,12 +133,12 @@
                         <div class="radio-option">
                             <input type="checkbox" name="accessoryHypomobility" id="accessory-hypomobility" value="1">
                             <label for="accessory-hypomobility">Hypomobility</label>
-                            <input type="text" name="accessoryNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="accessoryNotes1" class="detail-input" data-toggle="accessory-hypomobility" placeholder="ระบุข้อต่อและระดับการเคลื่อนที่ที่ลดลง">
                         </div>
                         <div class="radio-option">
                             <input type="checkbox" name="accessoryHypermobility" id="accessory-hypermobility" value="1">
                             <label for="accessory-hypermobility">Hypermobility</label>
-                            <input type="text" name="accessoryNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="accessoryNotes1" class="detail-input" data-toggle="accessory-hypermobility" placeholder="ระบุข้อต่อและระดับการเคลื่อนที่ที่เพิ่มขึ้น">
                         </div>
                     </div>
                 </div>
@@ -160,17 +160,17 @@
                             <div class="radio-option">
                                 <input type="checkbox" name="pinprickIntact" id="pinprick-intact" value="1">
                                 <label for="pinprick-intact">Intact</label>
-                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="pinprickNotes1" class="detail-input" data-toggle="pinprick-intact" placeholder="ระบุบริเวณที่ตรวจพบ">
                             </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="pinprickImpair" id="pinprick-impair" value="1">
                                 <label for="pinprick-impair">Impair</label>
-                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="pinprickNotes2" class="detail-input" data-toggle="pinprick-impair" placeholder="ระบุบริเวณที่มีความรู้สึกลดลง">
                             </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="pinprickLoss" id="pinprick-loss" value="1">
                                 <label for="pinprick-loss">Loss</label>
-                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="pinprickNotes3" class="detail-input" data-toggle="pinprick-loss" placeholder="ระบุบริเวณที่สูญเสียความรู้สึก">
                             </div>
                         </div>
 
@@ -187,13 +187,14 @@
                             <div class="radio-option">
                                 <input type="checkbox" name="lightTouchImpair" id="light-touch-impair" value="1">
                                 <label for="light-touch-impair">Impair</label>
-                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="lightTouchNotes1" class="detail-input" data-toggle="light-touch-impair" placeholder="ระบุบริเวณที่มีความรู้สึกลดลง">
                             </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="lightTouchLoss" id="light-touch-loss" value="1">
                                 <label for="light-touch-loss">Loss</label>
-                                <input type="text" name="pinprickNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="lightTouchNotes2" class="detail-input" data-toggle="light-touch-loss" placeholder="ระบุบริเวณที่สูญเสียความรู้สึก">
                             </div>
+                        </div>
                     </div>
 
                     <!-- Deep Tendon Reflex -->
@@ -202,12 +203,12 @@
                         <div class="radio-option">
                             <input type="checkbox" name="normalDTR" id="dtr-normal" value="1">
                             <label for="dtr-normal">Normal of</label>
-                            <input type="text" name="deepTendonReflexNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="deepTendonReflexNotes1" class="detail-input" data-toggle="dtr-normal" placeholder="ระบุเส้นประสาทที่ตรวจ เช่น Bicep, Tricep, Knee jerk">
                         </div>
                         <div class="radio-option">
                             <input type="checkbox" name="abnormalDTR" id="dtr-abnormal" value="1">
                             <label for="dtr-abnormal">Abnormal of</label>
-                            <input type="text" name="deepTendonReflexNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="deepTendonReflexNotes1" class="detail-input" data-toggle="dtr-abnormal" placeholder="ระบุเส้นประสาทและลักษณะความผิดปกติ">
                         </div>
                     </div>
 
@@ -221,7 +222,7 @@
                         <div class="radio-option" style="margin-top: 10px;">
                             <input type="checkbox" name="transferDependent" id="transfer-dependent" value="1">
                             <label for="transfer-dependent"><strong>Dependent</strong></label>
-                            <input type="text" name="transferNotes2" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="transferNotes2" class="detail-input" data-toggle="transfer-dependent" placeholder="ระบุระดับการพึ่งพา เช่น ต้องช่วย 1 คน, 2 คน">
                         </div>
                     </div>
 
@@ -240,13 +241,13 @@
                             <div class="radio-option">
                                 <input type="checkbox" name="ambulationWith" id="ambulation-with" value="1">
                                 <label for="ambulation-with">With</label>
-                                <input type="text" name="ambulationNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                                <input type="text" name="ambulationNotes1" class="detail-input" data-toggle="ambulation-with" placeholder="ระบุอุปกรณ์ช่วยเดิน เช่น Walker, Cane, Crutches">
                             </div>
                         </div>
                         <div class="radio-option" style="margin-top: 10px;">
                             <input type="checkbox" name="ambulationDependent" id="ambulation-dependent" value="1">
                             <label for="ambulation-dependent"><strong>Dependent</strong></label>
-                            <input type="text" name="ambulationNotes1" style="width: 100%; border: none; border-bottom: 1px solid #333; padding: 5px 0; margin-top: 5px;" placeholder="">
+                            <input type="text" name="ambulationNotes1" class="detail-input" data-toggle="ambulation-dependent" placeholder="ระบุระดับการพึ่งพาในการเดิน">
                         </div>
                     </div>
                 </div>
@@ -255,8 +256,8 @@
                 <div class="form-section fade-in" style="animation-delay: 0.8s;">
                     <h3><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</h3>
                     <div class="form-group">
-                        <label><i class="fas fa-comment-dots"></i> หมายเหตุ</label>
-                        <textarea name="notes" rows="8" placeholder="บันทึกข้อมูลเพิ่มเติม..."></textarea>
+                        <label><i class="fas fa-comment-dots"></i> หมายเหตุเพิ่มเติม</label>
+                        <textarea name="notes" rows="8" placeholder="บันทึกข้อมูลเพิ่มเติมหรือข้อสังเกตอื่นๆ"></textarea>
                     </div>
                 </div>
 

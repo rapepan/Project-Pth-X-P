@@ -1,78 +1,254 @@
-        function toggleCheckbox(item) {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                item.classList.add('checked');
-            } else {
-                item.classList.remove('checked');
-            }
+// Enhanced Patient Examination Form JavaScript
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    setupCheckboxBehaviors();
+    setupInputVisibility();
+    setupDetailInputToggle(); // เพิ่มฟังก์ชันใหม่
+    setupFormValidation();
+    setupAnimations();
+    preventEnterSubmit();
+});
+
+// Initialize form
+function initializeForm() {
+    console.log('Patient Examination Form initialized');
+}
+
+// Setup checkbox behaviors
+function setupCheckboxBehaviors() {
+    // Add click handlers to radio options
+    const radioOptions = document.querySelectorAll('.radio-option');
+    radioOptions.forEach(option => {
+        const checkbox = option.querySelector('input[type="checkbox"]');
+
+        // Add checked class if already checked
+        if (checkbox && checkbox.checked) {
+            option.classList.add('checked');
         }
 
-        function goBack() {
-            // ตรวจสอบว่าอยู่ในหน้า patientexamination หรือไม่
-            const currentPath = window.location.pathname;
-            
-            if (currentPath.includes('/patientexamination/')) {
-                // ถ้าเป็นหน้า patientexamination ให้ไปที่ examinationHistory
-                const hn = currentPath.split('/')[2]; // ดึง HN จาก path
-                window.location.href = '/examinationroom/' + hn;
-            } else {
-                // ถ้าไม่ใช่ให้ไปหน้าหลัก
-                window.location.href = '/index';
-            }
+        // Add change handler to checkbox
+        if (checkbox) {
+            checkbox.addEventListener('change', function() {
+                toggleRadioOption(option, this);
+            });
         }
 
-        // Initialize form
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add animation to form sections
-            const sections = document.querySelectorAll('.form-section');
-            sections.forEach((section, index) => {
-                setTimeout(() => {
-                    section.style.opacity = '0';
-                    section.style.transform = 'translateY(20px)';
-                    section.style.transition = 'all 0.5s ease';
-                    
-                    setTimeout(() => {
-                        section.style.opacity = '1';
-                        section.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 100);
+        // Add click handler to the entire radio option
+        option.addEventListener('click', function(e) {
+            // Don't trigger if clicking on the input itself
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+    });
+}
+
+// Toggle radio option visual state
+function toggleRadioOption(option, checkbox) {
+    if (checkbox.checked) {
+        option.classList.add('checked');
+        option.style.backgroundColor = 'rgba(0, 137, 123, 0.08)';
+        option.style.borderColor = 'var(--primary-color)';
+        option.style.transform = 'translateY(-2px)';
+        option.style.boxShadow = 'var(--shadow-sm)';
+    } else {
+        option.classList.remove('checked');
+        option.style.backgroundColor = 'var(--bg-light)';
+        option.style.borderColor = 'var(--border-color)';
+        option.style.transform = 'translateY(0)';
+        option.style.boxShadow = 'none';
+    }
+}
+
+// Setup input visibility based on checkbox state
+function setupInputVisibility() {
+    // Get all checkbox items that contain input-detail
+    const checkboxItems = document.querySelectorAll('.checkbox-item');
+
+    checkboxItems.forEach(item => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        const inputDetail = item.querySelector('.input-detail');
+
+        if (checkbox && inputDetail) {
+            // Initial state - hide if not checked
+            inputDetail.style.display = checkbox.checked ? 'block' : 'none';
+
+            // Toggle visibility when checkbox changes
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    inputDetail.style.display = 'block';
+                    // Focus on the input field inside
+                    const input = inputDetail.querySelector('input, textarea');
+                    if (input) {
+                        setTimeout(() => input.focus(), 100);
+                    }
+                } else {
+                    inputDetail.style.display = 'none';
+                }
+            });
+        }
+    });
+}
+
+// Setup detail input toggle - แสดง/ซ่อนช่อง input ตามการเลือก checkbox
+function setupDetailInputToggle() {
+    // หา checkbox ทั้งหมดที่มีการเชื่อมกับ detail input
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    checkboxes.forEach(checkbox => {
+        const checkboxId = checkbox.id;
+
+        // หา detail-input ที่มี data-toggle ตรงกับ checkbox id นี้
+        const relatedInputs = document.querySelectorAll(`.detail-input[data-toggle="${checkboxId}"]`);
+
+        if (relatedInputs.length > 0) {
+            // เริ่มต้น: ซ่อน input ถ้า checkbox ยังไม่ถูกเลือก
+            relatedInputs.forEach(input => {
+                if (checkbox.checked) {
+                    input.classList.add('show');
+                } else {
+                    input.classList.remove('show');
+                }
             });
 
-            // Form validation
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const patientName = document.querySelector('input[name="patientName"]').value;
-                    
-                    if (!patientName.trim()) {
-                        e.preventDefault();
-                        alert('กรุณากรอกชื่อผู้ป่วย');
-                        return false;
+            // เพิ่ม event listener สำหรับการเปลี่ยนแปลง
+            checkbox.addEventListener('change', function() {
+                relatedInputs.forEach(input => {
+                    if (this.checked) {
+                        // แสดง input พร้อม animation
+                        input.classList.add('show');
+                        // โฟกัสที่ input เมื่อแสดง
+                        setTimeout(() => {
+                            input.focus();
+                        }, 300);
+                    } else {
+                        // ซ่อน input
+                        input.classList.remove('show');
+                        // ล้างค่าเมื่อยกเลิกเลือก
+                        setTimeout(() => {
+                            input.value = '';
+                        }, 300);
                     }
                 });
+            });
+        }
+    });
+}
+
+// Setup form validation
+function setupFormValidation() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const observation = document.querySelector('textarea[name="observation"]');
+            const palpation = document.querySelector('textarea[name="palpation"]');
+
+            if (observation && !observation.value.trim()) {
+                e.preventDefault();
+                alert('กรุณากรอกข้อมูล Observation');
+                observation.focus();
+                return false;
+            }
+
+            if (palpation && !palpation.value.trim()) {
+                e.preventDefault();
+                alert('กรุณากรอกข้อมูล Palpation');
+                palpation.focus();
+                return false;
+            }
+
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+            }
+        });
+    }
+}
+
+// Setup animations
+function setupAnimations() {
+    const sections = document.querySelectorAll('.form-section');
+    sections.forEach((section, index) => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+
+        setTimeout(() => {
+            section.style.transition = 'all 0.5s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+}
+
+// Prevent Enter key from submitting the form
+function preventEnterSubmit() {
+    const form = document.querySelector('form');
+    if (form) {
+        // Prevent Enter key on all input fields (except textarea)
+        form.addEventListener('keydown', function(e) {
+            // ถ้ากด Enter และไม่ใช่ใน textarea
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
             }
         });
 
-        // Toggle checkbox and add visual feedback
-        function toggleCheckbox(element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                element.classList.add('checked');
-            } else {
-                element.classList.remove('checked');
-            }
-        }
-
-
-        // Initialize checked states on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
-                if (checkbox.checked) {
-                    checkbox.closest('.checkbox-item').classList.add('checked');
+        // Allow Enter key in textarea for line breaks
+        const textareas = form.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    // Allow default behavior (new line) in textarea
+                    // Don't prevent default
+                    e.stopPropagation(); // Stop event from bubbling to form
                 }
             });
         });
+
+        // Also prevent Enter on regular text inputs
+        const inputs = form.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Optional: move to next input field
+                    const formElements = Array.from(form.querySelectorAll('input, textarea, select'));
+                    const currentIndex = formElements.indexOf(e.target);
+                    if (currentIndex < formElements.length - 1) {
+                        formElements[currentIndex + 1].focus();
+                    }
+                    return false;
+                }
+            });
+        });
+    }
+}
+
+// Navigation function
+function goBack() {
+    const currentPath = window.location.pathname;
+
+    if (currentPath.includes('/patientexamination/')) {
+        const hn = currentPath.split('/')[2];
+        window.location.href = '/examinationroom/' + hn;
+    } else {
+        window.location.href = '/index';
+    }
+}
+
+// Enhanced checkbox toggle function
+function toggleCheckbox(element) {
+    const checkbox = element.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+        toggleCheckboxItem(element, checkbox);
+    }
+}

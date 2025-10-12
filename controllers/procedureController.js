@@ -1,9 +1,60 @@
 const ProcedureModel = require('../models/procedureModel');
+const { getCurrentDate } = require('../utils/billUtils');
+const ServiceModel = require('../models/serviceModel');
 
 class ProcedureController {
   // แสดงหน้าการรักษา
   static showProcedurePage(req, res) {
     const HN = req.params.HN;
+
+    // Helper functions สำหรับ EJS
+    const getProcedureIcon = (type) => {
+      const icons = {
+        'manual': 'hand-paper',
+        'electrotherapy': 'bolt',
+        'exercise': 'running',
+        'thermal': 'thermometer-half',
+        'traction': 'arrows-alt-v',
+        'massage': 'hands',
+        'other': 'tools'
+      };
+      return icons[type] || 'tools';
+    };
+
+    const getProcedureTypeName = (type) => {
+      const names = {
+        'manual': 'การรักษาด้วยมือ',
+        'electrotherapy': 'ไฟฟ้าบำบัด',
+        'exercise': 'การออกกำลังกาย',
+        'thermal': 'ความร้อนบำบัด',
+        'traction': 'การดึง',
+        'massage': 'การนวด',
+        'other': 'อื่นๆ'
+      };
+      return names[type] || 'อื่นๆ';
+    };
+
+    const getEffectivenessIcon = (effectiveness) => {
+      const icons = {
+        'excellent': 'star',
+        'good': 'thumbs-up',
+        'fair': 'minus',
+        'poor': 'thumbs-down',
+        'unknown': 'question'
+      };
+      return icons[effectiveness] || 'question';
+    };
+
+    const getEffectivenessName = (effectiveness) => {
+      const names = {
+        'excellent': 'ดีมาก',
+        'good': 'ดี',
+        'fair': 'ปานกลาง',
+        'poor': 'ไม่ดี',
+        'unknown': 'ยังประเมินไม่ได้'
+      };
+      return names[effectiveness] || 'ไม่ระบุ';
+    };
 
     if (HN) {
       ProcedureModel.getPatientProcedures(HN, (err, procedures) => {
@@ -14,23 +65,47 @@ class ProcedureController {
           });
         }
 
-        res.render("procedure", {
-          title: "หัตถการ",
-          HN: HN,
-          patient: { HN: HN },
-          procedures: procedures || [],
-          success: req.query.success,
-          error: req.query.error
+        ServiceModel.getAllServices((err, services) => {
+          if (err) {
+            console.error('Error fetching services:', err);
+            services = [];
+          }
+
+          res.render("procedure", {
+            title: "หัตถการ",
+            HN: HN,
+            patient: { HN: HN },
+            procedures: procedures || [],
+            services: services || [],
+            success: req.query.success,
+            error: req.query.error,
+            getProcedureIcon,
+            getProcedureTypeName,
+            getEffectivenessIcon,
+            getEffectivenessName
+          });
         });
       });
     } else {
-      res.render("procedure", {
-        title: "การรักษา",
-        HN: null,
-        patient: null,
-        procedures: [],
-        success: req.query.success,
-        error: req.query.error
+      ServiceModel.getAllServices((err, services) => {
+        if (err) {
+          console.error('Error fetching services:', err);
+          services = [];
+        }
+
+        res.render("procedure", {
+          title: "การรักษา",
+          HN: null,
+          patient: null,
+          procedures: [],
+          services: services || [],
+          success: req.query.success,
+          error: req.query.error,
+          getProcedureIcon,
+          getProcedureTypeName,
+          getEffectivenessIcon,
+          getEffectivenessName
+        });
       });
     }
   }
@@ -40,11 +115,77 @@ class ProcedureController {
     const HN = req.params.HN;
     const procedureData = req.body;
 
-    ProcedureModel.createProcedure(HN, procedureData, (err, result) => {
+    // ตรวจสอบว่ามีการเลือกบริการหรือไม่
+    if (!procedureData.selectedServices) {
+      return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('กรุณาเลือกบริการอย่างน้อย 1 รายการ')}`);
+    }
+
+    // แปลงข้อมูลบริการที่เลือก
+    let selectedServices = [];
+    try {
+      selectedServices = JSON.parse(procedureData.selectedServices);
+    } catch (err) {
+      return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ข้อมูลบริการไม่ถูกต้อง')}`);
+    }
+
+    if (selectedServices.length === 0) {
+      return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('กรุณาเลือกบริการอย่างน้อย 1 รายการ')}`);
+    }
+
+    // ดึงข้อมูลผู้ป่วยจากฐานข้อมูล
+    const db = require('../config/db');
+    const patientQuery = "SELECT fname, lname FROM patient WHERE HN = ?";
+    
+    db.query(patientQuery, [HN], (err, patientResults) => {
       if (err) {
-        return res.redirect(`/procedure/${HN}?error=${encodeURIComponent(err.message)}`);
+        console.error('Error fetching patient:', err);
+        return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถดึงข้อมูลผู้ป่วยได้')}`);
       }
-      res.redirect(`/procedure/${HN}?success=บันทึกการรักษาเรียบร้อย`);
+      
+      // เตรียมชื่อผู้ป่วย
+      let patientName = 'ผู้ป่วยไม่ระบุชื่อ';
+      if (patientResults && patientResults.length > 0) {
+        const patient = patientResults[0];
+        patientName = `${patient.fname || ''} ${patient.lname || ''}`.trim();
+        if (!patientName) {
+          patientName = 'ผู้ป่วยไม่ระบุชื่อ';
+        }
+      }
+      
+      // เตรียมข้อมูลหัตถการให้ครบถ้วน
+      const completeProcedureData = {
+        HN: HN,
+        patient_name: patientName,
+        procedure_date: getCurrentDate(), // YYYY-MM-DD format
+        procedure_code: procedureData.procedureCode || 'PT001',
+        procedure_name: procedureData.procedureName || 'หัตถการกายภาพบำบัด',
+        body_part: procedureData.bodyPart || 'ไม่ระบุส่วนร่างกาย',
+        technique: procedureData.techniques || 'การบำบัดด้วยบริการที่เลือก',
+        duration_minutes: parseInt(procedureData.duration) || 30,
+        therapist_name: procedureData.therapist || null, // เก็บชื่อผู้ทำการรักษา
+        notes: procedureData.notes || '', // ไม่เจนข้อมูลอัตโนมัติ ให้ผู้ใช้ใส่เอง
+        created_by: req.user ? (req.user.fullname || req.user.username || req.user.email || 'ไม่ระบุชื่อผู้ใช้') : null
+      };
+
+
+      // บันทึกหัตถการ
+      ProcedureModel.createProcedure(completeProcedureData, (err, result) => {
+        if (err) {
+          return res.redirect(`/procedure/${HN}?error=${encodeURIComponent(err.message)}`);
+        }
+
+        // ส่งข้อมูลบริการไปยังหน้า billing
+        const billingData = {
+          HN: HN,
+          procedureId: result.insertId,
+          selectedServices: procedureData.selectedServices,
+          totalAmount: procedureData.totalAmount || 0
+        };
+
+        // Redirect ไปหน้า billing พร้อมข้อมูล
+        const queryParams = new URLSearchParams(billingData).toString();
+        res.redirect(`/billing/${HN}?fromProcedure=true&${queryParams}`);
+      });
     });
   }
 

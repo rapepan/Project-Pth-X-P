@@ -53,99 +53,31 @@
             </div>
         <% } %>
 
-
-        <!-- Procedures Section -->
+        <!-- Add Procedure Button Section -->
         <% if (HN) { %>
-            <div class="procedures-section">
+            <div class="add-procedure-section">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-medkit"></i> การรักษาของผู้ป่วย HN: <%= HN %>
+                        <i class="fas fa-medkit"></i> หัตถการ
                     </h2>
                 </div>
-
-                <% if (procedures && procedures.length > 0) { %>
-                    <div class="procedures-grid">
-                        <% procedures.forEach(function(procedure) { %>
-                            <div class="procedure-card">
-                                <div class="procedure-header">
-                                    <div class="procedure-info">
-                                        <h3><%= procedure.procedureName %></h3>
-                                        <span class="procedure-date">
-                                            <i class="fas fa-calendar"></i>
-                                            <%= new Date(procedure.created_at).toLocaleDateString('th-TH') %>
-                                        </span>
-                                    </div>
-                                    <div class="procedure-type">
-                                        <span class="type-badge type-<%= procedure.procedureType %>">
-                                            <i class="fas fa-<%= getProcedureIcon(procedure.procedureType) %>"></i>
-                                            <%= getProcedureTypeName(procedure.procedureType) %>
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="procedure-body">
-                                    <div class="procedure-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">ผู้ทำการรักษา:</span>
-                                            <span class="detail-value"><%= procedure.therapist || 'ยังไม่ได้ระบุ' %></span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ระยะเวลา:</span>
-                                            <span class="detail-value">
-                                                <i class="fas fa-clock"></i>
-                                                <%= procedure.duration || 'ไม่ระบุ' %> นาที
-                                            </span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ความถี่:</span>
-                                            <span class="detail-value"><%= procedure.frequency || 'ไม่ระบุ' %></span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ผลการรักษา:</span>
-                                            <span class="detail-value status-<%= procedure.effectiveness || 'unknown' %>">
-                                                <i class="fas fa-<%= getEffectivenessIcon(procedure.effectiveness) %>"></i>
-                                                <%= getEffectivenessName(procedure.effectiveness) %>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <% if (procedure.notes) { %>
-                                        <div class="procedure-notes">
-                                            <h4><i class="fas fa-sticky-note"></i> หมายเหตุ</h4>
-                                            <p><%= procedure.notes %></p>
-                                        </div>
-                                    <% } %>
-                                </div>
-                                
-                                <div class="procedure-actions">
-                                    <a href="/procedureDetail/<%= HN %>/<%= procedure.procedureId %>" class="btn-view">
-                                        <i class="fas fa-eye"></i> ดูรายละเอียด
-                                    </a>
-                                    <a href="/procedureHistory/<%= HN %>" class="btn-history">
-                                        <i class="fas fa-history"></i> ประวัติ
-                                    </a>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
-                <% } else { %>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-medkit"></i>
+                <div class="add-procedure-card">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
                         </div>
-                        <h3 class="empty-state-title">ยังไม่มีการรักษา</h3>
-                        <p class="empty-state-text">
-                            ยังไม่มีการรักษาสำหรับผู้ป่วย HN: <%= HN %><br>
-                            คลิกปุ่ม "เพิ่มการรักษาใหม่" เพื่อเริ่มต้น
-                        </p>
-                        <button class="btn-procedure secondary" onclick="showCreateProcedureForm()">
-                            <i class="fas fa-plus"></i> เพิ่มการรักษาใหม่
+                        <h3>เพิ่มหัตถการใหม่</h3>
+                        <p>เริ่มต้นการรักษาใหม่สำหรับผู้ป่วย HN: <%= HN %></p>
+                        <button class="btn-procedure primary" onclick="showCreateProcedureForm()">
+                            <i class="fas fa-plus"></i> เพิ่มหัตถการใหม่
                         </button>
                     </div>
-                <% } %>
+                </div>
             </div>
+        <% } %>
 
             <!-- Create Procedure Form Modal -->
+        <% if (HN) { %>
             <div id="createProcedureModal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -189,6 +121,38 @@
                             </select>
                         </div>
                         
+                        <!-- ส่วนเลือกบริการ -->
+                        <div class="services-section" data-services='<%= JSON.stringify(services || []) %>'>
+                            <h4 class="services-title">
+                                <i class="fas fa-search"></i> เลือกบริการ
+                            </h4>
+                            
+                            <!-- ช่องค้นหาบริการ -->
+                            <div class="service-search-container">
+                                <div class="search-input-wrapper">
+                                    <input type="text" id="serviceSearch" class="service-search-input" placeholder="พิมพ์ชื่อบริการเพื่อค้นหา...">
+                                    <i class="fas fa-search search-icon"></i>
+                                </div>
+                                <div id="serviceDropdown" class="service-dropdown" style="display: none;"></div>
+                            </div>
+                            
+                            <!-- รายการบริการที่เลือก -->
+                            <div class="selected-services">
+                                <h5 class="selected-title">บริการที่เลือก:</h5>
+                                <div id="selectedServicesList" class="selected-services-list">
+                                    <div class="no-selection">
+                                        <p><i class="fas fa-info-circle"></i> ยังไม่ได้เลือกบริการ</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grand-total">
+                                <h4>ยอดรวมทั้งหมด: <span id="grandTotal">0</span> บาท</h4>
+                                <input type="hidden" name="totalAmount" id="totalAmountInput" value="0">
+                                <input type="hidden" name="selectedServices" id="selectedServicesInput" value="">
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
                             <label class="form-label">หมายเหตุ</label>
                             <textarea name="notes" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม"></textarea>
@@ -199,7 +163,7 @@
                                 <i class="fas fa-times"></i> ยกเลิก
                             </button>
                             <button type="submit" class="btn-procedure primary">
-                                <i class="fas fa-save"></i> บันทึกการรักษา
+                                <i class="fas fa-save"></i> บันทึกและทำใบเสร็จ
                             </button>
                         </div>
                     </form>
@@ -221,56 +185,176 @@
     <!-- JavaScript -->
     <script src="/js/procedure.js"></script>
     <script src="/js/notifications.js"></script>
-</body>
-</html>
 
 <script>
-// Helper functions for EJS
-function getProcedureIcon(type) {
-    const icons = {
-        'manual': 'hand-paper',
-        'electrotherapy': 'bolt',
-        'exercise': 'running',
-        'thermal': 'thermometer-half',
-        'traction': 'arrows-alt-v',
-        'massage': 'hands',
-        'other': 'tools'
-    };
-    return icons[type] || 'medkit';
-}
-
-function getProcedureTypeName(type) {
-    const names = {
-        'manual': 'การบำบัดด้วยมือ',
-        'electrotherapy': 'การรักษาด้วยไฟฟ้า',
-        'exercise': 'การออกกำลังกาย',
-        'thermal': 'การรักษาด้วยความร้อน/เย็น',
-        'traction': 'การดึง',
-        'massage': 'การนวด',
-        'other': 'อื่นๆ'
-    };
-    return names[type] || type;
-}
-
-function getEffectivenessIcon(effectiveness) {
-    const icons = {
-        'excellent': 'star',
-        'good': 'thumbs-up',
-        'fair': 'minus',
-        'poor': 'thumbs-down',
-        'unknown': 'question'
-    };
-    return icons[effectiveness] || 'question';
-}
-
-function getEffectivenessName(effectiveness) {
-    const names = {
-        'excellent': 'ดีมาก',
-        'good': 'ดี',
-        'fair': 'ปานกลาง',
-        'poor': 'ไม่ดี',
-        'unknown': 'ยังประเมินไม่ได้'
-    };
-    return names[effectiveness] || 'ไม่ระบุ';
-}
+    // ฟังก์ชันสำหรับจัดการการเลือกบริการ
+    document.addEventListener('DOMContentLoaded', function() {
+        // ดึงข้อมูลบริการจาก data attribute
+        const servicesSection = document.querySelector('.services-section');
+        if (!servicesSection) return; // ถ้าไม่มี services section ให้ออก
+        
+        const services = JSON.parse(servicesSection.dataset.services || '[]');
+        
+        const serviceSearchInput = document.getElementById('serviceSearch');
+        const serviceDropdown = document.getElementById('serviceDropdown');
+        const selectedServicesList = document.getElementById('selectedServicesList');
+        const grandTotalElement = document.getElementById('grandTotal');
+        const totalAmountInput = document.getElementById('totalAmountInput');
+        const selectedServicesInput = document.getElementById('selectedServicesInput');
+        
+        let selectedServices = [];
+        let filteredServices = [];
+        
+        // เมื่อพิมพ์ในช่องค้นหา
+        serviceSearchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            if (searchTerm.length < 2) {
+                serviceDropdown.style.display = 'none';
+                return;
+            }
+            
+            // ค้นหาบริการที่ตรงกับคำค้นหา
+            filteredServices = services.filter(service => 
+                service.service_name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredServices.length > 0) {
+                showDropdown(filteredServices);
+            } else {
+                serviceDropdown.style.display = 'none';
+            }
+        });
+        
+        // ซ่อน dropdown เมื่อคลิกข้างนอก
+        document.addEventListener('click', function(e) {
+            if (!serviceSearchInput.contains(e.target) && !serviceDropdown.contains(e.target)) {
+                serviceDropdown.style.display = 'none';
+            }
+        });
+        
+        // แสดง dropdown
+        function showDropdown(services) {
+            serviceDropdown.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceItem = document.createElement('div');
+                serviceItem.className = 'dropdown-item';
+                serviceItem.innerHTML = `
+                    <div class="service-info">
+                        <h6 class="service-name">${service.service_name}</h6>
+                        <p class="service-price">${service.price} บาท / ${service.unit}</p>
+                    </div>
+                `;
+                
+                serviceItem.addEventListener('click', function() {
+                    addService(service);
+                    serviceSearchInput.value = '';
+                    serviceDropdown.style.display = 'none';
+                });
+                
+                serviceDropdown.appendChild(serviceItem);
+            });
+            
+            serviceDropdown.style.display = 'block';
+        }
+        
+        // เพิ่มบริการ
+        function addService(service) {
+            // ตรวจสอบว่าบริการนี้ถูกเลือกแล้วหรือไม่
+            if (selectedServices.find(s => s.id === service.id)) {
+                alert('บริการนี้ถูกเลือกแล้ว');
+                return;
+            }
+            
+            const serviceWithQuantity = {
+                ...service,
+                quantity: 1,
+                total: parseFloat(service.price)
+            };
+            
+            selectedServices.push(serviceWithQuantity);
+            updateSelectedServicesList();
+            updateGrandTotal();
+        }
+        
+        // อัปเดตรายการบริการที่เลือก
+        function updateSelectedServicesList() {
+            if (selectedServices.length === 0) {
+                selectedServicesList.innerHTML = `
+                    <div class="no-selection">
+                        <p><i class="fas fa-info-circle"></i> ยังไม่ได้เลือกบริการ</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            selectedServicesList.innerHTML = '';
+            
+            selectedServices.forEach((service, index) => {
+                const serviceItem = document.createElement('div');
+                serviceItem.className = 'selected-service-item';
+                serviceItem.innerHTML = `
+                    <div class="service-info">
+                        <h6 class="service-name">${service.service_name}</h6>
+                        <p class="service-price">${service.price} บาท / ${service.unit}</p>
+                    </div>
+                    <div class="service-quantity">
+                        <label>จำนวน:</label>
+                        <input type="number" min="1" value="${service.quantity}" 
+                               onchange="updateServiceQuantity(${index}, this.value)">
+                        <span class="unit">${service.unit}</span>
+                    </div>
+                    <div class="service-total">
+                        <span class="total-amount">${service.total.toLocaleString()} บาท</span>
+                        <button type="button" class="remove-btn" onclick="removeService(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                selectedServicesList.appendChild(serviceItem);
+            });
+        }
+        
+        // อัปเดตจำนวนบริการ
+        window.updateServiceQuantity = function(index, quantity) {
+            const service = selectedServices[index];
+            service.quantity = parseInt(quantity) || 1;
+            service.total = parseFloat(service.price) * service.quantity;
+            updateSelectedServicesList();
+            updateGrandTotal();
+        };
+        
+        // ลบบริการ
+        window.removeService = function(index) {
+            selectedServices.splice(index, 1);
+            updateSelectedServicesList();
+            updateGrandTotal();
+        };
+        
+        // อัปเดตยอดรวมทั้งหมด
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            
+            selectedServices.forEach(service => {
+                grandTotal += service.total;
+            });
+            
+            grandTotalElement.textContent = grandTotal.toLocaleString();
+            totalAmountInput.value = grandTotal;
+            selectedServicesInput.value = JSON.stringify(selectedServices);
+        }
+        
+        // ตรวจสอบการเลือกบริการก่อนส่งฟอร์ม
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (selectedServices.length === 0) {
+                e.preventDefault();
+                alert('กรุณาเลือกบริการอย่างน้อย 1 รายการ');
+                return false;
+            }
+        });
+    });
 </script>
+</body>
+</html>

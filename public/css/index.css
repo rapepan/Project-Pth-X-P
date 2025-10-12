@@ -442,6 +442,17 @@ body {
     box-shadow: 0 4px 12px rgba(255, 138, 101, 0.3);
 }
 
+
+.billing-stat {
+    background: linear-gradient(135deg, #4CAF50, #45A049);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.new-patients-stat {
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+
 .stat-details {
     flex: 1;
 }

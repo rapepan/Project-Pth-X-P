@@ -142,6 +142,38 @@ class PatientModel {
       callback(null, results[0].count > 0);
     });
   }
+
+  // ดึงจำนวนผู้ป่วยทั้งหมด
+  static getTotalPatientsCount(callback) {
+    const query = "SELECT COUNT(*) as total FROM patient";
+    db.query(query, callback);
+  }
+
+  // ดึงจำนวนผู้ป่วยที่ลงทะเบียนในวันนี้
+  static getTodayPatientsCount(callback) {
+    const query = "SELECT COUNT(*) as today FROM patient WHERE DATE(created_at) = CURDATE()";
+    db.query(query, callback);
+  }
+
+  // ดึงจำนวนผู้ป่วยที่ลงทะเบียนในเดือนนี้
+  static getThisMonthPatientsCount(callback) {
+    const query = "SELECT COUNT(*) as thisMonth FROM patient WHERE YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())";
+    db.query(query, callback);
+  }
+
+  // ดึงสถิติผู้ป่วยรายเดือน (12 เดือนล่าสุด)
+  static getMonthlyPatientsStats(callback) {
+    const query = `
+      SELECT 
+        DATE_FORMAT(created_at, '%Y-%m') as month,
+        COUNT(*) as count
+      FROM patient 
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+      ORDER BY month ASC
+    `;
+    db.query(query, callback);
+  }
 }
 
 module.exports = PatientModel;  

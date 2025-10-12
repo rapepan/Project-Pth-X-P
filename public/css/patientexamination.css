@@ -431,7 +431,122 @@ nav a .fas {
     font-size: 1.3em;
 }
 
-/* ========== Radio Group ========== */
+/* ========== Checkbox Grid Layout ========== */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* ========== Checkbox Item ========== */
+.checkbox-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-light);
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.checkbox-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(0, 137, 123, 0.05);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.checkbox-item input[type="checkbox"]:checked + label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.checkbox-item label {
+    cursor: pointer;
+    font-weight: 500;
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* ========== Detail Input ========== */
+.detail-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #333;
+    padding: 5px 0;
+    margin-top: 5px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.detail-input.show {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.detail-input:focus {
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* ========== Sub Test Groups ========== */
+.sub-test-group {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(0, 137, 123, 0.02);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+}
+
+.sub-test-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.sub-test-header input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.sub-test-header label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin: 0;
+}
+
+.sub-options {
+    margin-left: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+}
+
+/* ========== Radio Group (Legacy) ========== */
 .radio-group {
     display: flex;
     gap: 1.5rem;
@@ -455,7 +570,6 @@ nav a .fas {
     background: rgba(0, 137, 123, 0.05);
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
-
 }
 
 .radio-option input[type="checkbox"] {
@@ -972,6 +1086,16 @@ textarea.info-input2 {
         gap: 1rem;
     }
 
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .sub-options {
+        grid-template-columns: 1fr;
+        margin-left: 1rem;
+    }
+
     .form-section {
         padding: 1.5rem;
     }
@@ -1010,6 +1134,14 @@ textarea.info-input2 {
     nav a {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
+    }
+
+    .checkbox-item {
+        padding: 0.75rem;
+    }
+
+    .sub-test-group {
+        padding: 0.75rem;
     }
 }
 

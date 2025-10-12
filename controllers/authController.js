@@ -140,9 +140,30 @@ class AuthController {
 
   // แสดงหน้าหลัก
   static showIndex(req, res) {
-    res.render("index", { 
-      title: "PTN-X-P",
-      user: req.user 
+    const StatsModel = require('../models/statsModel');
+    
+    // ดึงข้อมูลสถิติทั้งหมด
+    StatsModel.getAllStats((err, stats) => {
+      if (err) {
+        console.error('Error fetching stats:', err);
+        // ถ้าเกิดข้อผิดพลาด ให้แสดงข้อมูลเริ่มต้น
+        stats = {
+          thisMonthNewPatients: 0,
+          totalPatients: 0,
+          todayExaminations: 0,
+          thisMonthExaminations: 0,
+          thisMonthRevenue: 0,
+          totalBilling: 0,
+          thisMonthNewPatientsDuplicate: 0
+        };
+      }
+
+      res.render("index", {
+        title: "PTN-X-P",
+        user: req.user,
+        stats: stats,
+        userRole: req.user ? req.user.role : 'guest'
+      });
     });
   }
 

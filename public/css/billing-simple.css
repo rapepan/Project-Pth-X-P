@@ -1,0 +1,298 @@
+/* Simple CSS for Billing Page */
+
+body {
+    font-family: 'Sarabun', Arial, sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.billing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.payment-status-section {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.payment-status-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.payment-header {
+    margin-bottom: 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.logo i {
+    margin-right: 10px;
+}
+
+.payment-title {
+    font-size: 28px;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.patient-id {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.payment-details {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.detail-label {
+    font-weight: 500;
+}
+
+.detail-value {
+    font-weight: 600;
+}
+
+.payment-actions {
+    margin-top: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    margin: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    background: white;
+    color: #4CAF50;
+}
+
+.btn-success {
+    background: #2E7D32;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.invoice-section {
+    padding: 30px;
+    background: white;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.invoice-title {
+    font-size: 24px;
+    color: #2E7D32;
+    margin: 0;
+}
+
+.invoice-close a {
+    color: #666;
+    text-decoration: none;
+}
+
+.invoice-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #666;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.invoice-items {
+    margin: 20px 0;
+}
+
+.items-list {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.item-row:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.item-period {
+    font-size: 14px;
+    color: #666;
+}
+
+.item-details {
+    text-align: right;
+}
+
+.item-qty {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #2E7D32;
+    font-size: 16px;
+}
+
+.invoice-totals {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 8px 0;
+}
+
+.total-row:last-child {
+    border-top: 2px solid #2E7D32;
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.total-label {
+    color: #666;
+}
+
+.total-value {
+    font-weight: 600;
+    color: #2E7D32;
+}
+
+.system-info {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+    font-size: 14px;
+}
+
+.footer-links {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.footer-links a {
+    color: #666;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    color: #2E7D32;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .billing-container {
+        margin: 10px;
+        border-radius: 8px;
+    }
+    
+    .payment-status-section,
+    .invoice-section {
+        padding: 20px;
+    }
+    
+    .payment-title {
+        font-size: 24px;
+    }
+    
+    .invoice-title {
+        font-size: 20px;
+    }
+    
+    .item-row {
+        flex-direction: column;
+    }
+    
+    .item-details {
+        text-align: left;
+        margin-top: 10px;
+    }
+}

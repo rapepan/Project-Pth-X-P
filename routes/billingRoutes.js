@@ -50,4 +50,10 @@ router.get("/billingReport/yearly/:year", checkRole(['admin', 'user']), BillingC
 // รายงานลูกหนี้
 router.get("/billingReport/outstanding", checkRole(['admin', 'user']), BillingController.getOutstandingReport);
 
+// ดาวน์โหลดใบแจ้งหนี้
+router.get("/billing/:billId/download/invoice", checkRole('user'), BillingController.downloadInvoice);
+
+// ดาวน์โหลดใบเสร็จ
+router.get("/billing/:billId/download/receipt", checkRole('user'), BillingController.downloadReceipt);
+
 module.exports = router;

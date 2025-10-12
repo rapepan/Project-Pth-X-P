@@ -3,214 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    
-    <!-- Google Fonts สำหรับฟอนต์ไทย -->
+    <title>ใบเสร็จ - <%= patientData ? `${patientData.fname} ${patientData.lname}` : 'ไม่ระบุผู้ป่วย' %></title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS ของเรา -->
-    <link rel="stylesheet" href="/css/billing.css">
-    
+    <link rel="stylesheet" href="/css/billing-modal.css">
 </head>
 <body>
-    <!-- Sticky Header - ใช้ธีมเดียวกับ index.css -->
-    <header class="sticky-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <h1>
-                    <i class="fas fa-money-bill-wave"></i>
-                    <%= title %>
-                </h1>
-            </div>
-            <div class="user-info">
-                <span><%= user.fullname || user.username %></span>
-            </div>
-        </div>
-    </header>
-  <nav>
-        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
-        <% if (patient) { %>
-            <a href="/billing/<%= patient.HN %>"  class="active"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
-        <% } else { %>
-        <% } %>
-    </nav>
-
-    <div class="main-container">
-        <!-- Alert Messages -->
-        <% if (success) { %>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <%= success %>
-            </div>
-        <% } %>
-        
-        <% if (error) { %>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <%= error %>
-            </div>
-        <% } %>
-
-
-        <!-- Bills Section -->
-        <% if (HN) { %>
-            <div class="bills-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-receipt"></i> ใบเสร็จของผู้ป่วย HN: <%= HN %>
-                    </h2>
-                </div>
-
-                <% if (bills && bills.length > 0) { %>
-                    <div class="bills-grid">
-                        <% bills.forEach(function(bill) { %>
-                            <div class="bill-card">
-                                <div class="bill-header">
-                                    <div class="bill-info">
-                                        <h3>ใบเสร็จ #<%= bill.billId %></h3>
-                                        <span class="bill-date">
-                                            <i class="fas fa-calendar"></i>
-                                            <%= new Date(bill.created_at).toLocaleDateString('th-TH') %>
-                                        </span>
-                                    </div>
-                                    <div class="bill-status">
-                                        <% if (bill.status === 'paid') { %>
-                                            <span class="status-badge status-paid">
-                                                <i class="fas fa-check"></i> ชำระแล้ว
-                                            </span>
-                                        <% } else if (bill.status === 'pending') { %>
-                                            <span class="status-badge status-pending">
-                                                <i class="fas fa-clock"></i> รอดำเนินการ
-                                            </span>
-                                        <% } else { %>
-                                            <span class="status-badge status-cancelled">
-                                                <i class="fas fa-times"></i> ยกเลิก
-                                            </span>
-                                        <% } %>
-                                    </div>
-                                </div>
-                                
-                                <div class="bill-body">
-                                    <div class="bill-details">
-                                        <div class="detail-item">
-                                            <span class="detail-label">จำนวนบริการ:</span>
-                                            <span class="detail-value"><%= bill.serviceCount %> รายการ</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ยอดรวม:</span>
-                                            <span class="detail-value amount">
-                                                <i class="fas fa-baht"></i>
-                                                <%= bill.totalAmount.toLocaleString('th-TH') %>
-                                            </span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ส่วนลด:</span>
-                                            <span class="detail-value discount">
-                                                <i class="fas fa-percentage"></i>
-                                                <%= bill.discount || 0 %>%
-                                            </span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">ยอดสุทธิ:</span>
-                                            <span class="detail-value net-amount">
-                                                <i class="fas fa-baht"></i>
-                                                <%= bill.netAmount.toLocaleString('th-TH') %>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="bill-actions">
-                                    <a href="/billingDetail/<%= bill.billId %>" class="btn-view">
-                                        <i class="fas fa-eye"></i> ดูรายละเอียด
-                                    </a>
-                                    <% if (bill.status === 'pending') { %>
-                                        <button class="btn-pay" onclick="updatePaymentStatus('<%= bill.billId %>', 'paid')">
-                                            <i class="fas fa-credit-card"></i> ชำระเงิน
-                                        </button>
-                                    <% } %>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
-                <% } else { %>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-receipt"></i>
+    <div class="billing-container">
+        <% if (fromProcedure && procedureServices && procedureServices.length > 0) { %>
+            <!-- ส่วนแสดงสถานะการชำระเงิน (ส่วนกลาง) -->
+            <div class="payment-status-section">
+                <div class="payment-status-card">
+                    <div class="payment-header">
+                        <div class="logo">
+                            <i class="fas fa-hospital"></i>
+                            <span>PTH-X-P</span>
                         </div>
-                        <h3 class="empty-state-title">ยังไม่มีใบเสร็จ</h3>
-                        <p class="empty-state-text">
-                            ยังไม่มีใบเสร็จสำหรับผู้ป่วย HN: <%= HN %><br>
-                            คลิกปุ่ม "สร้างใบเสร็จใหม่" เพื่อเริ่มต้น
-                        </p>
-                        <button class="btn-billing primary" onclick="showCreateBillForm()">
-                            <i class="fas fa-plus"></i> สร้างใบเสร็จใหม่
-                        </button>
                     </div>
-                <% } %>
-            </div>
-
-            <!-- Create Bill Form Modal -->
-            <div id="createBillModal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-plus"></i> สร้างใบเสร็จใหม่</h3>
-                        <button class="close-btn" onclick="hideCreateBillForm()">
-                            <i class="fas fa-times"></i>
+                    
+                    <div class="payment-content">
+                        <div class="payment-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h1 class="payment-title">ใบเสร็จ</h1>
+                        <div class="payment-amount">
+                            ฿<%= parseFloat(totalAmount).toLocaleString() %>
+                        </div>
+                        <div class="payment-close">
+                            <a href="/patients" class="close-link">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-details">
+                        <div class="detail-row">
+                            <span class="detail-label">เลขที่ใบเสร็จ:</span>
+                            <span class="detail-value" id="billNumber"><%= billNumber || '-' %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">วันที่ชำระ:</span>
+                            <span class="detail-value" id="paymentDate"><%= currentDate || '-' %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">วิธีการชำระ:</span>
+                            <span class="detail-value" id="paymentMethod">ยังไม่ชำระ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-actions">
+                        <button class="btn btn-outline" id="downloadInvoiceBtn">
+                            <i class="fas fa-download"></i>
+                            ดาวน์โหลดใบแจ้งหนี้
+                        </button>
+                        <button class="btn btn-primary" id="downloadReceiptBtn">
+                            <i class="fas fa-receipt"></i>
+                            ดาวน์โหลดใบเสร็จ
                         </button>
                     </div>
                     
-                    <form class="modal-body" action="/billing/<%= HN %>" method="POST">
-                        <div class="form-group">
-                            <label class="form-label">บริการที่ให้</label>
-                            <div class="services-list" id="servicesList">
-                                <!-- Services will be populated by JavaScript -->
-                            </div>
-                            <button type="button" class="btn-add-service" onclick="addService()">
-                                <i class="fas fa-plus"></i> เพิ่มบริการ
-                            </button>
+                    <div class="payment-footer">
+                        <span class="footer-text">Powered by PTH-X-P System</span>
+                        <div class="footer-links">
+                            <a href="#" class="footer-link">เงื่อนไข</a>
+                            <a href="#" class="footer-link">ความเป็นส่วนตัว</a>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">ส่วนลด (%)</label>
-                            <input type="number" name="discount" class="form-control" min="0" max="100" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ส่วนแสดงรายละเอียดใบแจ้งหนี้ (ส่วนขวา) -->
+            <div class="invoice-details-section">
+                <div class="invoice-details-card">
+                    <div class="invoice-header">
+                        <div class="invoice-close">
+                            <a href="/patients" class="close-link">
+                                <i class="fas fa-times"></i> ปิดรายละเอียดใบแจ้งหนี้
+                            </a>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">หมายเหตุ</label>
-                            <textarea name="notes" class="form-control" rows="3" placeholder="หมายเหตุเพิ่มเติม"></textarea>
+                        <h2 class="invoice-title">ชำระเมื่อ <span id="invoicePaymentDate"><%= currentDate || '-' %></span></h2>
+                    </div>
+                    
+                    <div class="invoice-summary">
+                        <h3>สรุป</h3>
+                        <div class="summary-row">
+                            <span class="summary-label">ถึง:</span>
+                            <span class="summary-value">
+                                <% if (patientData) { %>
+                                    <%= patientData.fname %> <%= patientData.lname %><br>
+                                    <small>HN: <%= patientData.HN %></small>
+                                <% } else { %>
+                                    ไม่ระบุผู้ป่วย
+                                <% } %>
+                            </span>
                         </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn-cancel" onclick="hideCreateBillForm()">
-                                <i class="fas fa-times"></i> ยกเลิก
-                            </button>
-                            <button type="submit" class="btn-submit">
-                                <i class="fas fa-save"></i> สร้างใบเสร็จ
-                            </button>
+                        <div class="summary-row">
+                            <span class="summary-label">จาก:</span>
+                            <span class="summary-value">
+                                คลินิกกายภาพบำบัด PTH-X-P<br>
+                                <small>เลขที่ใบแจ้งหนี้: <span id="invoiceNumber"><%= billNumber || '-' %></span></small>
+                            </span>
                         </div>
-                    </form>
+                        <div class="summary-row">
+                            <span class="summary-label">หมายเหตุ:</span>
+                            <span class="summary-value">ใบเสร็จจากการรักษา</span>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-items">
+                        <h3>รายการบริการ</h3>
+                        <div class="items-list">
+                            <% procedureServices.forEach(function(service) { %>
+                                <div class="item-row">
+                                    <div class="item-info">
+                                        <span class="item-name"><%= service.service_name %></span>
+                                        <span class="item-period">
+                                            <% 
+                                                const now = new Date();
+                                                const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                                                const formatDate = (date) => {
+                                                    const day = String(date.getDate()).padStart(2, '0');
+                                                    const month = date.toLocaleDateString('th-TH', { month: 'short' }).toUpperCase();
+                                                    const year = date.getFullYear();
+                                                    return `${day} ${month} ${year}`;
+                                                };
+                                            %>
+                                            <%= formatDate(now) %> - <%= formatDate(nextMonth) %>
+                                        </span>
+                                    </div>
+                                    <div class="item-details">
+                                        <span class="item-qty">จำนวน <%= service.quantity %></span>
+                                        <span class="item-price">฿<%= parseFloat(service.price).toLocaleString() %></span>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-totals">
+                        <div class="total-row">
+                            <span class="total-label">ยอดรวมย่อย:</span>
+                            <span class="total-value" id="subtotal">฿<%= parseFloat(totalAmount).toLocaleString() %></span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">ยอดรวมไม่รวมภาษี:</span>
+                            <span class="total-value" id="totalExcludingTax">฿<%= parseFloat(totalAmount).toLocaleString() %></span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">VAT - ไทย (7%):</span>
+                            <span class="total-value" id="vatAmount">฿<%= (parseFloat(totalAmount) * 0.07).toLocaleString() %></span>
+                        </div>
+                        <div class="total-row total-row-main">
+                            <span class="total-label">ยอดรวมที่ต้องชำระ:</span>
+                            <span class="total-value" id="totalDue">฿<%= (parseFloat(totalAmount) * 1.07).toLocaleString() %></span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">จำนวนที่ชำระแล้ว:</span>
+                            <span class="total-value" id="amountPaid">฿0</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">จำนวนคงเหลือ:</span>
+                            <span class="total-value" id="amountRemaining">฿<%= (parseFloat(totalAmount) * 1.07).toLocaleString() %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-footer">
+                        <p class="contact-info">
+                            มีคำถาม? ติดต่อ คลินิกกายภาพบำบัด PTH-X-P
+                        </p>
+                    </div>
                 </div>
             </div>
         <% } else { %>
+            <!-- หน้าเปล่าเมื่อไม่มีข้อมูล -->
             <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-search"></i>
+                <div class="empty-content">
+                    <i class="fas fa-file-invoice-dollar empty-icon"></i>
+                    <h2>ไม่มีข้อมูลใบเสร็จ</h2>
+                    <p>กรุณาเลือกบริการจากหน้า Procedure เพื่อสร้างใบเสร็จ</p>
+                    <a href="/patients" class="btn btn-primary">กลับไปหน้าผู้ป่วย</a>
                 </div>
-                <h3 class="empty-state-title">ค้นหาผู้ป่วยเพื่อจัดการค่าใช้จ่าย</h3>
-                <p class="empty-state-text">
-                    กรอกข้อมูลในช่องค้นหาด้านบนเพื่อค้นหาผู้ป่วยและจัดการค่าใช้จ่าย
-                </p>
             </div>
+        <% } %>
+
+        <!-- ฟอร์มสำหรับสร้างใบเสร็จ -->
+        <% if (fromProcedure && procedureServices && procedureServices.length > 0) { %>
+            <form id="createBillForm" method="POST" action="/billing/<%= HN %>" style="display: none;">
+                <input type="hidden" name="serviceItems" value='<%= JSON.stringify(procedureServices) %>'>
+                <input type="hidden" name="totalAmount" value="<%= totalAmount %>">
+                <input type="hidden" name="procedureId" value="<%= procedureId || '' %>">
+                <input type="hidden" name="paymentStatus" value="pending">
+                <input type="hidden" name="paymentMethod" value="">
+                <input type="hidden" name="discountAmount" value="0">
+                <input type="hidden" name="discountType" value="none">
+                <input type="hidden" name="discountReason" value="">
+                <input type="hidden" name="taxAmount" value="<%= parseFloat(totalAmount) * 0.07 %>">
+                <input type="hidden" name="insuranceType" value="none">
+                <input type="hidden" name="insuranceClaimAmount" value="0">
+                <input type="hidden" name="patientPaidAmount" value="0">
+                <input type="hidden" name="receiptNumber" value="">
+                <input type="hidden" name="notes" value="ใบเสร็จจากหัตถการ - สร้างอัตโนมัติจากระบบ">
+            </form>
+
+            <!-- ฟอร์มสำหรับอัปเดตการชำระเงิน -->
+            <form id="updatePaymentForm" method="POST" action="/billing/<%= HN %>/updatePayment" style="display: none;">
+                <input type="hidden" name="billId" id="updateBillId" value="">
+                <input type="hidden" name="status" id="updatePaymentStatus" value="paid">
+                <input type="hidden" name="paymentMethod" id="updatePaymentMethod" value="cash">
+                <input type="hidden" name="paymentDate" id="updatePaymentDate" value="">
+            </form>
         <% } %>
     </div>
 
-    <!-- JavaScript -->
-    <script src="/js/billing.js"></script>
-    <script src="/js/notifications.js"></script>
+    <!-- ข้อมูลที่ส่งมาจาก server -->
+    <div id="billingData" 
+         data-hn="<%= HN %>"
+         data-from-procedure="<%= typeof fromProcedure !== 'undefined' ? fromProcedure : false %>"
+         data-procedure-services='<%- JSON.stringify(procedureServices || []) %>'
+         data-total-amount="<%= typeof totalAmount !== 'undefined' ? totalAmount : 0 %>"
+         data-patient-data='<%- JSON.stringify(patientData || {}) %>'
+         style="display: none;">
+    </div>
+
+    <script>
+        // ข้อมูลที่ส่งมาจาก server
+        const billingDataElement = document.getElementById('billingData');
+        const billingData = {
+            HN: billingDataElement.dataset.hn,
+            fromProcedure: billingDataElement.dataset.fromProcedure === 'true',
+            procedureServices: JSON.parse(billingDataElement.dataset.procedureServices),
+            totalAmount: parseFloat(billingDataElement.dataset.totalAmount) || 0,
+            patientData: JSON.parse(billingDataElement.dataset.patientData)
+        };
+
+        // สร้างใบเสร็จ
+        function createBill() {
+            const form = document.getElementById('createBillForm');
+            if (!form) {
+                console.error('Form not found');
+                return;
+            }
+
+            // แสดง loading state
+            const submitBtn = document.querySelector('.btn-primary');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังสร้างใบเสร็จ...';
+            }
+
+            // สร้าง FormData จาก form
+            const formData = new FormData(form);
+
+            // ส่งข้อมูลผ่าน AJAX
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // อัปเดต UI ด้วยข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
+                    updateBillInfo(data.billId, data.billNumber);
+                    updateBillUI(data.billData);
+                    
+                    // แสดงข้อความสำเร็จ
+                    showSuccessMessage(data.message);
+                } else {
+                    showErrorMessage(data.error || 'เกิดข้อผิดพลาดในการสร้างใบเสร็จ');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            })
+            .finally(() => {
+                // ซ่อน loading state
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> สร้างใบเสร็จเรียบร้อย';
+                }
+            });
+        }
+
+        // อัปเดตสถานะการชำระเงิน
+        function updatePaymentStatus(status, method = 'cash') {
+            const form = document.getElementById('updatePaymentForm');
+            if (form) {
+                document.getElementById('updatePaymentStatus').value = status;
+                document.getElementById('updatePaymentMethod').value = method;
+                document.getElementById('updatePaymentDate').value = new Date().toISOString().split('T')[0];
+                form.submit();
+            }
+        }
+
+        // ดาวน์โหลดใบแจ้งหนี้
+        function downloadInvoice() {
+            const billId = document.getElementById('updateBillId').value;
+            if (!billId) {
+                showErrorMessage('กรุณาสร้างใบเสร็จก่อน');
+                return;
+            }
+            
+            // เปิดหน้าต่างใหม่สำหรับดาวน์โหลด
+            window.open(`/billing/${billId}/download/invoice`, '_blank');
+        }
+
+        // ดาวน์โหลดใบเสร็จ
+        function downloadReceipt() {
+            const billId = document.getElementById('updateBillId').value;
+            if (!billId) {
+                showErrorMessage('กรุณาสร้างใบเสร็จก่อน');
+                return;
+            }
+            
+            // เปิดหน้าต่างใหม่สำหรับดาวน์โหลด
+            window.open(`/billing/${billId}/download/receipt`, '_blank');
+        }
+
+        // อัปเดตข้อมูลใบเสร็จเมื่อสร้างเสร็จ
+        function updateBillInfo(billId, billNumber) {
+            document.getElementById('billNumber').textContent = billNumber;
+            document.getElementById('invoiceNumber').textContent = billNumber;
+            document.getElementById('updateBillId').value = billId;
+            
+            const today = new Date().toLocaleDateString('th-TH');
+            document.getElementById('paymentDate').textContent = today;
+            document.getElementById('invoicePaymentDate').textContent = today;
+        }
+
+        // อัปเดต UI หลังสร้างใบเสร็จเสร็จ
+        function updateBillUI(billData) {
+            // อัปเดตสถานะการชำระเงิน
+            const paymentStatus = document.getElementById('paymentMethod');
+            if (paymentStatus) {
+                paymentStatus.textContent = billData.payment_status === 'paid' ? 'ชำระแล้ว' : 'ยังไม่ชำระ';
+            }
+
+            // อัปเดตจำนวนเงิน
+            const amountPaid = document.getElementById('amountPaid');
+            const amountRemaining = document.getElementById('amountRemaining');
+            
+            if (billData.payment_status === 'paid') {
+                if (amountPaid) amountPaid.textContent = '฿' + parseFloat(billData.total_amount).toLocaleString();
+                if (amountRemaining) amountRemaining.textContent = '฿0';
+            } else {
+                if (amountPaid) amountPaid.textContent = '฿0';
+                if (amountRemaining) amountRemaining.textContent = '฿' + parseFloat(billData.total_amount).toLocaleString();
+            }
+        }
+
+        // แสดงข้อความสำเร็จ
+        function showSuccessMessage(message) {
+            // สร้าง toast notification
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // แสดง toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // ซ่อน toast หลัง 3 วินาที
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // แสดงข้อความผิดพลาด
+        function showErrorMessage(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast error';
+            toast.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 5000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // ดาวน์โหลดใบแจ้งหนี้
+            const downloadInvoiceBtn = document.getElementById('downloadInvoiceBtn');
+            if (downloadInvoiceBtn) {
+                downloadInvoiceBtn.addEventListener('click', downloadInvoice);
+            }
+
+            // ดาวน์โหลดใบเสร็จ
+            const downloadReceiptBtn = document.getElementById('downloadReceiptBtn');
+            if (downloadReceiptBtn) {
+                downloadReceiptBtn.addEventListener('click', downloadReceipt);
+            }
+
+            // ตรวจสอบ URL parameters สำหรับข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
+            const urlParams = new URLSearchParams(window.location.search);
+            const billId = urlParams.get('billId');
+            const billNumber = urlParams.get('billNumber');
+            
+            if (billId && billNumber) {
+                // อัปเดตข้อมูลใบเสร็จที่สร้างเสร็จแล้ว
+                updateBillInfo(billId, billNumber);
+            } else if (billingData.fromProcedure && billingData.procedureServices.length > 0) {
+                // สร้างใบเสร็จอัตโนมัติเมื่อโหลดหน้า
+                setTimeout(createBill, 1000);
+            }
+        });
+
+        // ฟังก์ชันสำหรับอัปเดต UI เมื่อได้รับข้อมูลจาก server
+        window.updateBillingUI = function(billData) {
+            if (billData.billNumber) {
+                updateBillInfo(billData.id, billData.billNumber);
+            }
+            
+            if (billData.paymentStatus === 'paid') {
+                document.getElementById('paymentMethod').textContent = billData.paymentMethod || 'เงินสด';
+                document.getElementById('amountPaid').textContent = '฿' + parseFloat(billData.totalAmount).toLocaleString();
+                document.getElementById('amountRemaining').textContent = '฿0';
+            }
+        };
+    </script>
 </body>
 </html>

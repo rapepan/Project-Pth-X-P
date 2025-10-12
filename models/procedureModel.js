@@ -7,37 +7,25 @@ class ProcedureModel {
     const insertQuery = `
       INSERT INTO procedures (
         HN, patient_name, procedure_date,
-        procedure_code, procedure_name, procedure_type,
-        body_part, technique, equipment_used,
-        duration_minutes, performed_by, assisted_by,
-        pre_procedure_notes, procedure_details, post_procedure_notes,
-        complications, follow_up_required, follow_up_date,
-        treatment_session, total_sessions, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        procedure_code, procedure_name,
+        body_part, technique,
+        duration_minutes,
+        therapist_name, notes, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
       data.HN,
-      data.patientName,
-      data.procedureDate || new Date(),
-      data.procedureCode || '',
-      data.procedureName || '',
-      data.procedureType || '',
-      data.bodyPart || '',
+      data.patient_name,
+      data.procedure_date || new Date(),
+      data.procedure_code || '',
+      data.procedure_name || '',
+      data.body_part || '',
       data.technique || '',
-      JSON.stringify(data.equipmentUsed || []),
-      data.durationMinutes || 0,
-      data.performedBy || null,
-      data.assistedBy || null,
-      data.preProcedureNotes || '',
-      data.procedureDetails || '',
-      data.postProcedureNotes || '',
-      data.complications || '',
-      data.followUpRequired || false,
-      data.followUpDate || null,
-      data.treatmentSession || 1,
-      data.totalSessions || 1,
-      data.notes || ''
+      data.duration_minutes || 0,
+      data.therapist_name || null, // เก็บชื่อผู้ทำการรักษา
+      data.notes || '',
+      data.created_by || null
     ];
 
     db.query(insertQuery, values, callback);

@@ -1,7 +1,7 @@
 const BillingModel = require('../models/billingModel');
 const ServiceModel = require('../models/serviceModel');
 const ProcedureModel = require('../models/procedureModel');
-const { generateUniqueBillNumber, getCurrentDate, getCurrentDateTime } = require('../utils/billUtils');
+const { generateUniqueBillNumber, getCurrentDate, getCurrentDateTime, getCurrentMySQLDateTime } = require('../utils/billUtils');
 
 class BillingController {
   
@@ -247,7 +247,7 @@ class BillingController {
     const updateData = {
       payment_status: paymentData.payment_status || 'paid',
       payment_method: paymentData.payment_method,
-      payment_date: paymentData.payment_date || getCurrentDateTime(),
+      payment_date: paymentData.payment_date || getCurrentMySQLDateTime(),
       patient_paid_amount: parseFloat(paymentData.patient_paid_amount) || 0,
       notes: paymentData.notes
     };
@@ -545,7 +545,7 @@ class BillingController {
       total_amount: totalAmount,
       payment_status: 'paid',
       payment_method: billingData.paymentMethod,
-      payment_date: getCurrentDateTime(), // เพิ่ม payment_date
+      payment_date: getCurrentMySQLDateTime(), // เพิ่ม payment_date
       patient_paid_amount: totalAmount, // เพิ่ม patient_paid_amount
       insurance_type: billingData.insuranceType || '',
       notes: billingData.notes || '',

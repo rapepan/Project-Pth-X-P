@@ -296,3 +296,4 @@ class AppointmentModel {
 }
 
 module.exports = AppointmentModel;
+

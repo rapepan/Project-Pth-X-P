@@ -511,3 +511,4 @@ window.showNotification = showNotification;
 window.formatThaiDate = formatThaiDate;
 window.formatThaiTime = formatThaiTime;
 window.getAppointmentTypeText = getAppointmentTypeText;
+

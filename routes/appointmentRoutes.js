@@ -31,3 +31,4 @@ router.delete('/:id', isAuthenticated, checkRole(['admin', 'staff']), Appointmen
 router.get('/:id/card', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.generateAppointmentCard);
 
 module.exports = router;
+

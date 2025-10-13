@@ -23,3 +23,4 @@ CREATE TABLE IF NOT EXISTS appointments (
     INDEX idx_appointment_datetime (appointment_date, appointment_time)
 );
 
+

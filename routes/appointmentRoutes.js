@@ -1,0 +1,33 @@
+const express = require('express');
+const router = express.Router();
+const AppointmentController = require('../controllers/appointmentController');
+const { isAuthenticated, checkRole } = require('../middleware/authMiddleware');
+
+// แสดงหน้ารายการนัดหมาย
+router.get('/', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.showAppointments);
+
+// แสดงหน้าสร้างนัดหมาย
+router.get('/create', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.showCreateAppointment);
+
+// สร้างนัดหมายใหม่
+router.post('/create', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.createAppointment);
+
+// แสดงหน้าแก้ไขนัดหมาย
+router.get('/:id/edit', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.showEditAppointment);
+
+// อัปเดตข้อมูลนัดหมาย
+router.post('/:id/edit', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.updateAppointment);
+
+// แสดงหน้ารายละเอียดนัดหมาย
+router.get('/:id', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.showAppointmentDetail);
+
+// อัปเดตสถานะนัดหมาย (API)
+router.post('/:id/status', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.updateAppointmentStatus);
+
+// ลบนัดหมาย
+router.delete('/:id', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.deleteAppointment);
+
+// สร้างใบนัดหมาย (PDF)
+router.get('/:id/card', isAuthenticated, checkRole(['admin', 'staff']), AppointmentController.generateAppointmentCard);
+
+module.exports = router;

@@ -19,6 +19,7 @@ const diagnosisRoutes = require("./routes/diagnosisRoutes");
 const procedureRoutes = require("./routes/procedureRoutes");
 const ptDataRoutes = require("./routes/ptDataRoutes");
 const billingRoutes = require("./routes/billingRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
 
 // Import middleware
 const { checkRole } = require('./middleware/authMiddleware');
@@ -152,6 +153,7 @@ app.use("/", diagnosisRoutes);
 app.use("/", procedureRoutes);
 app.use("/", ptDataRoutes);
 app.use("/billing", billingRoutes);
+app.use("/appointments", appointmentRoutes);
 
 // ==================== Error Handling ====================
 

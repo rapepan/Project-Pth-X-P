@@ -227,16 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
             
-            // อัปเดตข้อมูลบริการก่อนส่ง
-            updateSelectedServicesInput();
-            
             // เพิ่ม totalAmount input ก่อนส่งฟอร์ม
             addTotalAmountInput();
-            
-            // Debug: ตรวจสอบข้อมูลที่จะส่ง
-            console.log('Form data being submitted:');
-            console.log('selectedServices:', document.getElementById('selectedServicesInput').value);
-            console.log('totalAmount:', document.querySelector('input[name="totalAmount"]').value);
             
             // แสดง loading state
             const submitButton = billingForm.querySelector('button[type="submit"]');
@@ -349,7 +341,7 @@ function processPayment() {
     document.getElementById('amountReceived').disabled = true;
     
     // Show success message
-    console.log('ชำระเงินเรียบร้อยแล้ว สามารถสร้างใบเสร็จได้');
+    showNotification('ชำระเงินเรียบร้อยแล้ว สามารถสร้างใบเสร็จได้', 'success');
 }
 
 // Event listener สำหรับการเปลี่ยนแปลงวิธีการชำระเงิน

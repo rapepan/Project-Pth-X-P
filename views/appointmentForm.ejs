@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/appointments.css">
+</head>
+<body>
+
+
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-title-section">
+                    <a href="/appointments" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับรายการนัดหมาย</span>
+                    </a>
+                    <div class="title-info">
+                        <h1 class="page-title">
+                            <i class="fas fa-calendar-plus"></i>
+                            <%= title %>
+                        </h1>
+                        <p class="page-subtitle">
+                            <%= appointment ? 'แก้ไขข้อมูลนัดหมาย' : 'สร้างนัดหมายใหม่สำหรับผู้ป่วย' %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/index" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    หน้าหลัก
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <%= error %>
+        </div>
+        <% } %>
+
+        <!-- Appointment Form -->
+        <div class="appointment-form">
+            <div class="form-header">
+                <h2>
+                    <i class="fas fa-calendar-check"></i>
+                    ข้อมูลนัดหมาย
+                </h2>
+                <p>กรุณากรอกข้อมูลให้ครบถ้วน</p>
+            </div>
+
+            <form action="<%= appointment ? `/appointments/${appointment.id}/edit` : '/appointments/create' %>" 
+                  method="POST" class="appointment-form-content">
+                
+                <!-- Patient Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        ข้อมูลผู้ป่วย
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="HN" class="form-label">เลข HN *</label>
+                            <input type="text" id="HN" name="HN" class="form-control" 
+                                   value="<%= appointment ? appointment.HN : (patientData ? patientData.HN : '') %>" 
+                                   required>
+                            <% if (!appointment && !patientData) { %>
+                            <small class="form-text">กรุณากรอกเลข HN ของผู้ป่วย</small>
+                            <% } %>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="patient_name" class="form-label">ชื่อ-นามสกุล *</label>
+                            <input type="text" id="patient_name" name="patient_name" class="form-control" 
+                                   value="<%= appointment ? appointment.patient_name : (patientData ? patientData.fullname : '') %>" 
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient_phone" class="form-label">เบอร์โทรศัพท์</label>
+                            <input type="tel" id="patient_phone" name="patient_phone" class="form-control" 
+                                   value="<%= appointment ? appointment.patient_phone : (patientData ? patientData.phone : '') %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        ข้อมูลนัดหมาย
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointment_date" class="form-label">วันที่นัดหมาย *</label>
+                            <input type="date" id="appointment_date" name="appointment_date" class="form-control" 
+                                   value="<%= appointment ? appointment.appointment_date : '' %>" required>
+                            <small class="form-text">เลือกวันที่ต้องการนัดหมาย</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="appointment_time" class="form-label">เวลานัดหมาย *</label>
+                            <input type="time" id="appointment_time" name="appointment_time" class="form-control" 
+                                   value="<%= appointment ? appointment.appointment_time : '' %>" required>
+                            <small class="form-text">เวลาทำการ: 08:00 - 17:00 น.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointment_type" class="form-label">ประเภทนัดหมาย *</label>
+                            <select id="appointment_type" name="appointment_type" class="form-control form-select" required>
+                                <option value="">-- เลือกประเภทนัดหมาย --</option>
+                                <option value="examination" <%= appointment && appointment.appointment_type === 'examination' ? 'selected' : '' %>>
+                                    การตรวจร่างกาย
+                                </option>
+                                <option value="treatment" <%= appointment && appointment.appointment_type === 'treatment' ? 'selected' : '' %>>
+                                    การรักษา
+                                </option>
+                                <option value="consultation" <%= appointment && appointment.appointment_type === 'consultation' ? 'selected' : '' %>>
+                                    การปรึกษา
+                                </option>
+                                <option value="follow_up" <%= appointment && appointment.appointment_type === 'follow_up' ? 'selected' : '' %>>
+                                    การติดตามผล
+                                </option>
+                                <option value="other" <%= appointment && appointment.appointment_type === 'other' ? 'selected' : '' %>>
+                                    อื่นๆ
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <% if (appointment) { %>
+                        <div class="form-group">
+                            <label for="status" class="form-label">สถานะ</label>
+                            <select id="status" name="status" class="form-control form-select">
+                                <option value="scheduled" <%= appointment.status === 'scheduled' ? 'selected' : '' %>>
+                                    รอการยืนยัน
+                                </option>
+                                <option value="confirmed" <%= appointment.status === 'confirmed' ? 'selected' : '' %>>
+                                    ยืนยันแล้ว
+                                </option>
+                                <option value="completed" <%= appointment.status === 'completed' ? 'selected' : '' %>>
+                                    เสร็จสิ้น
+                                </option>
+                                <option value="cancelled" <%= appointment.status === 'cancelled' ? 'selected' : '' %>>
+                                    ยกเลิก
+                                </option>
+                                <option value="no_show" <%= appointment.status === 'no_show' ? 'selected' : '' %>>
+                                    ไม่มาตามนัด
+                                </option>
+                            </select>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">หมายเหตุ</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="4" 
+                                  placeholder="กรอกหมายเหตุเพิ่มเติม (ถ้ามี)"><%= appointment ? appointment.notes : '' %></textarea>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i>
+                        <%= appointment ? 'บันทึกการแก้ไข' : 'สร้างนัดหมาย' %>
+                    </button>
+                    
+                    <a href="/appointments" class="btn-cancel">
+                        <i class="fas fa-times"></i>
+                        ยกเลิก
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Patient Search Section (only for new appointments) -->
+        <% if (!appointment && !patientData) { %>
+        <div class="patient-search-section">
+            <div class="search-header">
+                <h3>
+                    <i class="fas fa-search"></i>
+                    ค้นหาผู้ป่วย
+                </h3>
+                <p>หากไม่ทราบเลข HN สามารถค้นหาผู้ป่วยได้ที่นี่</p>
+            </div>
+            
+            <div class="search-form">
+                <div class="search-input-group">
+                    <input type="text" id="patientSearch" class="search-input" 
+                           placeholder="ค้นหาตามชื่อ หรือ HN...">
+                    <button type="button" id="searchPatientBtn" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="patientSearchResults" class="search-results" style="display: none;">
+                <!-- Search results will be populated here -->
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-buttons">
+                <a href="/appointments" class="action-btn">
+                    <i class="fas fa-list"></i>
+                    <span>รายการนัดหมาย</span>
+                </a>
+                <% if (appointment) { %>
+                <a href="/appointments/<%= appointment.id %>" class="action-btn">
+                    <i class="fas fa-eye"></i>
+                    <span>ดูรายละเอียด</span>
+                </a>
+                <button class="action-btn" onclick="printAppointmentCard(<%= appointment.id %>)">
+                    <i class="fas fa-print"></i>
+                    <span>พิมพ์ใบนัด</span>
+                </button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Scripts -->
+    <script src="/js/appointments.js"></script>
+    
+    <% if (!appointment && !patientData) { %>
+    <script>
+        // Patient search functionality
+        document.getElementById('searchPatientBtn').addEventListener('click', function() {
+            searchPatients();
+        });
+        
+        document.getElementById('patientSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchPatients();
+            }
+        });
+        
+        async function searchPatients() {
+            const searchTerm = document.getElementById('patientSearch').value.trim();
+            const resultsDiv = document.getElementById('patientSearchResults');
+            
+            if (searchTerm.length < 2) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/patients/search?q=${encodeURIComponent(searchTerm)}`);
+                const patients = await response.json();
+                
+                if (patients.length > 0) {
+                    let html = '<div class="search-results-list">';
+                    patients.forEach(patient => {
+                        html += `
+                            <div class="search-result-item" onclick="selectPatient('${patient.HN}', '${patient.fullname}', '${patient.phone || ''}')">
+                                <div class="patient-info">
+                                    <h4>${patient.fullname}</h4>
+                                    <p>HN: ${patient.HN}</p>
+                                    ${patient.phone ? `<p>โทร: ${patient.phone}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                    resultsDiv.style.display = 'block';
+                } else {
+                    resultsDiv.innerHTML = '<p class="no-results">ไม่พบผู้ป่วยที่ตรงกับคำค้นหา</p>';
+                    resultsDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error searching patients:', error);
+                resultsDiv.innerHTML = '<p class="error-message">เกิดข้อผิดพลาดในการค้นหา</p>';
+                resultsDiv.style.display = 'block';
+            }
+        }
+        
+        function selectPatient(HN, name, phone) {
+            document.getElementById('HN').value = HN;
+            document.getElementById('patient_name').value = name;
+            document.getElementById('patient_phone').value = phone;
+            
+            document.getElementById('patientSearchResults').style.display = 'none';
+            document.getElementById('patientSearch').value = '';
+            
+            // Focus on appointment date
+            document.getElementById('appointment_date').focus();
+        }
+    </script>
+    <% } %>
+</body>
+</html>

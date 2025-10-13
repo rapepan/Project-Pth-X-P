@@ -56,6 +56,12 @@ class StatsModel {
     db.query(query, callback);
   }
 
+  // ดึงจำนวนการนัดหมายในวันนี้
+  static getTodayAppointmentsCount(callback) {
+    const query = "SELECT COUNT(*) as today FROM appointments WHERE DATE(appointment_date) = CURDATE()";
+    db.query(query, callback);
+  }
+
   // ดึงสถิติผู้ป่วยรายเดือน (12 เดือนล่าสุด)
   static getMonthlyPatientsStats(callback) {
     const query = `
@@ -103,7 +109,7 @@ class StatsModel {
   static getAllStats(callback) {
     const stats = {};
     let completed = 0;
-    const total = 7; // จำนวนฟังก์ชันที่จะเรียก (ลบ todayExaminations)
+    const total = 8; // จำนวนฟังก์ชันที่จะเรียก (เพิ่ม todayAppointments)
 
     const checkComplete = () => {
       completed++;
@@ -152,6 +158,13 @@ class StatsModel {
     this.getThisMonthNewPatientsCount((err, result) => {
       if (err) return callback(err);
       stats.thisMonthNewPatientsDuplicate = result[0].thisMonth;
+      checkComplete();
+    });
+
+    // ดึงจำนวนการนัดหมายในวันนี้
+    this.getTodayAppointmentsCount((err, result) => {
+      if (err) return callback(err);
+      stats.todayAppointments = result[0].today;
       checkComplete();
     });
 

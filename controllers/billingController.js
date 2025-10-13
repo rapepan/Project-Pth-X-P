@@ -1,7 +1,7 @@
 const BillingModel = require('../models/billingModel');
 const ServiceModel = require('../models/serviceModel');
 const ProcedureModel = require('../models/procedureModel');
-const { generateUniqueBillNumber, getCurrentDate, getCurrentDateTime, getCurrentMySQLDateTime } = require('../utils/billUtils');
+const { generateUniqueBillNumber, getCurrentDate, getCurrentDateTime } = require('../utils/billUtils');
 
 class BillingController {
   
@@ -109,13 +109,6 @@ class BillingController {
     const HN = req.params.HN;
     const billingData = req.body;
 
-    console.log('=== BILLING CREATE DEBUG ===');
-    console.log('HN:', HN);
-    console.log('billingData:', billingData);
-    console.log('selectedServices:', billingData.selectedServices);
-    console.log('paymentMethod:', billingData.paymentMethod);
-    console.log('totalAmount:', billingData.totalAmount);
-
     if (!HN || !billingData) {
       return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ข้อมูลไม่ครบถ้วน')}`);
     }
@@ -155,8 +148,7 @@ class BillingController {
         BillingModel.createBill(processedData, (err, result) => {
           if (err) {
             console.error('Error creating bill:', err);
-            console.error('Processed data:', processedData);
-            return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ไม่สามารถสร้างใบเสร็จได้: ' + err.message)}`);
+            return res.redirect(`/billing/${HN}?error=${encodeURIComponent('ไม่สามารถสร้างใบเสร็จได้')}`);
           }
 
           // อัปเดตสถานะหัตถการให้เป็น "billed"
@@ -247,7 +239,7 @@ class BillingController {
     const updateData = {
       payment_status: paymentData.payment_status || 'paid',
       payment_method: paymentData.payment_method,
-      payment_date: paymentData.payment_date || getCurrentMySQLDateTime(),
+      payment_date: paymentData.payment_date || getCurrentDateTime(),
       patient_paid_amount: parseFloat(paymentData.patient_paid_amount) || 0,
       notes: paymentData.notes
     };
@@ -545,7 +537,7 @@ class BillingController {
       total_amount: totalAmount,
       payment_status: 'paid',
       payment_method: billingData.paymentMethod,
-      payment_date: getCurrentMySQLDateTime(), // เพิ่ม payment_date
+      payment_date: getCurrentDateTime(), // เพิ่ม payment_date
       patient_paid_amount: totalAmount, // เพิ่ม patient_paid_amount
       insurance_type: billingData.insuranceType || '',
       notes: billingData.notes || '',

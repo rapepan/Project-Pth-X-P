@@ -64,8 +64,17 @@
                     <p class="stat-label">ผู้ป่วยทั้งหมด</p>
                 </div>
             </div>
-            <% if (userRole === 'admin') { %>
             <div class="stat-card" data-delay="0.3">
+                <div class="stat-icon appointments-stat">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 class="stat-number"><%= stats.todayAppointments || 0 %></h3>
+                    <p class="stat-label">นัดหมายวันนี้</p>
+                </div>
+            </div>
+            <% if (userRole === 'admin') { %>
+            <div class="stat-card" data-delay="0.4">
                 <div class="stat-icon treatments-stat">
                     <i class="fas fa-heartbeat"></i>
                 </div>
@@ -242,20 +251,20 @@
                 </a>
             </div>
 
-            <!-- Placeholder for future feature -->
-            <div class="menu-card coming-soon-card" data-delay="0.4">
+            <!-- ระบบนัดหมาย -->
+            <div class="menu-card appointments-card" data-delay="0.4" onclick="window.location.href='/appointments'">
                 <div class="card-decoration"></div>
                 <div class="icon-wrapper">
                     <i class="fas fa-calendar-alt"></i>
                 </div>
                 <div class="card-content">
                     <h3>ระบบนัดหมาย</h3>
-                    <p>จัดการนัดหมายผู้ป่วย ดูตารางนัดหมาย และส่งการแจ้งเตือน</p>
+                    <p>จัดการนัดหมายผู้ป่วย สร้างใบนัดหมาย และติดตามสถานะการนัดหมาย</p>
                 </div>
-                <div class="coming-soon-badge">
-                    <i class="fas fa-clock"></i>
-                    <span>เร็วๆ นี้</span>
-                </div>
+                <a href="/appointments" class="btn-action">
+                    <span>จัดการนัดหมาย</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
 
         </div>

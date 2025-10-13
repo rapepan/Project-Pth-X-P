@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/appointments.css">
+</head>
+<body>
+    <!-- Header -->
+
+    <%
+        // ประกาศตัวแปรร่วมกันสำหรับทั้งไฟล์
+        const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        
+        const typeTexts = {
+            'examination': 'การตรวจร่างกาย',
+            'treatment': 'การรักษา',
+            'consultation': 'การปรึกษา',
+            'follow_up': 'การติดตามผล',
+            'other': 'อื่นๆ'
+        };
+        
+        const statusTexts = {
+            'scheduled': 'รอการยืนยัน',
+            'confirmed': 'ยืนยันแล้ว',
+            'completed': 'เสร็จสิ้น',
+            'cancelled': 'ยกเลิก',
+            'no_show': 'ไม่มาตามนัด'
+        };
+        
+        // ฟังก์ชันสำหรับจัดรูปแบบวันที่
+        function formatAppointmentDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate();
+            const month = thaiMonths[date.getMonth()];
+            const year = date.getFullYear() + 543;
+            return `${day} ${month} ${year}`;
+        }
+        
+        // ฟังก์ชันสำหรับจัดรูปแบบเวลา
+        function formatAppointmentTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            return `${hours}:${minutes} น.`;
+        }
+        
+        // ฟังก์ชันสำหรับจัดรูปแบบประเภท
+        function formatAppointmentType(type) {
+            return typeTexts[type] || type;
+        }
+        
+        // ฟังก์ชันสำหรับจัดรูปแบบสถานะ
+        function formatAppointmentStatus(status) {
+            return statusTexts[status] || status;
+        }
+    %>
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-title-section">
+                    <a href="/index" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับหน้าหลัก</span>
+                    </a>
+                    <div class="title-info">
+                        <h1 class="page-title">
+                            <i class="fas fa-calendar-check"></i>
+                            ระบบนัดหมาย
+                        </h1>
+                        <p class="page-subtitle">จัดการนัดหมายผู้ป่วย</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/appointments/create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    สร้างนัดหมายใหม่
+                </a>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <%= success %>
+        </div>
+        <% } %>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <%= error %>
+        </div>
+        <% } %>
+
+        <!-- Appointment Stats -->
+        <div class="appointment-stats">
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-number"><%= stats.total_appointments || 0 %></div>
+                <div class="stat-label">นัดหมายทั้งหมด</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon scheduled">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number"><%= stats.scheduled_count || 0 %></div>
+                <div class="stat-label">รอการยืนยัน</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon confirmed">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stat-number"><%= stats.confirmed_count || 0 %></div>
+                <div class="stat-label">ยืนยันแล้ว</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon completed">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number"><%= stats.completed_count || 0 %></div>
+                <div class="stat-label">เสร็จสิ้น</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon cancelled">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-number"><%= stats.cancelled_count || 0 %></div>
+                <div class="stat-label">ยกเลิก</div>
+            </div>
+        </div>
+
+
+        <!-- Search -->
+        <div class="search-section">
+            <form id="searchForm" class="search-form">
+                <div class="search-input-group">
+                    <input type="text" id="appointmentSearch" class="search-input" 
+                           placeholder="ค้นหาตามชื่อ, HN, หรือเบอร์โทร..." 
+                           value="<%= searchTerm %>">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Appointments List -->
+        <div class="appointments-list">
+            <% if (appointments && appointments.length > 0) { %>
+                <% appointments.forEach((appointment, index) => { %>
+                <div class="appointment-card" data-delay="<%= index * 0.1 %>">
+                    <div class="card-header">
+                        <h3 class="patient-name"><%= appointment.patient_name %></h3>
+                        <span class="appointment-id">#<%= appointment.id %></span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label">เลข HN:</span>
+                            <span class="info-value"><%= appointment.HN %></span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">วันที่:</span>
+                            <span class="info-value">
+                                <%= formatAppointmentDate(appointment.appointment_date) %>
+                            </span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">เวลา:</span>
+                            <span class="info-value">
+                                <%= formatAppointmentTime(appointment.appointment_time) %>
+                            </span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">ประเภท:</span>
+                            <span class="info-value">
+                                <%= formatAppointmentType(appointment.appointment_type) %>
+                            </span>
+                        </div>
+                        
+                        <% if (appointment.patient_phone) { %>
+                        <div class="info-row">
+                            <span class="info-label">เบอร์โทร:</span>
+                            <span class="info-value">
+                                <a href="tel:<%= appointment.patient_phone %>" style="color: inherit; text-decoration: none;">
+                                    <%= appointment.patient_phone %>
+                                </a>
+                            </span>
+                        </div>
+                        <% } %>
+                        
+                        <% if (appointment.notes) { %>
+                        <div class="info-row">
+                            <span class="info-label">หมายเหตุ:</span>
+                            <span class="info-value"><%= appointment.notes %></span>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="status-info">
+                            <span class="status-badge status-<%= appointment.status %>">
+                                <%= formatAppointmentStatus(appointment.status) %>
+                            </span>
+                        </div>
+                        
+                        <div class="appointment-actions">
+                            <a href="/appointments/<%= appointment.id %>" class="btn-action btn-primary">
+                                <i class="fas fa-eye"></i>
+                                ดูรายละเอียด
+                            </a>
+                            
+                            <% if (appointment.status === 'scheduled') { %>
+                            <button class="btn-action btn-primary status-update-btn" 
+                                    data-appointment-id="<%= appointment.id %>" 
+                                    data-status="confirmed" 
+                                    data-status-text="ยืนยันแล้ว">
+                                <i class="fas fa-check"></i>
+                                ยืนยัน
+                            </button>
+                            <% } %>
+                            
+                            <% if (appointment.status === 'confirmed') { %>
+                            <button class="btn-action btn-primary status-update-btn" 
+                                    data-appointment-id="<%= appointment.id %>" 
+                                    data-status="completed" 
+                                    data-status-text="เสร็จสิ้น">
+                                <i class="fas fa-check-circle"></i>
+                                เสร็จสิ้น
+                            </button>
+                            <% } %>
+                            
+                            <% if (['scheduled', 'confirmed'].includes(appointment.status)) { %>
+                            <button class="btn-action btn-danger status-update-btn" 
+                                    data-appointment-id="<%= appointment.id %>" 
+                                    data-status="cancelled" 
+                                    data-status-text="ยกเลิก">
+                                <i class="fas fa-times"></i>
+                                ยกเลิก
+                            </button>
+                            <% } %>
+                            
+                            <button class="btn-action btn-primary" 
+                                    onclick="printAppointmentCard(<%= appointment.id %>)">
+                                <i class="fas fa-print"></i>
+                                พิมพ์ใบนัด
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <h3>ไม่พบนัดหมาย</h3>
+                    <p>ยังไม่มีนัดหมายในระบบ หรือไม่พบนัดหมายที่ตรงกับเงื่อนไขการค้นหา</p>
+                    <a href="/appointments/create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        สร้างนัดหมายใหม่
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
+
+
+    <!-- Scripts -->
+    <script src="/js/appointments.js"></script>
+</body>
+</html>

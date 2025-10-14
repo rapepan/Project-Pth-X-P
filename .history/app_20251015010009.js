@@ -20,7 +20,6 @@ const procedureRoutes = require("./routes/procedureRoutes");
 const ptDataRoutes = require("./routes/ptDataRoutes");
 const billingRoutes = require("./routes/billingRoutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
-const adminRoutes = require("./routes/adminRoutes");
 
 // Import middleware
 const { checkRole } = require('./middleware/authMiddleware');
@@ -155,7 +154,6 @@ app.use("/", procedureRoutes);
 app.use("/", ptDataRoutes);
 app.use("/billing", billingRoutes);
 app.use("/appointments", appointmentRoutes);
-app.use("/admin", adminRoutes);
 
 app.use((req, res) => {
 

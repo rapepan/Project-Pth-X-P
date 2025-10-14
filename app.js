@@ -155,13 +155,7 @@ app.use("/", ptDataRoutes);
 app.use("/billing", billingRoutes);
 app.use("/appointments", appointmentRoutes);
 
-// ==================== Error Handling ====================
-
-// 404 handler
 app.use((req, res) => {
-  console.log(`⚠️  404 Not Found: ${req.method} ${req.url}`);
-
-  // ไม่ใช้ API แล้ว - redirect ไปหน้า login
 
   // สำหรับ page requests
   res.status(404).render('error', {

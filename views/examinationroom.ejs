@@ -29,13 +29,21 @@
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <a href="#" class="active"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (patient) { %>
-            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-            <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-            <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-            <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
+            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
+            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
+                <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+                <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+                <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+                <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
+            <% } %>
+            <!-- เมนูสำหรับทุกคน -->
             <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
-            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
+            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
+                <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <% } %>
+            <!-- เมนูสำหรับทุกคน -->
             <a href="/patients"><i class="fas fa-search"></i> ค้นหาผู้ป่วย</a>
         <% } %>
     </nav>
@@ -103,11 +111,14 @@
                     <small>บันทึกข้อมูลพื้นฐาน</small>
                 </button>
                 
+                <!-- ปุ่มสำหรับ Physical Therapist และ Admin เท่านั้น -->
+                <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
                 <button class="action-btn success" onclick="window.location.href='/patientexamination/<%= patient.HN %>'">
                     <i class="fas fa-user-md"></i>
                     <span>ตรวจร่างกาย</span>
                     <small>การตรวจทางกายภาพ</small>
                 </button>
+                <% } %>
                 
                 <button class="action-btn info" onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
                     <i class="fas fa-history"></i>
@@ -115,11 +126,14 @@
                     <small>ดูข้อมูลย้อนหลัง</small>
                 </button>
                 
+                <!-- ปุ่มสำหรับ Physical Therapist และ Admin เท่านั้น -->
+                <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
                 <button class="action-btn warning" onclick="window.location.href='/examinationHistory/<%= patient.HN %>'">
                     <i class="fas fa-clipboard-check"></i>
                     <span>ประวัติการตรวจ</span>
                     <small>ผลการตรวจร่างกาย</small>
                 </button>
+                <% } %>
             </div>
             
         <% } else { %>

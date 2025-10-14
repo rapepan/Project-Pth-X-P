@@ -14,129 +14,7 @@ class AuthController {
     });
   }
 
-  // แสดงหน้า register
-  static showRegister(req, res) {
-    if (req.isAuthenticated()) {
-      return res.redirect("/index");
-    }
-    res.render("register", { 
-      title: "สมัครสมาชิก",
-      message: null,
-      errors: [],
-      formData: {}
-    });
-  }
-
-  // สมัครสมาชิก
-  static register(req, res) {
-    const { username, password, confirmPassword, email, fullname, role } = req.body;
-    const errors = [];
-
-    // Validation
-    if (!username || username.trim() === '') {
-      errors.push('กรุณากรอกชื่อผู้ใช้');
-    }
-
-    if (!password || password.length < 6) {
-      errors.push('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-    }
-
-    if (password !== confirmPassword) {
-      errors.push('รหัสผ่านไม่ตรงกัน');
-    }
-
-    if (!email || !AuthController.isValidEmail(email)) {
-      errors.push('กรุณากรอกอีเมลที่ถูกต้อง');
-    }
-
-    if (!fullname || fullname.trim() === '') {
-      errors.push('กรุณากรอกชื่อ-นามสกุล');
-    }
-
-    if (!role || !['admin', 'user'].includes(role)) {
-      errors.push('กรุณาเลือกระดับผู้ใช้');
-    }
-
-    if (errors.length > 0) {
-      return res.render("register", {
-        title: "สมัครสมาชิก",
-        message: null,
-        errors,
-        formData: req.body
-      });
-    }
-
-    // ตรวจสอบว่า username ซ้ำหรือไม่
-    const checkUserQuery = "SELECT * FROM users WHERE username = ? OR email = ?";
-    db.query(checkUserQuery, [username, email], (err, results) => {
-      if (err) {
-        console.error("Error checking user:", err);
-        return res.render("register", {
-          title: "สมัครสมาชิก",
-          message: "เกิดข้อผิดพลาดในระบบ",
-          errors: [],
-          formData: req.body
-        });
-      }
-
-      if (results.length > 0) {
-        const existingUser = results[0];
-        let errorMessage = '';
-        if (existingUser.username === username) {
-          errorMessage = 'ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว';
-        } else if (existingUser.email === email) {
-          errorMessage = 'อีเมลนี้มีอยู่ในระบบแล้ว';
-        }
-
-        return res.render("register", {
-          title: "สมัครสมาชิก",
-          message: null,
-          errors: [errorMessage],
-          formData: req.body
-        });
-      }
-
-      // Hash password และบันทึกผู้ใช้ใหม่
-      bcrypt.hash(password, 10, (err, hashedPassword) => {
-        if (err) {
-          console.error("Error hashing password:", err);
-          return res.render("register", {
-            title: "สมัครสมาชิก",
-            message: "เกิดข้อผิดพลาดในการสร้างรหัสผ่าน",
-            errors: [],
-            formData: req.body
-          });
-        }
-
-        const insertUserQuery = `
-          INSERT INTO users (username, password, email, fullname, role, created_at) 
-          VALUES (?, ?, ?, ?, ?, NOW())
-        `;
-        
-        db.query(insertUserQuery, [username, hashedPassword, email, fullname, role], (err, result) => {
-          if (err) {
-            console.error("Error inserting user:", err);
-            return res.render("register", {
-              title: "สมัครสมาชิก",
-              message: "เกิดข้อผิดพลาดในการสมัครสมาชิก",
-              errors: [],
-              formData: req.body
-            });
-          }
-
-          res.redirect("/login?message=สมัครสมาชิกเรียบร้อยแล้วกรุณาเข้าสู่ระบบ");
-        });
-      });
-    });
-  }
-
-  // logout
-  static logout(req, res, next) {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.redirect("/login?error=ออกจากระบบเรียบร้อยแล้ว");
-    });
-  }
+  // Register functions removed - only Admin can create users through /admin/users/create
 
   // แสดงหน้าหลัก
   static showIndex(req, res) {
@@ -146,66 +24,72 @@ class AuthController {
     StatsModel.getAllStats((err, stats) => {
       if (err) {
         console.error('Error fetching stats:', err);
-        // ถ้าเกิดข้อผิดพลาด ให้แสดงข้อมูลเริ่มต้น
+        // ถ้าไม่มีข้อมูลสถิติ ให้ส่งข้อมูลว่าง
         stats = {
-          thisMonthNewPatients: 0,
           totalPatients: 0,
-          todayExaminations: 0,
+          thisMonthNewPatients: 0,
+          todayAppointments: 0,
           thisMonthExaminations: 0,
           thisMonthRevenue: 0,
           totalBilling: 0,
-          thisMonthNewPatientsDuplicate: 0
+          thisMonthNewPatientsDuplicate: 0,
+          monthlyRevenue: []
         };
       }
 
       res.render("index", {
-        title: "PTN-X-P",
+        title: "ระบบบริหารจัดการคลินิกกายภาพบำบัด",
         user: req.user,
-        stats: stats,
-        userRole: req.user ? req.user.role : 'guest'
+        userRole: req.user.role,
+        stats: stats
       });
     });
   }
 
-  // Helper function to validate email
-  static isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  // Get user profile
+  // แสดงข้อมูลโปรไฟล์ผู้ใช้
   static getUserProfile(req, res) {
     res.render("profile", {
-      title: "ข้อมูลส่วนตัว",
-      user: req.user
+      title: "โปรไฟล์",
+      user: req.user,
+      userRole: req.user.role,
+      errors: null,
+      message: null
     });
   }
 
-  // Update user profile
+  // อัปเดตข้อมูลโปรไฟล์
   static updateProfile(req, res) {
     const { email, fullname, currentPassword, newPassword, confirmNewPassword } = req.body;
-    const userId = req.user.id;
+    console.log('🔍 ข้อมูลที่ส่งมา:', { email, fullname, newPassword, confirmNewPassword });
     const errors = [];
 
-    // Validation
-    if (!email || !AuthController.isValidEmail(email)) {
+    // Validation - ยืดหยุ่นขึ้น
+    if (email && email.trim() !== '' && !AuthController.isValidEmail(email)) {
       errors.push('กรุณากรอกอีเมลที่ถูกต้อง');
     }
 
-    if (!fullname || fullname.trim() === '') {
+    if (fullname && fullname.trim() === '') {
       errors.push('กรุณากรอกชื่อ-นามสกุล');
     }
 
-    // ถ้าต้องการเปลี่ยนรหัสผ่าน
-    if (newPassword || confirmNewPassword || currentPassword) {
-      if (!currentPassword) {
-        errors.push('กรุณากรอกรหัสผ่านปัจจุบัน');
+    // ถ้ามีการเปลี่ยนรหัสผ่าน
+    if (newPassword && newPassword.length > 0) {
+      if (newPassword.length < 8) {
+        errors.push('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 8 ตัวอักษร');
       }
 
-      if (!newPassword || newPassword.length < 6) {
-        errors.push('รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+      // ตรวจสอบความปลอดภัยของรหัสผ่าน
+      const passwordValidation = AuthController.validatePassword(newPassword);
+      if (!passwordValidation.isValid) {
+        errors.push(...passwordValidation.errors);
       }
 
+      console.log('🔐 ตรวจสอบรหัสผ่าน:', { 
+        newPassword, 
+        confirmNewPassword, 
+        isMatch: newPassword === confirmNewPassword 
+      });
+      
       if (newPassword !== confirmNewPassword) {
         errors.push('รหัสผ่านใหม่ไม่ตรงกัน');
       }
@@ -213,103 +97,178 @@ class AuthController {
 
     if (errors.length > 0) {
       return res.render("profile", {
-        title: "ข้อมูลส่วนตัว",
+        title: "โปรไฟล์",
         user: req.user,
-        errors,
-        formData: req.body
+        userRole: req.user.role,
+        errors: errors,
+        message: null
       });
     }
 
-    // ตรวจสอบอีเมลซ้ำ (ยกเว้นของตัวเอง)
-    const checkEmailQuery = "SELECT * FROM users WHERE email = ? AND id != ?";
-    db.query(checkEmailQuery, [email, userId], (err, results) => {
-      if (err) {
-        console.error("Error checking email:", err);
-        return res.render("profile", {
-          title: "ข้อมูลส่วนตัว",
-          user: req.user,
-          errors: ['เกิดข้อผิดพลาดในระบบ'],
-          formData: req.body
-        });
-      }
+    // ถ้ามีการเปลี่ยนรหัสผ่าน
+    if (newPassword && newPassword.length > 0) {
+      // เข้ารหัสรหัสผ่านใหม่
+      bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
+        if (err) {
+          console.error('Error hashing password:', err);
+          return res.render("profile", {
+            title: "โปรไฟล์",
+            user: req.user,
+            userRole: req.user.role,
+            errors: ['เกิดข้อผิดพลาดในระบบ'],
+            message: null
+          });
+        }
 
-      if (results.length > 0) {
-        return res.render("profile", {
-          title: "ข้อมูลส่วนตัว",
-          user: req.user,
-          errors: ['อีเมลนี้มีอยู่ในระบบแล้ว'],
-          formData: req.body
-        });
-      }
-
-      // ถ้าต้องการเปลี่ยนรหัสผ่าน ตรวจสอบรหัสผ่านเก่า
-      if (currentPassword) {
-        bcrypt.compare(currentPassword, req.user.password, (err, isMatch) => {
+        // อัปเดตข้อมูล - ใช้ข้อมูลเดิมหากไม่ได้กรอกใหม่
+        const finalEmail = email && email.trim() !== '' ? email : req.user.email;
+        const finalFullname = fullname && fullname.trim() !== '' ? fullname : req.user.fullname;
+        
+        const updateQuery = "UPDATE users SET email = ?, fullname = ?, password = ? WHERE id = ?";
+        db.query(updateQuery, [finalEmail, finalFullname, hashedPassword, req.user.id], (err, result) => {
           if (err) {
-            console.error("Error comparing password:", err);
+            console.error('Error updating profile:', err);
             return res.render("profile", {
-              title: "ข้อมูลส่วนตัว",
+              title: "โปรไฟล์",
               user: req.user,
+              userRole: req.user.role,
               errors: ['เกิดข้อผิดพลาดในระบบ'],
-              formData: req.body
+              message: null
             });
           }
 
-          if (!isMatch) {
-            return res.render("profile", {
-              title: "ข้อมูลส่วนตัว",
-              user: req.user,
-              errors: ['รหัสผ่านปัจจุบันไม่ถูกต้อง'],
-              formData: req.body
-            });
-          }
-
-          // Hash รหัสผ่านใหม่และอัพเดท
-          bcrypt.hash(newPassword, 10, (err, hashedPassword) => {
-            if (err) {
-              console.error("Error hashing password:", err);
-              return res.render("profile", {
-                title: "ข้อมูลส่วนตัว",
-                user: req.user,
-                errors: ['เกิดข้อผิดพลาดในการสร้างรหัสผ่าน'],
-                formData: req.body
-              });
-            }
-
-            const updateQuery = "UPDATE users SET email = ?, fullname = ?, password = ? WHERE id = ?";
-            db.query(updateQuery, [email, fullname, hashedPassword, userId], (err, result) => {
-              if (err) {
-                console.error("Error updating user:", err);
-                return res.render("profile", {
-                  title: "ข้อมูลส่วนตัว",
-                  user: req.user,
-                  errors: ['เกิดข้อผิดพลาดในการอัพเดทข้อมูล'],
-                  formData: req.body
-                });
-              }
-
-              res.redirect("/profile?success=update");
-            });
+          res.render("profile", {
+            title: "โปรไฟล์",
+            user: { ...req.user, email: finalEmail, fullname: finalFullname },
+            userRole: req.user.role,
+            errors: null,
+            message: 'อัปเดตโปรไฟล์เรียบร้อยแล้ว'
           });
         });
-      } else {
-        // อัพเดทเฉพาะอีเมลและชื่อ
-        const updateQuery = "UPDATE users SET email = ?, fullname = ? WHERE id = ?";
-        db.query(updateQuery, [email, fullname, userId], (err, result) => {
-          if (err) {
-            console.error("Error updating user:", err);
-            return res.render("profile", {
-              title: "ข้อมูลส่วนตัว",
-              user: req.user,
-              errors: ['เกิดข้อผิดพลาดในการอัพเดทข้อมูล'],
-              formData: req.body
-            });
-          }
+      });
+    } else {
+      // ไม่เปลี่ยนรหัสผ่าน - ใช้ข้อมูลเดิมหากไม่ได้กรอกใหม่
+      const finalEmail = email && email.trim() !== '' ? email : req.user.email;
+      const finalFullname = fullname && fullname.trim() !== '' ? fullname : req.user.fullname;
+      
+      const updateQuery = "UPDATE users SET email = ?, fullname = ? WHERE id = ?";
+      db.query(updateQuery, [finalEmail, finalFullname, req.user.id], (err, result) => {
+        if (err) {
+          console.error('Error updating profile:', err);
+          return res.render("profile", {
+            title: "โปรไฟล์",
+            user: req.user,
+            userRole: req.user.role,
+            errors: ['เกิดข้อผิดพลาดในระบบ'],
+            message: null
+          });
+        }
 
-          res.redirect("/profile?success=update");
+        res.render("profile", {
+          title: "โปรไฟล์",
+          user: { ...req.user, email: finalEmail, fullname: finalFullname },
+          userRole: req.user.role,
+          errors: null,
+          message: 'อัปเดตโปรไฟล์เรียบร้อยแล้ว'
         });
-      }
+      });
+    }
+  }
+
+  // ออกจากระบบ
+  static logout(req, res, next) {
+    req.logout((err) => {
+      if (err) return next(err);
+      res.redirect("/login?message=ออกจากระบบเรียบร้อยแล้ว");
     });
+  }
+
+  // ตรวจสอบ email format
+  static isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // ตรวจสอบความปลอดภัยของรหัสผ่าน
+  static validatePassword(password) {
+    const errors = [];
+
+    // ตรวจสอบความยาวขั้นต่ำ
+    if (password.length < 8) {
+      errors.push('รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร');
+    }
+
+    // ตรวจสอบความยาวสูงสุด (ป้องกันการโจมตี)
+    if (password.length > 128) {
+      errors.push('รหัสผ่านต้องมีความยาวไม่เกิน 128 ตัวอักษร');
+    }
+
+    // ตรวจสอบตัวพิมพ์เล็ก
+    if (!/[a-z]/.test(password)) {
+      errors.push('รหัสผ่านต้องมีตัวพิมพ์เล็ก (a-z) อย่างน้อย 1 ตัว');
+    }
+
+    // ตรวจสอบตัวพิมพ์ใหญ่
+    if (!/[A-Z]/.test(password)) {
+      errors.push('รหัสผ่านต้องมีตัวพิมพ์ใหญ่ (A-Z) อย่างน้อย 1 ตัว');
+    }
+
+    // ตรวจสอบตัวเลข
+    if (!/[0-9]/.test(password)) {
+      errors.push('รหัสผ่านต้องมีตัวเลข (0-9) อย่างน้อย 1 ตัว');
+    }
+
+    // ตรวจสอบอักขระพิเศษ
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)) {
+      errors.push('รหัสผ่านต้องมีอักขระพิเศษ (!@#$%^&* ฯลฯ) อย่างน้อย 1 ตัว');
+    }
+
+    // ตรวจสอบว่ามีอักขระที่ไม่ได้รับอนุญาต
+    if (!/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/.test(password)) {
+      errors.push('รหัสผ่านมีอักขระที่ไม่ได้รับอนุญาต');
+    }
+
+    // ตรวจสอบรหัสผ่านที่อ่อนแอ (common passwords)
+    const commonPasswords = [
+      'password', '123456', '12345678', 'qwerty', 'abc123', 'password123',
+      'admin', 'root', 'user', 'test', 'guest', 'welcome', 'login',
+      'letmein', 'master', 'secret', 'pass', '1234', '12345', '123456789',
+      'password1', '1234567890', 'qwerty123', 'admin123', 'root123',
+      '123456789', '987654321', '111111', '000000', '123123'
+    ];
+    
+    if (commonPasswords.includes(password.toLowerCase())) {
+      errors.push('รหัสผ่านนี้ไม่ปลอดภัย กรุณาใช้รหัสผ่านที่ซับซ้อนกว่า');
+    }
+
+    // ตรวจสอบลำดับตัวอักษรที่ง่ายเดา
+    const sequentialPatterns = [
+      'abcdef', 'qwerty', 'asdfgh', 'zxcvbn', '123456', '654321',
+      'abcdefg', 'qwertyu', 'asdfghj', 'zxcvbnm', '1234567890',
+      '0987654321', 'abcdefgh', 'qwertyui', 'asdfghjk'
+    ];
+    
+    for (const pattern of sequentialPatterns) {
+      if (password.toLowerCase().includes(pattern)) {
+        errors.push('รหัสผ่านไม่ควรมีลำดับตัวอักษรที่ง่ายเดา');
+        break;
+      }
+    }
+
+    // ตรวจสอบการซ้ำของตัวอักษร
+    if (/(.)\1{2,}/.test(password)) {
+      errors.push('รหัสผ่านไม่ควรมีตัวอักษรซ้ำติดกันมากกว่า 2 ตัว');
+    }
+
+    // ตรวจสอบตัวเลขเรียงกัน
+    if (/0123456789|9876543210|1234567890|0987654321/.test(password)) {
+      errors.push('รหัสผ่านไม่ควรมีตัวเลขเรียงกัน');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
   }
 }
 

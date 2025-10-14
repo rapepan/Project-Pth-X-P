@@ -83,21 +83,6 @@
             </div>
         </div>
 
-        <!-- Success/Error Messages -->
-        <% if (typeof success !== 'undefined' && success) { %>
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <%= success %>
-        </div>
-        <% } %>
-
-        <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <%= error %>
-        </div>
-        <% } %>
-
         <!-- Appointment Stats -->
         <div class="appointment-stats">
             <div class="stat-card">
@@ -159,7 +144,6 @@
                 <div class="appointment-card" data-delay="<%= index * 0.1 %>">
                     <div class="card-header">
                         <h3 class="patient-name"><%= appointment.patient_name %></h3>
-                        <span class="appointment-id">#<%= appointment.id %></span>
                     </div>
                     
                     <div class="card-body">
@@ -182,12 +166,6 @@
                             </span>
                         </div>
                         
-                        <div class="info-row">
-                            <span class="info-label">ประเภท:</span>
-                            <span class="info-value">
-                                <%= formatAppointmentType(appointment.appointment_type) %>
-                            </span>
-                        </div>
                         
                         <% if (appointment.patient_phone) { %>
                         <div class="info-row">
@@ -206,6 +184,11 @@
                             <span class="info-value"><%= appointment.notes %></span>
                         </div>
                         <% } %>
+                        
+                        <div class="info-row">
+                            <span class="info-label">สร้างโดย:</span>
+                            <span class="info-value"><%= appointment.created_by_name || 'ไม่ระบุ' %></span>
+                        </div>
                     </div>
                     
                     <div class="card-footer">
@@ -252,7 +235,8 @@
                             <% } %>
                             
                             <button class="btn-action btn-primary" 
-                                    onclick="printAppointmentCard(<%= appointment.id %>)">
+                                    data-appointment-id="<%= appointment.id %>"
+                                    onclick="printAppointmentCard(this.dataset.appointmentId)">
                                 <i class="fas fa-print"></i>
                                 พิมพ์ใบนัด
                             </button>

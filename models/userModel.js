@@ -27,7 +27,7 @@ class UserModel {
 
   // ฟังก์ชันสร้างผู้ใช้ใหม่
   static createUser(userData, callback) {
-    const { username, password, email, fullname, role = 'user' } = userData;
+    const { username, password, email, fullname, role = 'staff' } = userData;
     const query = `
       INSERT INTO users (username, password, email, fullname, role, created_at) 
       VALUES (?, ?, ?, ?, ?, NOW())

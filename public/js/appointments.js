@@ -121,9 +121,9 @@ function validateAppointmentForm(form) {
         isValid = false;
     }
     
-    // Validate appointment type
+    // Validate appointment type (optional field)
     const typeSelect = form.querySelector('select[name="appointment_type"]');
-    if (!typeSelect || !typeSelect.value) {
+    if (typeSelect && !typeSelect.value) {
         showFieldError(typeSelect, 'กรุณาเลือกประเภทนัดหมาย');
         isValid = false;
     }

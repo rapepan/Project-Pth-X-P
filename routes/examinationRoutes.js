@@ -1,71 +1,71 @@
 const express = require('express');
 const router = express.Router();
 const ExaminationController = require('../controllers/examinationController');
-const { checkRole } = require('../middleware/authMiddleware');
+const { checkRole, checkStaff, checkNotStaff } = require('../middleware/authMiddleware');
 
 // ==================== Examination Management Routes ====================
 
-// แสดงหน้าห้องตรวจ
-router.get("/examinationroom/:HN?", checkRole('user'), ExaminationController.showExaminationRoom);
+// แสดงหน้าห้องตรวจ - Staff เข้าถึงได้
+router.get("/examinationroom/:HN?", checkStaff, ExaminationController.showExaminationRoom);
 
-// แสดงหน้าระบบตรวจร่างกายผู้ป่วย
-router.get("/patientexamination/:HN", checkRole('user'), ExaminationController.showPatientExamination);
+// แสดงหน้าระบบตรวจร่างกายผู้ป่วย - Staff เข้าถึงไม่ได้
+router.get("/patientexamination/:HN", checkNotStaff, ExaminationController.showPatientExamination);
 
-// บันทึกการตรวจร่างกายผู้ป่วย
-router.post("/patientexamination/:HN", checkRole('user'), ExaminationController.savePatientExamination);
+// บันทึกการตรวจร่างกายผู้ป่วย - Staff เข้าถึงไม่ได้
+router.post("/patientexamination/:HN", checkNotStaff, ExaminationController.savePatientExamination);
 
-// บันทึกการตรวจ
-router.post("/examinationroom/:HN", checkRole('user'), ExaminationController.saveExamination);
+// บันทึกการตรวจ - Staff เข้าถึงไม่ได้
+router.post("/examinationroom/:HN", checkNotStaff, ExaminationController.saveExamination);
 
-// แสดงประวัติการตรวจ
-router.get("/examinationHistory/:HN", checkRole('user'), ExaminationController.showExaminationHistory);
+// แสดงประวัติการตรวจ - Staff เข้าถึงไม่ได้
+router.get("/examinationHistory/:HN", checkNotStaff, ExaminationController.showExaminationHistory);
 
-// แสดงรายละเอียดการตรวจ
-router.get("/examinationDetail/:HN/:examId", checkRole('user'), ExaminationController.showExaminationDetail);
+// แสดงรายละเอียดการตรวจ - Staff เข้าถึงไม่ได้
+router.get("/examinationDetail/:HN/:examId", checkNotStaff, ExaminationController.showExaminationDetail);
 
-// แสดงหน้าการพิมพ์รายงานการตรวจ
-router.get("/examinationPrint/:examId", checkRole('user'), ExaminationController.showExaminationPrint);
+// แสดงหน้าการพิมพ์รายงานการตรวจ - Staff เข้าถึงไม่ได้
+router.get("/examinationPrint/:examId", checkNotStaff, ExaminationController.showExaminationPrint);
 
-// แสดงการตรวจล่าสุด (ใช้ form submit)
-router.post("/examination/latest/:HN", checkRole('user'), ExaminationController.getLatestExamination);
+// แสดงการตรวจล่าสุด (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/latest/:HN", checkNotStaff, ExaminationController.getLatestExamination);
 
-// แสดงการตรวจตามวันที่ (ใช้ form submit)
-router.post("/examination/bydate", checkRole('user'), ExaminationController.getExaminationsByDate);
+// แสดงการตรวจตามวันที่ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/bydate", checkNotStaff, ExaminationController.getExaminationsByDate);
 
-// แสดงวันที่ที่มีการตรวจ (ใช้ form submit)
-router.post("/examination/dates/:HN", checkRole('user'), ExaminationController.getExaminationDates);
+// แสดงวันที่ที่มีการตรวจ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/dates/:HN", checkNotStaff, ExaminationController.getExaminationDates);
 
-// ค้นหาการตรวจ (ใช้ form submit)
-router.post("/examination/search", checkRole('user'), ExaminationController.searchExaminations);
+// ค้นหาการตรวจ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/search", checkNotStaff, ExaminationController.searchExaminations);
 
-// สถิติการตรวจ (ใช้ form submit)
-router.post("/examination/statistics/:HN", checkRole('user'), ExaminationController.getExaminationStatistics);
+// สถิติการตรวจ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/statistics/:HN", checkNotStaff, ExaminationController.getExaminationStatistics);
 
-// อัปเดตการตรวจ (ใช้ form submit)
-router.post("/examination/:examId/update", checkRole(['admin', 'doctor']), ExaminationController.updateExamination);
+// อัปเดตการตรวจ (ใช้ form submit) - Physical Therapist หรือ Admin เท่านั้น
+router.post("/examination/:examId/update", checkRole('physical_therapist'), ExaminationController.updateExamination);
 
-// ลบการตรวจ (ใช้ form submit)
+// ลบการตรวจ (ใช้ form submit) - Admin เท่านั้น
 router.post("/examination/:examId/delete", checkRole('admin'), ExaminationController.deleteExamination);
 
-// เปรียบเทียบการตรวจ (ใช้ form submit)
-router.post("/examination/compare", checkRole('user'), ExaminationController.compareExaminations);
+// เปรียบเทียบการตรวจ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/compare", checkNotStaff, ExaminationController.compareExaminations);
 
-// สรุปการตรวจรายเดือน (ใช้ form submit)
-router.post("/examination/summary/monthly", checkRole('user'), ExaminationController.getMonthlySummary);
+// สรุปการตรวจรายเดือน (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/summary/monthly", checkNotStaff, ExaminationController.getMonthlySummary);
 
-// สรุปการตรวจรายปี (ใช้ form submit)
-router.post("/examination/summary/yearly/:year", checkRole('user'), ExaminationController.getYearlySummary);
+// สรุปการตรวจรายปี (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/summary/yearly/:year", checkNotStaff, ExaminationController.getYearlySummary);
 
-// ตรวจสอบความถูกต้อง (ใช้ form submit)
-router.post("/examination/validate", checkRole('user'), ExaminationController.validateExamination);
+// ตรวจสอบความถูกต้อง (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/validate", checkNotStaff, ExaminationController.validateExamination);
 
-// แสดงเทมเพลตการตรวจ
-router.get("/examinationTemplates", checkRole('user'), ExaminationController.showExaminationTemplates);
+// แสดงเทมเพลตการตรวจ - Staff เข้าถึงไม่ได้
+router.get("/examinationTemplates", checkNotStaff, ExaminationController.showExaminationTemplates);
 
-// บันทึกเทมเพลตการตรวจ (ใช้ form submit)
-router.post("/examinationTemplates", checkRole('user'), ExaminationController.saveExaminationTemplate);
+// บันทึกเทมเพลตการตรวจ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examinationTemplates", checkNotStaff, ExaminationController.saveExaminationTemplate);
 
-// ติดตามความก้าวหน้า (ใช้ form submit)
-router.post("/examination/progress/:HN", checkRole('user'), ExaminationController.getProgressTracking);
+// ติดตามความก้าวหน้า (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/examination/progress/:HN", checkNotStaff, ExaminationController.getProgressTracking);
 
 module.exports = router;

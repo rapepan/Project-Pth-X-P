@@ -105,11 +105,23 @@ class StatsModel {
     db.query(query, callback);
   }
 
+  // ดึงจำนวนผู้ใช้ตาม role
+  static getUsersByRole(callback) {
+    const query = `
+      SELECT 
+        role,
+        COUNT(*) as count
+      FROM users 
+      GROUP BY role
+    `;
+    db.query(query, callback);
+  }
+
   // ดึงข้อมูลสถิติทั้งหมดสำหรับหน้าแรก
   static getAllStats(callback) {
     const stats = {};
     let completed = 0;
-    const total = 8; // จำนวนฟังก์ชันที่จะเรียก (เพิ่ม todayAppointments)
+    const total = 9; // จำนวนฟังก์ชันที่จะเรียก (เพิ่ม usersByRole)
 
     const checkComplete = () => {
       completed++;
@@ -172,6 +184,22 @@ class StatsModel {
     this.getMonthlyRevenueStats((err, result) => {
       if (err) return callback(err);
       stats.monthlyRevenue = result || [];
+      checkComplete();
+    });
+
+    // ดึงจำนวนผู้ใช้ตาม role
+    this.getUsersByRole((err, result) => {
+      if (err) return callback(err);
+      stats.usersByRole = {};
+      if (result && result.length > 0) {
+        result.forEach(user => {
+          stats.usersByRole[user.role] = user.count;
+        });
+      }
+      // กำหนดค่าเริ่มต้นถ้าไม่มีข้อมูล
+      stats.usersByRole.admin = stats.usersByRole.admin || 0;
+      stats.usersByRole.physical_therapist = stats.usersByRole.physical_therapist || 0;
+      stats.usersByRole.staff = stats.usersByRole.staff || 0;
       checkComplete();
     });
   }

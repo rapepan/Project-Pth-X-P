@@ -94,14 +94,6 @@
             </div>
         </div>
 
-        <!-- Success Message -->
-        <% if (typeof success !== 'undefined' && success) { %>
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <%= success %>
-        </div>
-        <% } %>
-
         <!-- Appointment Detail Card -->
         <div class="appointment-detail">
             <div class="detail-header">
@@ -133,13 +125,6 @@
                 </div>
                 
                 <div class="info-item">
-                    <div class="info-label">ประเภทนัดหมาย</div>
-                    <div class="info-value">
-                        <%= formatAppointmentType(appointment.appointment_type) %>
-                    </div>
-                </div>
-                
-                <div class="info-item">
                     <div class="info-label">สถานะ</div>
                     <div class="info-value">
                         <span class="status-badge status-<%= appointment.status %>">
@@ -160,15 +145,10 @@
                 </div>
                 <% } %>
                 
-                <% if (appointment.patient_email) { %>
-                <div class="info-item">
-                    <div class="info-label">อีเมล</div>
-                    <div class="info-value">
-                        <a href="mailto:<%= appointment.patient_email %>" style="color: inherit; text-decoration: none;">
-                            <i class="fas fa-envelope"></i>
-                            <%= appointment.patient_email %>
-                        </a>
-                    </div>
+                <% if (appointment.patient_address) { %>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">ที่อยู่</div>
+                    <div class="info-value"><%= appointment.patient_address %></div>
                 </div>
                 <% } %>
                 
@@ -229,7 +209,8 @@
                 <% } %>
                 
                 <button class="btn-action btn-primary" 
-                        onclick="printAppointmentCard(<%= appointment.id %>)">
+                        data-appointment-id="<%= appointment.id %>"
+                        onclick="printAppointmentCard(this.dataset.appointmentId)">
                     <i class="fas fa-print"></i>
                     พิมพ์ใบนัดหมาย
                 </button>
@@ -272,28 +253,6 @@
                     </div>
                 </div>
                 <% } %>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <div class="action-buttons">
-                <a href="/appointments" class="action-btn">
-                    <i class="fas fa-list"></i>
-                    <span>รายการนัดหมาย</span>
-                </a>
-                <a href="/appointments/create" class="action-btn">
-                    <i class="fas fa-plus"></i>
-                    <span>สร้างนัดหมายใหม่</span>
-                </a>
-                <a href="/appointments/<%= appointment.id %>/edit" class="action-btn">
-                    <i class="fas fa-edit"></i>
-                    <span>แก้ไขข้อมูล</span>
-                </a>
-                <button class="action-btn" onclick="printAppointmentCard(<%= appointment.id %>)">
-                    <i class="fas fa-print"></i>
-                    <span>พิมพ์ใบนัด</span>
-                </button>
             </div>
         </div>
     </div>

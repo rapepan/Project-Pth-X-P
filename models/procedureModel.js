@@ -9,8 +9,8 @@ class ProcedureModel {
         HN, patient_name, procedure_date,
         procedure_code, procedure_name,
         technique, duration_minutes,
-        therapist_name, notes, created_by, session_count
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        therapist_name, notes, effectiveness, created_by, session_count
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -23,6 +23,7 @@ class ProcedureModel {
       data.duration_minutes || 0,
       data.therapist_name || null,
       data.notes || '',
+      data.effectiveness || 'unknown',
       data.created_by || null,
       data.session_count || 1
     ];
@@ -40,6 +41,7 @@ class ProcedureModel {
         duration_minutes = ?,
         therapist_name = ?,
         notes = ?,
+        effectiveness = ?,
         updated_at = NOW()
       WHERE id = ?
     `;
@@ -50,6 +52,7 @@ class ProcedureModel {
       data.durationMinutes || 0,
       data.therapistName || null,
       data.notes || '',
+      data.effectiveness || 'unknown',
       id
     ];
 

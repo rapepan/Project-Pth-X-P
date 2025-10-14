@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .btn-add-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-add-user:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .users-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table {
+            width: 100%;
+            margin: 0;
+            border-collapse: collapse;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .table tbody td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .role-admin {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        
+        .role-physical-therapist {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+        
+        .role-staff {
+            background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
+            color: #2c3e50;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-edit, .btn-delete {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #2980b9;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+            color: white;
+        }
+        
+        .btn-delete.disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
+            color: #2c3e50;
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, #ffb3ba, #ff9a9e);
+            color: #2c3e50;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #7f8c8d;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="/index" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            กลับสู่หน้าหลัก
+        </a>
+        
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-users-cog"></i>
+                <%= title %>
+            </h1>
+            <a href="/admin/users/create" class="btn-add-user">
+                <i class="fas fa-user-plus"></i>
+                เพิ่มผู้ใช้ใหม่
+            </a>
+        </div>
+        
+        <div class="users-table">
+            <% if (users && users.length > 0) { %>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ชื่อผู้ใช้</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>อีเมล</th>
+                            <th>ระดับผู้ใช้</th>
+                            <th>วันที่สร้าง</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(user => { %>
+                            <tr>
+                                <td>
+                                    <strong><%= user.username %></strong>
+                                </td>
+                                <td><%= user.fullname %></td>
+                                <td><%= user.email %></td>
+                                <td>
+                                    <% if (user.role === 'admin') { %>
+                                        <span class="role-badge role-admin">
+                                            <i class="fas fa-user-shield"></i>
+                                            Admin
+                                        </span>
+                                    <% } else if (user.role === 'physical_therapist') { %>
+                                        <span class="role-badge role-physical-therapist">
+                                            <i class="fas fa-user-md"></i>
+                                            Physical Therapist
+                                        </span>
+                                    <% } else { %>
+                                        <span class="role-badge role-staff">
+                                            <i class="fas fa-user"></i>
+                                            Staff
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <%= new Date(user.created_at).toLocaleDateString('th-TH', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    }) %>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/admin/users/<%= user.id %>/edit" class="btn-edit">
+                                            <i class="fas fa-edit"></i>
+                                            แก้ไข
+                                        </a>
+                                        <% if (user.id !== currentUser.id) { %>
+                                            <form method="POST" action="/admin/users/<%= user.id %>/delete" style="display: inline;" onsubmit="return confirm('คุณแน่ใจหรือไม่ที่จะลบผู้ใช้นี้?')">
+                                                <button type="submit" class="btn-delete">
+                                                    <i class="fas fa-trash"></i>
+                                                    ลบ
+                                                </button>
+                                            </form>
+                                        <% } else { %>
+                                            <button class="btn-delete disabled" disabled>
+                                                <i class="fas fa-trash"></i>
+                                                ลบ
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>ยังไม่มีผู้ใช้ในระบบ</h3>
+                    <p>เริ่มต้นด้วยการเพิ่มผู้ใช้ใหม่</p>
+                    <a href="/admin/users/create" class="btn-add-user">
+                        <i class="fas fa-user-plus"></i>
+                        เพิ่มผู้ใช้ใหม่
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

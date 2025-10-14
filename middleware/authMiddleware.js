@@ -23,7 +23,7 @@ function isAuthenticated(req, res, next) {
   res.redirect("/login?message=กรุณาเข้าสู่ระบบก่อน");
 }
 
-// Check user role - ใช้สำหรับทั้ง user และ admin
+// Check user role - ใช้สำหรับ 3 Role: admin, physical_therapist, staff
 function checkRole(requiredRole) {
   return function (req, res, next) {
     // ตรวจสอบว่า login แล้วหรือยัง
@@ -42,7 +42,7 @@ function checkRole(requiredRole) {
       return next();
     }
 
-    const userRole = req.user.role || 'user';
+    const userRole = req.user.role || 'staff';
 
     // Admin ผ่านได้ทุกอย่าง
     if (userRole === 'admin') {
@@ -66,8 +66,47 @@ function checkRole(requiredRole) {
       });
     }
 
-    // ถ้าต้องการ user และมี role เป็น user หรือ admin
-    if (requiredRole === 'user' && (userRole === 'user' || userRole === 'admin')) {
+    // Physical Therapist ทำได้ทุกอย่างยกเว้นส่วน Admin
+    if (userRole === 'physical_therapist') {
+      // ถ้าต้องการ admin ให้ปฏิเสธ
+      if (requiredRole === 'admin') {
+        if (expectsJson(req)) {
+          return res.status(403).json({
+            success: false,
+            message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็น Admin)'
+          });
+        }
+
+        return res.status(403).render('error', {
+          title: "ไม่มีสิทธิ์เข้าถึง",
+          message: "หน้านี้จำกัดเฉพาะผู้ดูแลระบบเท่านั้น",
+          error: null,
+          statusCode: 403
+        });
+      }
+      // นอกเหนือจาก admin ให้ผ่านได้
+      return next();
+    }
+
+    // ถ้าต้องการ physical_therapist แต่ user ไม่ใช่ physical_therapist หรือ admin
+    if (requiredRole === 'physical_therapist' && userRole !== 'physical_therapist' && userRole !== 'admin') {
+      if (expectsJson(req)) {
+        return res.status(403).json({
+          success: false,
+          message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็นนักกายภาพบำบัดหรือ Admin)'
+        });
+      }
+
+      return res.status(403).render('error', {
+        title: "ไม่มีสิทธิ์เข้าถึง",
+        message: "หน้านี้จำกัดเฉพาะนักกายภาพบำบัดหรือผู้ดูแลระบบเท่านั้น",
+        error: null,
+        statusCode: 403
+      });
+    }
+
+    // ถ้าต้องการ staff และมี role เป็น staff, physical_therapist หรือ admin
+    if (requiredRole === 'staff' && (userRole === 'staff' || userRole === 'physical_therapist' || userRole === 'admin')) {
       return next();
     }
 
@@ -109,6 +148,145 @@ function checkAdminOnly(req, res, next) {
 // Check if user is admin (alias)
 function isAdmin(req, res, next) {
   return checkAdminOnly(req, res, next);
+}
+
+// Check if user is physical therapist or admin
+function checkPhysicalTherapist(req, res, next) {
+  if (!req.isAuthenticated()) {
+    if (expectsJson(req)) {
+      return res.status(401).json({
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบก่อน'
+      });
+    }
+    return res.redirect("/login?message=กรุณาเข้าสู่ระบบก่อน");
+  }
+
+  const userRole = req.user.role || 'staff';
+  if (userRole !== 'physical_therapist' && userRole !== 'admin') {
+    if (expectsJson(req)) {
+      return res.status(403).json({
+        success: false,
+        message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็นนักกายภาพบำบัดหรือ Admin)'
+      });
+    }
+
+    return res.status(403).render('error', {
+      title: "ไม่มีสิทธิ์เข้าถึง",
+      message: "หน้านี้จำกัดเฉพาะนักกายภาพบำบัดหรือผู้ดูแลระบบเท่านั้น",
+      error: null,
+      statusCode: 403
+    });
+  }
+
+  next();
+}
+
+// Check if user is staff, physical therapist or admin (OLD - ใช้สำหรับหน้าที่ Staff ควรเข้าถึงได้ทั้งหมด)
+function checkStaff(req, res, next) {
+  if (!req.isAuthenticated()) {
+    if (expectsJson(req)) {
+      return res.status(401).json({
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบก่อน'
+      });
+    }
+    return res.redirect("/login?message=กรุณาเข้าสู่ระบบก่อน");
+  }
+
+  const userRole = req.user.role || 'staff';
+  if (userRole !== 'staff' && userRole !== 'physical_therapist' && userRole !== 'admin') {
+    if (expectsJson(req)) {
+      return res.status(403).json({
+        success: false,
+        message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้'
+      });
+    }
+
+    return res.status(403).render('error', {
+      title: "ไม่มีสิทธิ์เข้าถึง",
+      message: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+      error: null,
+      statusCode: 403
+    });
+  }
+
+  next();
+}
+
+// Check if user is staff only (สำหรับหน้าที่ Staff เข้าถึงได้เฉพาะ)
+function checkStaffOnly(req, res, next) {
+  if (!req.isAuthenticated()) {
+    if (expectsJson(req)) {
+      return res.status(401).json({
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบก่อน'
+      });
+    }
+    return res.redirect("/login?message=กรุณาเข้าสู่ระบบก่อน");
+  }
+
+  const userRole = req.user.role || 'staff';
+  
+  // Staff เข้าถึงได้
+  if (userRole === 'staff') {
+    return next();
+  }
+  
+  // Physical Therapist และ Admin เข้าถึงได้
+  if (userRole === 'physical_therapist' || userRole === 'admin') {
+    return next();
+  }
+
+  // ถ้าไม่ใช่ role ที่อนุญาต
+  if (expectsJson(req)) {
+    return res.status(403).json({
+      success: false,
+      message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้'
+    });
+  }
+
+  return res.status(403).render('error', {
+    title: "ไม่มีสิทธิ์เข้าถึง",
+    message: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+    error: null,
+    statusCode: 403
+  });
+}
+
+// Check if user is NOT staff (สำหรับหน้าที่ Staff เข้าถึงไม่ได้)
+function checkNotStaff(req, res, next) {
+  if (!req.isAuthenticated()) {
+    if (expectsJson(req)) {
+      return res.status(401).json({
+        success: false,
+        message: 'กรุณาเข้าสู่ระบบก่อน'
+      });
+    }
+    return res.redirect("/login?message=กรุณาเข้าสู่ระบบก่อน");
+  }
+
+  const userRole = req.user.role || 'staff';
+  
+  // Staff เข้าถึงไม่ได้
+  if (userRole === 'staff') {
+    if (expectsJson(req)) {
+      return res.status(403).json({
+        success: false,
+        message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (Staff ไม่สามารถเข้าถึงได้)'
+      });
+    }
+
+    return res.status(403).render('error', {
+      title: "ไม่มีสิทธิ์เข้าถึง",
+      message: "หน้าที่นี้จำกัดเฉพาะนักกายภาพบำบัดและผู้ดูแลระบบเท่านั้น",
+      error: null,
+      statusCode: 403
+    });
+  }
+  
+  // Physical Therapist และ Admin เข้าถึงได้
+  next();
 }
 
 // Redirect if already authenticated
@@ -198,6 +376,10 @@ module.exports = {
   checkRole,
   checkAdminOnly,
   isAdmin,
+  checkPhysicalTherapist,
+  checkStaff,
+  checkStaffOnly,
+  checkNotStaff,
   redirectIfAuthenticated,
   makeUserAvailable,
   logRequests,

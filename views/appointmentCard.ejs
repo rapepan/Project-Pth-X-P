@@ -350,13 +350,6 @@
                 </span>
             </div>
             
-            <div class="info-row">
-                <span class="info-label">ประเภท:</span>
-                <span class="info-value">
-                    <%= formattedType %>
-                </span>
-            </div>
-            
             <% if (appointment.patient_phone) { %>
             <div class="info-row">
                 <span class="info-label">เบอร์โทร:</span>
@@ -370,6 +363,11 @@
                 <span class="info-value"><%= appointment.notes %></span>
             </div>
             <% } %>
+            
+            <div class="info-row">
+                <span class="info-label">สร้างโดย:</span>
+                <span class="info-value"><%= appointment.created_by_name || 'ไม่ระบุ' %></span>
+            </div>
         </div>
         
         <div class="card-footer">

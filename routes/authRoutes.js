@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const AuthController = require('../controllers/authController');
-const { checkRole, redirectIfAuthenticated } = require('../middleware/authMiddleware');
+const { checkRole, checkStaff, redirectIfAuthenticated } = require('../middleware/authMiddleware');
 
 // Auth routes
 router.get("/login", redirectIfAuthenticated, AuthController.showLogin);
@@ -14,9 +14,6 @@ router.post("/login", (req, res, next) => {
     }
     
     if (!user) {
-      const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-      const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
-      console.log(`⚠️  [${timestamp}] Failed login attempt: ${req.body.username} from ${clientIP}`);
       
       // แยกแยะระหว่าง "ไม่พบผู้ใช้" และ "รหัสผ่านไม่ถูกต้อง"
       const errorMessage = info.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
@@ -71,8 +68,7 @@ router.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
-router.get("/register", redirectIfAuthenticated, AuthController.showRegister);
-router.post("/register", AuthController.register);
+// Register routes removed - only Admin can create users through /admin/users/create
 
 router.get("/logout", (req, res, next) => {
   if (req.user) {
@@ -97,10 +93,10 @@ router.get("/logout", (req, res, next) => {
   });
 });
 
-router.get("/index", checkRole('user'), AuthController.showIndex);
+router.get("/index", checkStaff, AuthController.showIndex);
 
 // Profile routes
-router.get("/profile", checkRole('user'), AuthController.getUserProfile);
-router.post("/profile", checkRole('user'), AuthController.updateProfile);
+router.get("/profile", checkStaff, AuthController.getUserProfile);
+router.post("/profile", checkStaff, AuthController.updateProfile);
 
 module.exports = router;

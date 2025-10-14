@@ -34,6 +34,57 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
         
+        .clinic-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        
+        .clinic-info {
+            text-align: center;
+        }
+        
+        .bill-info {
+            text-align: right;
+            justify-content: flex-end;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        
+        .clinic-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .clinic-subtitle {
+            font-size: 16px;
+            color: #666;
+            font-weight: 400;
+            margin-bottom: 8px;
+            letter-spacing: 1px
+        }
+        
+        .clinic-subtitle2 {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        .bill-number {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        .bill-date {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+        
         .close-link {
             color: #666;
             text-decoration: none;
@@ -288,7 +339,7 @@
             color: #721c24;
         }
         
-        @media print {
+            @media print {
             body {
                 background: white !important;
                 font-size: 12px;
@@ -300,6 +351,28 @@
                 max-width: none !important;
                 margin: 0 !important;
                 padding: 15px !important;
+            }
+            
+            .clinic-header {
+                margin-bottom: 20px !important;
+                padding-bottom: 15px !important;
+                text-align: center !important;
+            }
+            
+            .clinic-info {
+                text-align: center !important;
+                margin-bottom: 10px !important;
+            }
+
+            .bill-info {
+            text-align: right !important;
+            justify-content: flex-end !important;
+            gap: 30px !important;
+            margin-top: 15px !important;
+        }
+            
+            .clinic-name {
+                font-size: 24px !important;
             }
             
             .close-link,
@@ -369,6 +442,25 @@
                 padding: 20px;
             }
             
+            .clinic-header {
+                text-align: center;
+            }
+            
+            .clinic-info {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            
+            .bill-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+            
+            .clinic-name {
+                font-size: 24px;
+            }
+            
             .paid-status {
                 font-size: 20px;
             }
@@ -387,10 +479,24 @@
 </head>
 <body>
     <div class="invoice-container">
-        <!-- Close Link -->
-        <a href="javascript:window.close()" class="close-link">
-            <i class="fas fa-times"></i> ปิดใบเสร็จ
-        </a>
+        <!-- Clinic Header -->
+        <div class="clinic-header">
+            <div class="clinic-info">
+                <div class="clinic-name">คลินิกกายภาพบำบัด</div>
+                <div class="clinic-subtitle">Physical Therapy Clinic</div>
+                <div class="clinic-subtitle2">ใบเสร็จรับเงิน</div>
+            </div>
+            
+            <div class="bill-info">
+                <div class="bill-number">เลขที่: <%= bill.bill_number %></div>
+                <div class="bill-date">วันที่: <%= new Date(bill.bill_date).toLocaleDateString('th-TH', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }) %></div>
+            </div>
+        </div>
+        
         
         <!-- Summary Section -->
         <div class="section">
@@ -401,24 +507,8 @@
                     <span class="info-value"> <%= bill.HN %></span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">ถึง:</span>
-                    <span class="info-value">คุณ <%= bill.patient_name %> (HN: <%= bill.HN %>)</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">จาก:</span>
-                    <span class="info-value">คลินิกกายภาพบำบัด</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">เลขที่:</span>
-                    <span class="info-value"><%= bill.bill_number %></span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">วันที่:</span>
-                    <span class="info-value"><%= new Date(bill.bill_date).toLocaleDateString('th-TH', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    }) %></span>
+                    <span class="info-label">ได้รับเงินจาก:</span>
+                    <span class="info-value">คุณ <%= bill.patient_name %></span>
                 </div>
             </div>
         </div>
@@ -428,13 +518,6 @@
         <!-- Items Section -->
         <div class="section items-section">
             <div class="section-title">รายการบริการ</div>
-            <div class="date-range">
-                <%= new Date(bill.bill_date).toLocaleDateString('th-TH', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }) %>
-            </div>
             
             <% if (serviceItems && serviceItems.length > 0) { %>
                 <% serviceItems.forEach(item => { %>

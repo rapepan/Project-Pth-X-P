@@ -8,8 +8,8 @@ class AppointmentModel {
   static createAppointment(appointmentData, callback) {
     const query = `
       INSERT INTO appointments 
-      (HN, patient_name, patient_phone, appointment_date, appointment_time, 
-       appointment_type, status, notes, created_by) 
+      (HN, patient_name, patient_phone, patient_address, appointment_date, appointment_time, 
+       status, notes, created_by) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
@@ -17,9 +17,9 @@ class AppointmentModel {
       appointmentData.HN,
       appointmentData.patient_name,
       appointmentData.patient_phone,
+      appointmentData.patient_address || null,
       appointmentData.appointment_date,
       appointmentData.appointment_time,
-      appointmentData.appointment_type,
       appointmentData.status || 'scheduled',
       appointmentData.notes,
       appointmentData.created_by
@@ -34,8 +34,8 @@ class AppointmentModel {
   static updateAppointment(appointmentId, appointmentData, callback) {
     const query = `
       UPDATE appointments 
-      SET patient_name = ?, patient_phone = ?, 
-          appointment_date = ?, appointment_time = ?, appointment_type = ?, 
+      SET patient_name = ?, patient_phone = ?, patient_address = ?,
+          appointment_date = ?, appointment_time = ?, 
           status = ?, notes = ?
       WHERE id = ?
     `;
@@ -43,9 +43,9 @@ class AppointmentModel {
     const values = [
       appointmentData.patient_name,
       appointmentData.patient_phone,
+      appointmentData.patient_address || null,
       appointmentData.appointment_date,
       appointmentData.appointment_time,
-      appointmentData.appointment_type,
       appointmentData.status,
       appointmentData.notes,
       appointmentId
@@ -59,9 +59,8 @@ class AppointmentModel {
    */
   static getAppointmentById(appointmentId, callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
       WHERE a.id = ?
     `;
     
@@ -73,10 +72,10 @@ class AppointmentModel {
    */
   static getAllAppointments(callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      ORDER BY a.appointment_date DESC, a.appointment_time DESC
+      WHERE a.status NOT IN ('completed', 'cancelled')
+      ORDER BY a.appointment_date ASC, a.appointment_time ASC
     `;
     
     db.query(query, callback);
@@ -87,10 +86,9 @@ class AppointmentModel {
    */
   static getFilteredAppointments(filters, callback) {
     let query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE 1=1
+      WHERE a.status NOT IN ('completed', 'cancelled')
     `;
     
     const params = [];
@@ -114,7 +112,7 @@ class AppointmentModel {
       params.push(searchPattern, searchPattern, searchPattern);
     }
     
-    query += ' ORDER BY a.appointment_date DESC, a.appointment_time DESC';
+    query += ' ORDER BY a.appointment_date ASC, a.appointment_time ASC';
     
     db.query(query, params, callback);
   }
@@ -124,10 +122,9 @@ class AppointmentModel {
    */
   static getAppointmentsByDate(date, callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE a.appointment_date = ?
+      WHERE a.appointment_date = ? AND a.status NOT IN ('completed', 'cancelled')
       ORDER BY a.appointment_time ASC
     `;
     
@@ -139,11 +136,10 @@ class AppointmentModel {
    */
   static getAppointmentsByHN(HN, callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE a.HN = ?
-      ORDER BY a.appointment_date DESC, a.appointment_time DESC
+      WHERE a.HN = ? AND a.status NOT IN ('completed', 'cancelled')
+      ORDER BY a.appointment_date ASC, a.appointment_time ASC
     `;
     
     db.query(query, [HN], callback);
@@ -154,10 +150,9 @@ class AppointmentModel {
    */
   static getAppointmentsByStatus(status, callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE a.status = ?
+      WHERE a.status = ? AND a.status NOT IN ('completed', 'cancelled')
       ORDER BY a.appointment_date ASC, a.appointment_time ASC
     `;
     
@@ -169,10 +164,9 @@ class AppointmentModel {
    */
   static getTodayAppointments(callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE a.appointment_date = CURDATE()
+      WHERE a.appointment_date = CURDATE() AND a.status NOT IN ('completed', 'cancelled')
       ORDER BY a.appointment_time ASC
     `;
     
@@ -184,9 +178,8 @@ class AppointmentModel {
    */
   static getUpcomingAppointments(callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
       WHERE a.appointment_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
       AND a.status IN ('scheduled', 'confirmed')
       ORDER BY a.appointment_date ASC, a.appointment_time ASC
@@ -216,11 +209,11 @@ class AppointmentModel {
    */
   static searchAppointments(searchTerm, callback) {
     const query = `
-      SELECT a.*, u.fullname as created_by_name 
+      SELECT a.*, a.created_by as created_by_name 
       FROM appointments a 
-      LEFT JOIN users u ON a.created_by = u.id 
-      WHERE a.patient_name LIKE ? OR a.HN LIKE ? OR a.patient_phone LIKE ?
-      ORDER BY a.appointment_date DESC, a.appointment_time DESC
+      WHERE a.status NOT IN ('completed', 'cancelled')
+      AND (a.patient_name LIKE ? OR a.HN LIKE ? OR a.patient_phone LIKE ?)
+      ORDER BY a.appointment_date ASC, a.appointment_time ASC
     `;
     
     const searchPattern = `%${searchTerm}%`;
@@ -286,7 +279,7 @@ class AppointmentModel {
    */
   static getPatientForAppointment(HN, callback) {
     const query = `
-      SELECT HN, fullname, phone, email 
+      SELECT HN, CONCAT(fname, ' ', lname) as fullname, phone 
       FROM patient 
       WHERE HN = ?
     `;

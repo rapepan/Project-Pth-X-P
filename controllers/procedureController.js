@@ -166,42 +166,20 @@ class ProcedureController {
         duration_minutes: parseInt(procedureData.duration) || 30,
         therapist_name: procedureData.therapist || null,
         notes: procedureData.notes || '',
+        effectiveness: procedureData.effectiveness || 'unknown',
         created_by: req.user ? (req.user.fullname || req.user.username || req.user.email || 'ไม่ระบุผู้ใช้') : 'ไม่ระบุผู้ใช้'
       };
 
-      // ตรวจสอบว่ามีหัตถการเดิมหรือไม่ (ดูจาก HN และ procedure_name)
-      ProcedureModel.checkExistingProcedure(HN, completeProcedureData.procedure_name, (err, existingProcedure) => {
+      // บันทึกหัตถการเป็นข้อมูลใหม่เสมอ (ไม่ตรวจสอบหัตถการเดิม)
+      completeProcedureData.session_count = 1;
+      ProcedureModel.createProcedure(completeProcedureData, (err, result) => {
         if (err) {
-          console.error('Error checking existing procedure:', err);
-          return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถตรวจสอบหัตถการเดิมได้')}`);
+          console.error('Error creating procedure:', err);
+          return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถบันทึกหัตถการได้')}`);
         }
 
-        if (existingProcedure) {
-          // ถ้ามีหัตถการเดิม ให้บวกจำนวนครั้งเพิ่ม (ใช้ session_count)
-          const newSessionCount = parseInt(existingProcedure.session_count || 1) + 1;
-          const updatedNotes = `${existingProcedure.notes} | บันทึกเพิ่มครั้งที่ ${newSessionCount} - ${new Date().toLocaleDateString('th-TH')}`;
-          
-          ProcedureModel.updateProcedureSessionCount(existingProcedure.id, newSessionCount, updatedNotes, (err, result) => {
-            if (err) {
-              console.error('Error updating procedure session count:', err);
-              return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถอัปเดตจำนวนครั้งได้')}`);
-            }
-
-            res.redirect(`/procedure/${HN}?success=${encodeURIComponent(`บันทึกหัตถการเรียบร้อยแล้ว (ครั้งที่ ${newSessionCount})`)}`);
-          });
-        } else {
-          // ถ้าไม่มีหัตถการเดิม ให้สร้างใหม่ (ครั้งที่ 1)
-          completeProcedureData.session_count = 1;
-          ProcedureModel.createProcedure(completeProcedureData, (err, result) => {
-            if (err) {
-              console.error('Error creating procedure:', err);
-              return res.redirect(`/procedure/${HN}?error=${encodeURIComponent('ไม่สามารถบันทึกหัตถการได้')}`);
-            }
-
-            // บันทึกสำเร็จ - redirect กลับไปหน้า procedure พร้อมข้อความสำเร็จ
-            res.redirect(`/procedure/${HN}?success=${encodeURIComponent('บันทึกหัตถการเรียบร้อยแล้ว (ครั้งที่ 1)')}`);
-          });
-        }
+        // บันทึกสำเร็จ - redirect กลับไปหน้า procedure พร้อมข้อความสำเร็จ
+        res.redirect(`/procedure/${HN}?success=${encodeURIComponent('บันทึกหัตถการเรียบร้อยแล้ว')}`);
       });
     });
   }

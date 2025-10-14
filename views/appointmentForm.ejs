@@ -40,14 +40,6 @@
             </div>
         </div>
 
-        <!-- Error Message -->
-        <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <%= error %>
-        </div>
-        <% } %>
-
         <!-- Appointment Form -->
         <div class="appointment-form">
             <div class="form-header">
@@ -73,7 +65,7 @@
                             <label for="HN" class="form-label">เลข HN *</label>
                             <input type="text" id="HN" name="HN" class="form-control" 
                                    value="<%= appointment ? appointment.HN : (patientData ? patientData.HN : '') %>" 
-                                   required>
+                                   placeholder="กรอกเลข HN เพื่อค้นหาผู้ป่วย" required>
                             <% if (!appointment && !patientData) { %>
                             <small class="form-text">กรุณากรอกเลข HN ของผู้ป่วย</small>
                             <% } %>
@@ -81,7 +73,7 @@
                         
                         <div class="form-group">
                             <label for="patient_name" class="form-label">ชื่อ-นามสกุล *</label>
-                            <input type="text" id="patient_name" name="patient_name" class="form-control" 
+                            <input type="text" id="patient_name" name="patient_name" class="form-control patient-info-field" 
                                    value="<%= appointment ? appointment.patient_name : (patientData ? patientData.fullname : '') %>" 
                                    required>
                         </div>
@@ -90,9 +82,15 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="patient_phone" class="form-label">เบอร์โทรศัพท์</label>
-                            <input type="tel" id="patient_phone" name="patient_phone" class="form-control" 
+                            <input type="tel" id="patient_phone" name="patient_phone" class="form-control patient-info-field" 
                                    value="<%= appointment ? appointment.patient_phone : (patientData ? patientData.phone : '') %>">
                         </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="patient_address" class="form-label">ที่อยู่</label>
+                        <textarea id="patient_address" name="patient_address" class="form-control patient-info-field" rows="3" 
+                                  placeholder="กรอกที่อยู่ผู้ป่วย (ถ้ามี)"><%= appointment ? appointment.patient_address : (patientData ? patientData.address : '') %></textarea>
                     </div>
                 </div>
 
@@ -119,30 +117,8 @@
                         </div>
                     </div>
                     
+                    <% if (appointment) { %>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="appointment_type" class="form-label">ประเภทนัดหมาย *</label>
-                            <select id="appointment_type" name="appointment_type" class="form-control form-select" required>
-                                <option value="">-- เลือกประเภทนัดหมาย --</option>
-                                <option value="examination" <%= appointment && appointment.appointment_type === 'examination' ? 'selected' : '' %>>
-                                    การตรวจร่างกาย
-                                </option>
-                                <option value="treatment" <%= appointment && appointment.appointment_type === 'treatment' ? 'selected' : '' %>>
-                                    การรักษา
-                                </option>
-                                <option value="consultation" <%= appointment && appointment.appointment_type === 'consultation' ? 'selected' : '' %>>
-                                    การปรึกษา
-                                </option>
-                                <option value="follow_up" <%= appointment && appointment.appointment_type === 'follow_up' ? 'selected' : '' %>>
-                                    การติดตามผล
-                                </option>
-                                <option value="other" <%= appointment && appointment.appointment_type === 'other' ? 'selected' : '' %>>
-                                    อื่นๆ
-                                </option>
-                            </select>
-                        </div>
-                        
-                        <% if (appointment) { %>
                         <div class="form-group">
                             <label for="status" class="form-label">สถานะ</label>
                             <select id="status" name="status" class="form-control form-select">
@@ -163,8 +139,8 @@
                                 </option>
                             </select>
                         </div>
-                        <% } %>
                     </div>
+                    <% } %>
                     
                     <div class="form-group">
                         <label for="notes" class="form-label">หมายเหตุ</label>
@@ -187,79 +163,64 @@
                 </div>
             </form>
         </div>
-
-        <!-- Patient Search Section (only for new appointments) -->
-        <% if (!appointment && !patientData) { %>
-        <div class="patient-search-section">
-            <div class="search-header">
-                <h3>
-                    <i class="fas fa-search"></i>
-                    ค้นหาผู้ป่วย
-                </h3>
-                <p>หากไม่ทราบเลข HN สามารถค้นหาผู้ป่วยได้ที่นี่</p>
-            </div>
-            
-            <div class="search-form">
-                <div class="search-input-group">
-                    <input type="text" id="patientSearch" class="search-input" 
-                           placeholder="ค้นหาตามชื่อ หรือ HN...">
-                    <button type="button" id="searchPatientBtn" class="search-btn">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div id="patientSearchResults" class="search-results" style="display: none;">
-                <!-- Search results will be populated here -->
-            </div>
-        </div>
-        <% } %>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <div class="action-buttons">
-                <a href="/appointments" class="action-btn">
-                    <i class="fas fa-list"></i>
-                    <span>รายการนัดหมาย</span>
-                </a>
-                <% if (appointment) { %>
-                <a href="/appointments/<%= appointment.id %>" class="action-btn">
-                    <i class="fas fa-eye"></i>
-                    <span>ดูรายละเอียด</span>
-                </a>
-                <button class="action-btn" onclick="printAppointmentCard(<%= appointment.id %>)">
-                    <i class="fas fa-print"></i>
-                    <span>พิมพ์ใบนัด</span>
-                </button>
-                <% } %>
-            </div>
-        </div>
     </div>
 
 
     <!-- Scripts -->
     <script src="/js/appointments.js"></script>
     
-    <% if (!appointment && !patientData) { %>
     <script>
-        // Patient search functionality
-        document.getElementById('searchPatientBtn').addEventListener('click', function() {
-            searchPatients();
-        });
-        
-        document.getElementById('patientSearch').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                searchPatients();
+        // Initialize appointment form functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const dateInput = document.getElementById('appointment_date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
             }
-        });
-        
-        async function searchPatients() {
-            const searchTerm = document.getElementById('patientSearch').value.trim();
-            const resultsDiv = document.getElementById('patientSearchResults');
             
-            if (searchTerm.length < 2) {
-                resultsDiv.style.display = 'none';
+            // Set default time if empty
+            const timeInput = document.getElementById('appointment_time');
+            if (timeInput && !timeInput.value) {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = (Math.ceil(now.getMinutes() / 15) * 15).toString().padStart(2, '0');
+                timeInput.value = `${hours}:${minutes}`;
+            }
+
+            // Initialize patient search functionality
+            initializePatientSearch();
+        });
+
+        function initializePatientSearch() {
+            const hnInput = document.getElementById('HN');
+
+            if (hnInput) {
+                // Auto search when typing (with debounce)
+                let searchTimeout;
+                hnInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        if (this.value.trim().length >= 3) {
+                            searchPatients();
+                        } else {
+                            // Clear patient data if HN is too short
+                            clearPatientData();
+                        }
+                    }, 800); // เพิ่มเวลารอให้มากขึ้น
+                });
+            }
+        }
+
+        async function searchPatients() {
+            const hnInput = document.getElementById('HN');
+            
+            if (!hnInput) return;
+
+            const searchTerm = hnInput.value.trim();
+            
+            if (searchTerm.length < 3) {
+                clearPatientData();
                 return;
             }
             
@@ -268,45 +229,67 @@
                 const patients = await response.json();
                 
                 if (patients.length > 0) {
-                    let html = '<div class="search-results-list">';
-                    patients.forEach(patient => {
-                        html += `
-                            <div class="search-result-item" onclick="selectPatient('${patient.HN}', '${patient.fullname}', '${patient.phone || ''}')">
-                                <div class="patient-info">
-                                    <h4>${patient.fullname}</h4>
-                                    <p>HN: ${patient.HN}</p>
-                                    ${patient.phone ? `<p>โทร: ${patient.phone}</p>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    resultsDiv.innerHTML = html;
-                    resultsDiv.style.display = 'block';
+                    // Auto-fill patient data
+                    const patient = patients[0];
+                    selectPatient(patient.HN, patient.fullname, patient.phone || '', patient.address || '');
                 } else {
-                    resultsDiv.innerHTML = '<p class="no-results">ไม่พบผู้ป่วยที่ตรงกับคำค้นหา</p>';
-                    resultsDiv.style.display = 'block';
+                    // Clear patient data if no results
+                    clearPatientData();
                 }
             } catch (error) {
                 console.error('Error searching patients:', error);
-                resultsDiv.innerHTML = '<p class="error-message">เกิดข้อผิดพลาดในการค้นหา</p>';
-                resultsDiv.style.display = 'block';
+                clearPatientData();
             }
         }
         
-        function selectPatient(HN, name, phone) {
+        function selectPatient(HN, name, phone, address) {
             document.getElementById('HN').value = HN;
             document.getElementById('patient_name').value = name;
             document.getElementById('patient_phone').value = phone;
+            document.getElementById('patient_address').value = address;
             
-            document.getElementById('patientSearchResults').style.display = 'none';
-            document.getElementById('patientSearch').value = '';
+            // Add readonly behavior to patient info fields
+            addReadonlyBehavior();
             
             // Focus on appointment date
             document.getElementById('appointment_date').focus();
         }
+
+        function clearPatientData() {
+            document.getElementById('patient_name').value = '';
+            document.getElementById('patient_phone').value = '';
+            document.getElementById('patient_address').value = '';
+            
+            // Remove readonly behavior
+            removeReadonlyBehavior();
+        }
+
+        function addReadonlyBehavior() {
+            const patientFields = document.querySelectorAll('.patient-info-field');
+            patientFields.forEach(field => {
+                field.addEventListener('keydown', preventEditing);
+                field.addEventListener('paste', preventEditing);
+                field.addEventListener('cut', preventEditing);
+                field.addEventListener('input', preventEditing);
+            });
+        }
+
+        function removeReadonlyBehavior() {
+            const patientFields = document.querySelectorAll('.patient-info-field');
+            patientFields.forEach(field => {
+                field.removeEventListener('keydown', preventEditing);
+                field.removeEventListener('paste', preventEditing);
+                field.removeEventListener('cut', preventEditing);
+                field.removeEventListener('input', preventEditing);
+            });
+        }
+
+        function preventEditing(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
     </script>
-    <% } %>
 </body>
 </html>
 

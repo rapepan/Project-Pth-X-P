@@ -42,7 +42,6 @@ class BillingController {
 
       // ดึงข้อมูลหัตถการทั้งหมดของวันที่ปัจจุบัน
       const today = getCurrentDate();
-      console.log('🔍 Debug: Looking for procedures for HN:', HN, 'on date:', today);
       
       BillingController._getTodayProcedures(HN, today, (err, procedures) => {
         if (err) {
@@ -53,11 +52,6 @@ class BillingController {
             statusCode: 500,
             error: err
           });
-        }
-        
-        console.log('📋 Debug: Found procedures:', procedures.length, 'records');
-        if (procedures.length > 0) {
-          console.log('📋 Debug: First procedure:', procedures[0]);
         }
 
         // ดึงข้อมูลบริการเพื่อคำนวณราคา
@@ -74,15 +68,6 @@ class BillingController {
 
           // รวมหัตถการทั้งหมดของวันนี้
           const selectedServices = BillingController._aggregateServices(procedures, allServices);
-          console.log('🔧 Debug: Aggregated services:', selectedServices.length, 'services');
-          if (selectedServices.length > 0) {
-            console.log('🔧 Debug: First service:', selectedServices[0]);
-          }
-          
-          // ตรวจสอบว่ามีข้อมูลหัตถการหรือไม่
-          if (procedures.length === 0) {
-            console.log('⚠️ Debug: No procedures found, showing empty billing page');
-          }
           
           res.render("billing", {
             title: "สรุปค่าใช้จ่าย",
@@ -342,7 +327,7 @@ class BillingController {
       FROM procedures p
       LEFT JOIN users u ON p.created_by = u.id
       WHERE p.HN = ?
-      AND (p.notes NOT LIKE '%สร้างใบเสร็จแล้ว%' OR p.notes IS NULL)
+      AND (p.is_bill NOT LIKE '%สร้างใบเสร็จแล้ว%' OR p.is_bill IS NULL)
       ORDER BY p.procedure_date DESC, p.created_at DESC
       LIMIT 10
     `;
@@ -354,12 +339,9 @@ class BillingController {
       FROM procedures p
       LEFT JOIN users u ON p.created_by = u.id
       WHERE p.HN = ? AND DATE(p.procedure_date) = ?
-      AND (p.notes NOT LIKE '%สร้างใบเสร็จแล้ว%' OR p.notes IS NULL)
+      AND (p.is_bill NOT LIKE '%สร้างใบเสร็จแล้ว%' OR p.is_bill IS NULL)
       ORDER BY p.created_at ASC
     `;
-    
-    console.log('🔍 Debug: Executing main query with params:', [HN, date]);
-    console.log('🔍 Debug: Main Query:', mainQuery);
     
     db.query(mainQuery, [HN, date], (err, results) => {
       if (err) {
@@ -367,11 +349,8 @@ class BillingController {
         return callback(err);
       }
       
-      console.log('📊 Debug: Main query results:', results.length, 'records found');
-      
       // หากไม่พบข้อมูลของวันที่ปัจจุบัน ให้ลองดูข้อมูลล่าสุด
       if (results.length === 0) {
-        console.log('⚠️ Debug: No procedures found for today, trying fallback query...');
         
         db.query(fallbackQuery, [HN], (err, fallbackResults) => {
           if (err) {
@@ -379,18 +358,9 @@ class BillingController {
             return callback(err);
           }
           
-          console.log('📊 Debug: Fallback query results:', fallbackResults.length, 'records found');
-          if (fallbackResults.length > 0) {
-            console.log('📊 Debug: Latest procedure:', fallbackResults[0]);
-            console.log('📊 Debug: Latest procedure date:', fallbackResults[0].procedure_date);
-          }
-          
           callback(null, fallbackResults);
         });
       } else {
-        if (results.length > 0) {
-          console.log('📊 Debug: Sample result:', results[0]);
-        }
         callback(null, results);
       }
     });
@@ -401,12 +371,8 @@ class BillingController {
    */
   static _aggregateServices(procedures, allServices) {
     const serviceMap = new Map();
-    
-    console.log('🔧 Debug: Aggregating services from', procedures.length, 'procedures');
-    console.log('🔧 Debug: Available services count:', allServices.length);
 
     procedures.forEach((procedure, index) => {
-      console.log(`🔧 Debug: Processing procedure ${index + 1}:`, procedure.procedure_name);
       if (procedure.procedure_name) {
         const serviceNames = procedure.procedure_name.split(', ');
 
@@ -448,8 +414,6 @@ class BillingController {
     });
 
     const result = Array.from(serviceMap.values());
-    console.log('🔧 Debug: Final aggregated services:', result.length, 'services');
-    console.log('🔧 Debug: Service map keys:', Array.from(serviceMap.keys()));
     
     return result;
   }
@@ -554,7 +518,7 @@ class BillingController {
     const db = require('../config/db');
     const query = `
       UPDATE procedures 
-      SET notes = CONCAT(IFNULL(notes, ''), ' | สร้างใบเสร็จแล้ว (Bill ID: ?)')
+      SET is_bill = CONCAT(IFNULL(is_bill, ''), ' สร้างใบเสร็จแล้ว (Bill ID: ?)')
       WHERE HN = ? AND DATE(procedure_date) = ? AND session_count > 0
     `;
     

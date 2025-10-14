@@ -220,8 +220,13 @@ class AppointmentController {
         });
       }
 
-      // เพิ่มข้อมูล created_by
-      appointmentData.created_by = req.user.id;
+      // เพิ่มข้อมูล created_by (ใช้ชื่อผู้ใช้แทน ID)
+      appointmentData.created_by = req.user ? (req.user.fullname || req.user.username || req.user.email || 'ไม่ระบุผู้ใช้') : 'ไม่ระบุผู้ใช้';
+      
+      // แปลงชื่อผู้ป่วยให้เป็นรูปแบบที่ถูกต้อง
+      if (appointmentData.patient_name) {
+        appointmentData.patient_name = appointmentData.patient_name.trim();
+      }
 
       // บันทึกนัดหมาย
       await new Promise((resolve, reject) => {
@@ -426,10 +431,6 @@ class AppointmentController {
       return { isValid: false, error: 'กรุณาเลือกเวลานัดหมาย' };
     }
 
-    if (!appointmentData.appointment_type) {
-      return { isValid: false, error: 'กรุณาเลือกประเภทนัดหมาย' };
-    }
-
     // ตรวจสอบวันที่ไม่สามารถเป็นอดีตได้
     const appointmentDate = new Date(appointmentData.appointment_date);
     const today = new Date();
@@ -456,19 +457,6 @@ class AppointmentController {
     return statusMap[status] || status;
   }
 
-  /**
-   * แปลงประเภทนัดหมายเป็นภาษาไทย
-   */
-  static getAppointmentTypeInThai(type) {
-    const typeMap = {
-      'examination': 'การตรวจร่างกาย',
-      'treatment': 'การรักษา',
-      'consultation': 'การปรึกษา',
-      'follow_up': 'การติดตามผล',
-      'other': 'อื่นๆ'
-    };
-    return typeMap[type] || type;
-  }
 }
 
 module.exports = AppointmentController;

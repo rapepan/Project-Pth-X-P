@@ -4,72 +4,660 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/register.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #00897B 0%, #4DB6AC 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0,137,123,0.2);
+        }
+        
+        .profile-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .profile-header .user-info {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .profile-form {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .form-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .form-section h3 {
+            color: #00897B;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f5e9;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row.full-width {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        
+        .password-input-wrapper {
+            position: relative;
+        }
+        
+        .password-input-wrapper input {
+            padding-right: 50px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1rem;
+        }
+        
+        .toggle-password:hover {
+            color: #00897B;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00897B;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+        }
+        
+        .form-group input:disabled {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .error-messages {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .error-messages .error {
+            color: #c62828;
+            margin: 5px 0;
+            font-weight: 500;
+        }
+        
+        .success-message {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00897B 0%, #4DB6AC 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,137,123,0.3);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #00897B;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            color: #00695C;
+        }
+        
+        /* Password Strength Bar */
+        .password-strength {
+            margin-top: 10px;
+        }
+        
+        .strength-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .strength-fill.weak {
+            background: #ff4444;
+            width: 25%;
+        }
+        
+        .strength-fill.fair {
+            background: #ffaa00;
+            width: 50%;
+        }
+        
+        .strength-fill.good {
+            background: #00aa00;
+            width: 75%;
+        }
+        
+        .strength-fill.strong {
+            background: #0088ff;
+            width: 100%;
+        }
+        
+        .strength-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .strength-text.weak {
+            color: #ff4444;
+        }
+        
+        .strength-text.fair {
+            color: #ffaa00;
+        }
+        
+        .strength-text.good {
+            color: #00aa00;
+        }
+        
+        .strength-text.strong {
+            color: #0088ff;
+        }
+        
+        /* Password Requirements Styles */
+        .password-requirements {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .requirements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .requirement-item i {
+            color: #00897B;
+            width: 16px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 15px;
+            }
+            
+            .profile-form {
+                padding: 25px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    
 </head>
 <body>
-    <div class="container">
-        <h1>ข้อมูลส่วนตัว</h1>
+    <div class="profile-container">
+        <a href="/index" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            กลับสู่หน้าหลัก
+        </a>
         
         <% if (user) { %>
+        <div class="profile-header">
+            <h1>
+                <i class="fas fa-user-cog"></i>
+                จัดการโปรไฟล์
+            </h1>
+            <div class="user-info">
+                <strong><%= user.fullname || user.username %></strong>
+                <span>•</span>
+                <span><%= user.role === 'admin' ? 'ผู้ดูแลระบบ' : user.role === 'physical_therapist' ? 'นักกายภาพบำบัด' : 'เจ้าหน้าที่' %></span>
+            </div>
+        </div>
+        
         <form method="POST" action="/profile" class="profile-form">
-            <div class="form-group">
-                <label for="username">ชื่อผู้ใช้:</label>
-                <input type="text" id="username" value="<%= user.username %>" disabled>
+            <!-- ข้อมูลพื้นฐาน -->
+            <div class="form-section">
+                <h3>
+                    <i class="fas fa-user"></i>
+                    ข้อมูลพื้นฐาน
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i>
+                            ชื่อผู้ใช้
+                        </label>
+                        <input type="text" id="username" value="<%= user.username %>" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="role">
+                            <i class="fas fa-user-tag"></i>
+                            บทบาท
+                        </label>
+                        <input type="text" id="role" value="<%= user.role === 'admin' ? 'ผู้ดูแลระบบ' : user.role === 'physical_therapist' ? 'นักกายภาพบำบัด' : 'เจ้าหน้าที่' %>" disabled>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullname">
+                            <i class="fas fa-id-card"></i>
+                            ชื่อ-นามสกุล
+                        </label>
+                        <input type="text" id="fullname" name="fullname" value="<%= user.fullname || '' %>" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            อีเมล
+                        </label>
+                        <input type="email" id="email" name="email" value="<%= user.email || '' %>" disabled>
+                    </div>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="email">อีเมล:</label>
-                <input type="email" id="email" name="email" value="<%= user.email || '' %>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fullname">ชื่อ-นามสกุล:</label>
-                <input type="text" id="fullname" name="fullname" value="<%= user.fullname || '' %>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="role">บทบาท:</label>
-                <input type="text" id="role" value="<%= user.role || 'user' %>" disabled>
-            </div>
-            
-            <h3>เปลี่ยนรหัสผ่าน</h3>
-            <div class="form-group">
-                <label for="currentPassword">รหัสผ่านปัจจุบัน:</label>
-                <input type="password" id="currentPassword" name="currentPassword">
-            </div>
-            
-            <div class="form-group">
-                <label for="newPassword">รหัสผ่านใหม่:</label>
-                <input type="password" id="newPassword" name="newPassword">
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmNewPassword">ยืนยันรหัสผ่านใหม่:</label>
-                <input type="password" id="confirmNewPassword" name="confirmNewPassword">
+            <!-- เปลี่ยนรหัสผ่าน -->
+            <div class="form-section">
+                <h3>
+                    <i class="fas fa-lock"></i>
+                    เปลี่ยนรหัสผ่าน
+                </h3>             
+                
+                <div class="form-row full-width">
+                    <div class="form-group">
+                        <label for="newPassword">
+                            <i class="fas fa-shield-alt"></i>
+                            รหัสผ่านใหม่
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="newPassword" name="newPassword" placeholder="กรอกรหัสผ่านใหม่">
+                            <button type="button" class="toggle-password" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye" id="newPassword-eye"></i>
+                            </button>
+                        </div>
+                        <!-- แถบความปลอดภัยรหัสผ่าน -->
+                        <div class="password-strength" id="passwordStrength" style="display: none;">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">ความปลอดภัย: อ่อนแอ</div>
+                        </div>
+                        
+                        <!-- ข้อกำหนดรหัสผ่าน -->
+                        <div class="password-requirements" id="passwordRequirements" style="display: none;">
+                            <h4 style="color: #00897B; margin-bottom: 15px; font-size: 1.1rem;">
+                                <i class="fas fa-shield-alt"></i>
+                                ข้อกำหนดรหัสผ่านที่ปลอดภัย:
+                            </h4>
+                            <div class="requirements-list">
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านต้องมีตัวพิมพ์เล็ก (a-z) อย่างน้อย 1 ตัว</span>
+                                </div>
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านต้องมีตัวพิมพ์ใหญ่ (A-Z) อย่างน้อย 1 ตัว</span>
+                                </div>
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านต้องมีอักขระพิเศษ (!@#$%^&* ฯลฯ) อย่างน้อย 1 ตัว</span>
+                                </div>
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านไม่ควรมีลำดับตัวอักษรที่ง่ายเดา</span>
+                                </div>
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านไม่ควรมีตัวอักษรซ้ำติดกันมากกว่า 2 ตัว</span>
+                                </div>
+                                <div class="requirement-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>รหัสผ่านไม่ควรมีตัวเลขเรียงกัน</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row full-width">
+                    <div class="form-group">
+                        <label for="confirmNewPassword">
+                            <i class="fas fa-check-circle"></i>
+                            ยืนยันรหัสผ่าน
+                        </label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="ยืนยันรหัสผ่านใหม่">
+                            <button type="button" class="toggle-password" onclick="togglePassword('confirmNewPassword')">
+                                <i class="fas fa-eye" id="confirmNewPassword-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <% if (errors && errors.length > 0) { %>
             <div class="error-messages">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>พบข้อผิดพลาด:</strong>
                 <% errors.forEach(error => { %>
-                <p class="error"><%= error %></p>
+                <p class="error">• <%= error %></p>
                 <% }); %>
             </div>
             <% } %>
             
-            <% if (req.query.success === 'update') { %>
+            <% if (message) { %>
             <div class="success-message">
-                <p>อัพเดทข้อมูลเรียบร้อยแล้ว</p>
+                <i class="fas fa-check-circle"></i>
+                <%= message %>
             </div>
             <% } %>
             
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">บันทึก</button>
-                <a href="/index" class="btn btn-secondary">ยกเลิก</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    บันทึกการเปลี่ยนแปลง
+                </button>
+                <a href="/index" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    ยกเลิก
+                </a>
             </div>
         </form>
         <% } else { %>
-        <p>ไม่พบข้อมูลผู้ใช้</p>
+        <div class="profile-form">
+            <div class="error-messages">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>ไม่พบข้อมูลผู้ใช้</strong>
+                <p class="error">กรุณาล็อกอินใหม่</p>
+            </div>
+            <div class="form-actions">
+                <a href="/login" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    เข้าสู่ระบบ
+                </a>
+            </div>
+        </div>
         <% } %>
     </div>
 </body>
+<script>
+    // Toggle password visibility
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const eye = document.getElementById(fieldId + '-eye');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            eye.classList.remove('fa-eye');
+            eye.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            eye.classList.remove('fa-eye-slash');
+            eye.classList.add('fa-eye');
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmNewPassword');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+        
+        // ฟังก์ชันตรวจสอบความแข็งแกร่งของรหัสผ่าน
+        function checkPasswordStrength(password) {
+            let score = 0;
+            let feedback = [];
+            
+            // ตรวจสอบความยาว
+            if (password.length >= 8) score += 1;
+            else feedback.push('ความยาวอย่างน้อย 8 ตัวอักษร');
+            
+            // ตรวจสอบตัวพิมพ์เล็ก
+            if (/[a-z]/.test(password)) score += 1;
+            else feedback.push('ตัวพิมพ์เล็ก (a-z)');
+            
+            // ตรวจสอบตัวพิมพ์ใหญ่
+            if (/[A-Z]/.test(password)) score += 1;
+            else feedback.push('ตัวพิมพ์ใหญ่ (A-Z)');
+            
+            // ตรวจสอบตัวเลข
+            if (/[0-9]/.test(password)) score += 1;
+            else feedback.push('ตัวเลข (0-9)');
+            
+            // ตรวจสอบอักขระพิเศษ
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)) score += 1;
+            else feedback.push('อักขระพิเศษ (!@#$%^&*)');
+            
+            return { score, feedback };
+        }
+        
+        // ฟังก์ชันอัปเดตแถบความปลอดภัย
+        function updateStrengthBar(password) {
+            if (password.length === 0) {
+                passwordStrength.style.display = 'none';
+                return;
+            }
+            
+            passwordStrength.style.display = 'block';
+            const { score, feedback } = checkPasswordStrength(password);
+            
+            // ลบ class เก่าออก
+            strengthFill.className = 'strength-fill';
+            strengthText.className = 'strength-text';
+            
+            if (score <= 1) {
+                strengthFill.classList.add('weak');
+                strengthText.classList.add('weak');
+                strengthText.textContent = 'ความปลอดภัย: อ่อนแอ';
+            } else if (score <= 2) {
+                strengthFill.classList.add('fair');
+                strengthText.classList.add('fair');
+                strengthText.textContent = 'ความปลอดภัย: ปานกลาง';
+            } else if (score <= 3) {
+                strengthFill.classList.add('good');
+                strengthText.classList.add('good');
+                strengthText.textContent = 'ความปลอดภัย: ดี';
+            } else {
+                strengthFill.classList.add('strong');
+                strengthText.classList.add('strong');
+                strengthText.textContent = 'ความปลอดภัย: แข็งแกร่ง';
+            }
+        }
+        
+        // ฟังก์ชันแสดง/ซ่อนข้อกำหนดรหัสผ่าน
+        function togglePasswordRequirements(show) {
+            if (show) {
+                passwordRequirements.style.display = 'block';
+            } else {
+                passwordRequirements.style.display = 'none';
+            }
+        }
+        
+        // ฟังก์ชันเช็คว่ารหัสผ่านตรงกัน
+        function checkPasswordMatch() {
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword.length === 0) return;
+            
+            if (newPassword === confirmPassword) {
+                confirmPasswordInput.style.borderColor = '#00aa00';
+                confirmPasswordInput.style.backgroundColor = '#f0fff0';
+            } else {
+                confirmPasswordInput.style.borderColor = '#ff4444';
+                confirmPasswordInput.style.backgroundColor = '#fff0f0';
+            }
+        }
+        
+        // Event listeners
+        newPasswordInput.addEventListener('focus', function() {
+            togglePasswordRequirements(true);
+        });
+        
+        newPasswordInput.addEventListener('blur', function() {
+            if (this.value.length === 0) {
+                togglePasswordRequirements(false);
+            }
+        });
+        
+        newPasswordInput.addEventListener('input', function() {
+            updateStrengthBar(this.value);
+            checkPasswordMatch();
+        });
+        
+        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    });
+</script>
 </html>

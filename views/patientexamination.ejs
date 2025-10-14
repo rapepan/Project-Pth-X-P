@@ -32,6 +32,14 @@
         <% if (typeof patient !== 'undefined' && patient) { %>
             <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
             <a href="/patientexamination/<%= patient.HN %>" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
+            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
+                <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
+                <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+                <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
+            <% } %>
+            <!-- เมนูสำหรับทุกคน -->
+            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
             <a href="/examinationroom"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% } %>
@@ -223,14 +231,14 @@
                             <label for="dtr-normal">Normal of</label>
                         </div>
                         <div class="detail-input-container">
-                            <input type="text" name="deepTendonReflexNotes1" class="detail-input" data-toggle="dtr-normal" placeholder="ระบุเส้นประสาทที่ตรวจ เช่น Bicep, Tricep, Knee jerk">
+                            <input type="text" name="deepTendonReflexNotes1" class="detail-input" data-toggle="dtr-normal" placeholder="ระบุตำแหน่ง">
                         </div>
                         <div class="radio-option">
                             <input type="checkbox" name="abnormalDTR" id="dtr-abnormal" value="1">
                             <label for="dtr-abnormal">Abnormal of</label>
                         </div>
                         <div class="detail-input-container">
-                            <input type="text" name="deepTendonReflexNotes2" class="detail-input" data-toggle="dtr-abnormal" placeholder="ระบุเส้นประสาทและลักษณะความผิดปกติ">
+                            <input type="text" name="deepTendonReflexNotes2" class="detail-input" data-toggle="dtr-abnormal" placeholder="ระบุตำแหน่ง">
                         </div>
                     </div>
 

@@ -144,6 +144,37 @@ class PatientController {
     });
   }
 
+  // API สำหรับค้นหาผู้ป่วยด้วย HN (สำหรับ appointment form)
+  static searchPatientByHN(req, res) {
+    const HN = req.query.q;
+    
+    if (!HN || HN.trim() === '') {
+      return res.json([]);
+    }
+
+    PatientModel.getPatientByHN(HN.trim(), (err, results) => {
+      if (err) {
+        console.error("Error searching patient:", err);
+        return res.status(500).json({ error: 'ไม่สามารถค้นหาข้อมูลผู้ป่วยได้' });
+      }
+
+      if (results.length === 0) {
+        return res.json([]);
+      }
+
+      // ส่งข้อมูลผู้ป่วยในรูปแบบที่ appointment form ต้องการ
+      const patient = results[0];
+      const patientData = {
+        HN: patient.HN,
+        fullname: `${patient.fname} ${patient.lname}`,
+        phone: patient.phone || '',
+        address: `${patient.housenumber} ${patient.moo || ''} ${patient.soi || ''} ${patient.subdistrict} ${patient.district} ${patient.province} ${patient.postcode}`.trim()
+      };
+
+      res.json([patientData]);
+    });
+  }
+
   // Prepare patient data - จัดการข้อมูลให้พร้อมบันทึก
   static preparePatientData(data) {
     const preparedData = { ...data };

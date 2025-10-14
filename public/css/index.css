@@ -181,7 +181,13 @@ body {
 }
 
 /* ========== Logout Button ========== */
-.logout-btn {
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-btn, .logout-btn {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     padding: 0.65rem 1.5rem;
@@ -197,14 +203,19 @@ body {
     font-size: 0.95rem;
 }
 
-.logout-btn:hover {
+.profile-btn {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.profile-btn:hover, .logout-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-.logout-btn:active {
+.profile-btn:active, .logout-btn:active {
     transform: translateY(0);
 }
 

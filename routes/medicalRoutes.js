@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const MedicalController = require('../controllers/medicalController');
-const { checkRole } = require('../middleware/authMiddleware');
+const { checkRole, checkStaff, checkNotStaff } = require('../middleware/authMiddleware');
 
-// Examination room routes
-router.get("/examinationroom/:HN?", checkRole("user"), MedicalController.showExaminationRoom);
+// Examination room routes - Staff เข้าถึงได้
+router.get("/examinationroom/:HN?", checkStaff, MedicalController.showExaminationRoom);
 
-// Medical form routes
-router.get("/medicalFrom/:HN?", checkRole("user"), MedicalController.showMedicalForm);
-router.post("/medicalFrom/:HN", checkRole("user"), MedicalController.saveMedicalForm);
+// Medical form routes - Staff เข้าถึงได้
+router.get("/medicalFrom/:HN?", checkStaff, MedicalController.showMedicalForm);
+router.post("/medicalFrom/:HN", checkStaff, MedicalController.saveMedicalForm);
 
-// Medical history routes
-router.get("/medicalHistory/:HN", checkRole("user"), MedicalController.showMedicalHistory);
-router.get("/medicaHistorydate", checkRole("user"), MedicalController.showMedicalHistoryByDate);
+// Medical history routes - Staff เข้าถึงได้
+router.get("/medicalHistory/:HN", checkStaff, MedicalController.showMedicalHistory);
+router.get("/medicaHistorydate", checkStaff, MedicalController.showMedicalHistoryByDate);
 
 module.exports = router;  

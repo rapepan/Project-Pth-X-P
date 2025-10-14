@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const PTDataController = require('../controllers/ptDataController');
-const { checkRole } = require('../middleware/authMiddleware');
+const { checkRole, checkStaff, checkNotStaff } = require('../middleware/authMiddleware');
 
 // ==================== PT Data Management Routes ====================
 
-// แสดงหน้า PT Data
-router.get("/ptData/:HN?", checkRole('user'), PTDataController.showPTDataPage);
+// แสดงหน้า PT Data - Staff เข้าถึงไม่ได้
+router.get("/ptData/:HN?", checkNotStaff, PTDataController.showPTDataPage);
 
-// บันทึก PT Data
-router.post("/ptData/:HN", checkRole('user'), PTDataController.savePTData);
+// บันทึก PT Data - Staff เข้าถึงไม่ได้
+router.post("/ptData/:HN", checkNotStaff, PTDataController.savePTData);
 
-// แสดงประวัติ PT Data
-router.get("/ptDataHistory/:HN", checkRole('user'), PTDataController.showPTDataHistory);
+// แสดงประวัติ PT Data - Staff เข้าถึงไม่ได้
+router.get("/ptDataHistory/:HN", checkNotStaff, PTDataController.showPTDataHistory);
 
-// แสดงรายละเอียด PT Data
-router.get("/ptDataDetail/:HN/:dataId", checkRole('user'), PTDataController.showPTDataDetail);
+// แสดงรายละเอียด PT Data - Staff เข้าถึงไม่ได้
+router.get("/ptDataDetail/:HN/:dataId", checkNotStaff, PTDataController.showPTDataDetail);
 
 // อัปเดต PT Data (ใช้ form submit)
 router.post("/ptData/:HN/:dataId/update", checkRole(['admin', 'doctor']), PTDataController.updatePTData);
@@ -23,19 +23,19 @@ router.post("/ptData/:HN/:dataId/update", checkRole(['admin', 'doctor']), PTData
 // ลบ PT Data (ใช้ form submit)
 router.post("/ptData/:HN/:dataId/delete", checkRole('admin'), PTDataController.deletePTData);
 
-// ติดตามความก้าวหน้า (ใช้ form submit)
-router.post("/ptData/progress/:HN", checkRole('user'), PTDataController.getProgressTracking);
+// ติดตามความก้าวหน้า (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/ptData/progress/:HN", checkNotStaff, PTDataController.getProgressTracking);
 
-// เปรียบเทียบผลลัพธ์ (ใช้ form submit)
-router.post("/ptData/compare", checkRole('user'), PTDataController.compareResults);
+// เปรียบเทียบผลลัพธ์ (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/ptData/compare", checkNotStaff, PTDataController.compareResults);
 
-// บันทึกเป้าหมาย (ใช้ form submit)
-router.post("/ptData/goals/:HN", checkRole('user'), PTDataController.saveGoals);
+// บันทึกเป้าหมาย (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/ptData/goals/:HN", checkNotStaff, PTDataController.saveGoals);
 
-// ดูเป้าหมาย
-router.get("/ptData/goals/:HN", checkRole('user'), PTDataController.getGoals);
+// ดูเป้าหมาย - Staff เข้าถึงไม่ได้
+router.get("/ptData/goals/:HN", checkNotStaff, PTDataController.getGoals);
 
-// อัปเดตความก้าวหน้าเป้าหมาย (ใช้ form submit)
-router.post("/ptData/goals/:goalId/update", checkRole('user'), PTDataController.updateGoalProgress);
+// อัปเดตความก้าวหน้าเป้าหมาย (ใช้ form submit) - Staff เข้าถึงไม่ได้
+router.post("/ptData/goals/:goalId/update", checkNotStaff, PTDataController.updateGoalProgress);
 
 module.exports = router;

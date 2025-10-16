@@ -9,6 +9,7 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 const LocalStrategy = require("passport-local").Strategy;
 const methodOverride = require('method-override');
+const flash = require('connect-flash');
 
 // Import routes
 const authRoutes = require("./routes/authRoutes");
@@ -72,6 +73,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Flash messages middleware
+app.use(flash());
+
 // Passport LocalStrategy
 passport.use(
   new LocalStrategy((username, password, done) => {
@@ -106,9 +110,11 @@ passport.deserializeUser((id, done) => {
   });
 });
 
-// Global middleware to make user available in all views
+// Global middleware to make user and flash messages available in all views
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
   next();
 });
 

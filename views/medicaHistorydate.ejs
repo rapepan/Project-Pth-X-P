@@ -10,7 +10,13 @@
 </head>
 <body>
     <header>
-        <h1><i class="fas fa-calendar-check"></i> <%= title %></h1>
+        <div class="header-content">
+            <button class="back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+                <span>ย้อนกลับ</span>
+            </button>
+            <h1><i class="fas fa-calendar-check"></i> <%= title %></h1>
+        </div>
     </header>
 
     <nav>
@@ -68,7 +74,7 @@
             </div>
         <% } %>
 
-        <!-- แสดงประวัติการรักษา -->
+        <!-- กรอบข้อมูลพื้นฐาน -->
         <% if (medicalHistory && medicalHistory.length > 0) { %>
             <% medicalHistory.forEach(function(record) { %>
                 <div class="patient-entry">
@@ -91,7 +97,6 @@
                                 <%= recordDay %>/<%= recordMonth %>/<%= recordYear %>
                             </div>
                         </div>
-
                     </div>
 
                     <h4>
@@ -162,10 +167,441 @@
                     </div>
                 </div>
             <% }); %>
-        <% } else if (patient) { %>
+        <% } %>
+
+        <!-- กรอบประวัติการตรวจร่างกาย -->
+        <% if (examinationHistory && examinationHistory.length > 0 && user.role !== 'staff') { %>
+            <div class="examination-section">
+                <h4>
+                    <i class="fas fa-stethoscope"></i> ประวัติการตรวจร่างกาย
+                </h4>
+                <% examinationHistory.forEach(function(examRecord, index) { %>
+                    <div class="examination-item fade-in" data-animation-delay="<%= (index * 0.1) + 0.2 %>">
+                        <div class="examination-header">
+                            <h3><i class="fas fa-clipboard-list"></i> การตรวจครั้งที่ <%= index + 1 %></h3>
+                            <div class="examination-date">
+                                <i class="fas fa-calendar-alt"></i>
+                                <% 
+                                    const examDate = new Date(examRecord.created_at || examRecord.date);
+                                    const examDay = examDate.getDate();
+                                    const examMonth = examDate.getMonth() + 1;
+                                    const examYear = examDate.getFullYear() + 543;
+                                    const examTime = examDate.toTimeString().slice(0, 5);
+                                %>
+                                <%= examDay %>/<%= examMonth %>/<%= examYear %> <%= examTime %>
+                            </div>
+                        </div>
+
+                        <!-- Observation & Palpation -->
+                        <div class="form-section">
+                            <h4><i class="fas fa-eye"></i> การสังเกต (Observation) และการคลำ (Palpation)</h4>
+                            <div class="form-group">
+                                <label><i class="fas fa-eye"></i> การสังเกต (Observation)</label>
+                                <div class="readonly-field">
+                                    <%= examRecord.observation || 'ไม่ระบุ' %>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-hand-paper"></i> การคลำ (Palpation)</label>
+                                <div class="readonly-field">
+                                    <%= examRecord.palpation || 'ไม่ระบุ' %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Range of Motion & Movement Tests -->
+                        <div class="form-section">
+                            <h4><i class="fas fa-running"></i> การทดสอบการเคลื่อนไหว</h4>
+                            
+                            <!-- ROM Test -->
+                            <div class="form-group">
+                                <label><i class="fas fa-arrows-alt"></i> ROM (Range of Motion)</label>
+                                <div class="readonly-field">
+                                    <% if (examRecord.rom && examRecord.rom.wnl) { %>
+                                        <span class="status-badge wnl">WNL (Within Normal Limits)</span>
+                                    <% } %>
+                                    <% if (examRecord.rom && examRecord.rom.weakness) { %>
+                                        <span class="status-badge limited">Limited</span>
+                                        <% if (examRecord.rom.notes) { %>
+                                            <span class="notes"> - <%= examRecord.rom.notes %></span>
+                                        <% } %>
+                                    <% } %>
+                                    <% if (!examRecord.rom || (!examRecord.rom.wnl && !examRecord.rom.weakness)) { %>
+                                        <span class="no-data">ไม่ระบุ</span>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- MMT Test -->
+                            <div class="form-group">
+                                <label><i class="fas fa-dumbbell"></i> MMT (Manual Muscle Testing)</label>
+                                <div class="readonly-field">
+                                    <% if (examRecord.mmt && examRecord.mmt.normal) { %>
+                                        <span class="status-badge normal">Normal</span>
+                                    <% } %>
+                                    <% if (examRecord.mmt && examRecord.mmt.limited) { %>
+                                        <span class="status-badge weakness">Weakness</span>
+                                        <% if (examRecord.mmt.notes) { %>
+                                            <span class="notes"> - <%= examRecord.mmt.notes %></span>
+                                        <% } %>
+                                    <% } %>
+                                    <% if (!examRecord.mmt || (!examRecord.mmt.normal && !examRecord.mmt.limited)) { %>
+                                        <span class="no-data">ไม่ระบุ</span>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Accessory Movement -->
+                            <div class="form-group">
+                                <label><i class="fas fa-hand-holding-heart"></i> Accessory Movement</label>
+                                <div class="readonly-field simple-field">
+                                    <% if (examRecord.accessory && examRecord.accessory.notes) { %>
+                                        <% 
+                                            const accessoryText = examRecord.accessory.notes;
+                                            let displayText = accessoryText;
+                                            let badgeClass = '';
+                                            
+                                            if (accessoryText.toLowerCase().includes('hypomobility')) {
+                                                badgeClass = 'hypomobility';
+                                                displayText = 'Hypomobility';
+                                            } else if (accessoryText.toLowerCase().includes('hypermobility')) {
+                                                badgeClass = 'hypermobility';
+                                                displayText = 'Hypermobility';
+                                            } else if (accessoryText.toLowerCase().includes('normal')) {
+                                                badgeClass = 'normal';
+                                                displayText = 'Normal';
+                                            }
+                                        %>
+                                        <% if (badgeClass) { %>
+                                            <span class="status-badge <%= badgeClass %>"><%= displayText %></span>
+                                            <% if (accessoryText !== displayText) { %>
+                                                <span class="notes"> - <%= accessoryText %></span>
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= accessoryText %>
+                                        <% } %>
+                                    <% } else { %>
+                                        ไม่ระบุ
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Tests -->
+                        <div class="form-section">
+                            <h4><i class="fas fa-clipboard-check"></i> การทดสอบพิเศษ</h4>
+                            
+                            <!-- Sensory Test -->
+                            <div class="form-group">
+                                <label><i class="fas fa-hand-paper"></i> Sensory Test</label>
+                                <div class="readonly-field simple-field">
+                                        <% if (examRecord.sensory && examRecord.sensory.notes) { %>
+                                            <%= examRecord.sensory.notes %>
+                                        <% } else { %>
+                                            ไม่ระบุ
+                                        <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Deep Tendon Reflex -->
+                            <div class="form-group">
+                                <label><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</label>
+                                <div class="readonly-field">
+                                    <% if (examRecord.reflex && (examRecord.reflex.normal || examRecord.reflex.abnormal)) { %>
+                                        <% if (examRecord.reflex.normal) { %>
+                                            <span class="status-badge normal">Normal</span>
+                                        <% } %>
+                                        <% if (examRecord.reflex.abnormal) { %>
+                                            <span class="status-badge abnormal">Abnormal</span>
+                                        <% } %>
+                                        <% if (examRecord.reflex.notes) { %>
+                                            <span class="notes"> - <%= examRecord.reflex.notes %></span>
+                                        <% } %>
+                                    <% } else { %>
+                                        <span class="no-data">ไม่ระบุ</span>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Transfer -->
+                            <div class="form-group">
+                                <label><i class="fas fa-exchange-alt"></i> Transfer</label>
+                                <div class="readonly-field">
+                                    <% if (examRecord.transfer && examRecord.transfer.independent) { %>
+                                        <span class="status-badge independent">Independent</span>
+                                    <% } %>
+                                    <% if (examRecord.transfer && examRecord.transfer.dependent) { %>
+                                        <span class="status-badge dependent">Dependent</span>
+                                        <% if (examRecord.transfer.notes) { %>
+                                            <span class="notes"> - <%= examRecord.transfer.notes %></span>
+                                        <% } %>
+                                    <% } %>
+                                    <% if (!examRecord.transfer || (!examRecord.transfer.independent && !examRecord.transfer.dependent)) { %>
+                                        <span class="no-data">ไม่ระบุ</span>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Ambulation -->
+                            <div class="form-group">
+                                <label><i class="fas fa-walking"></i> Ambulation</label>
+                                <div class="readonly-field">
+                                    <% if (examRecord.ambulation && examRecord.ambulation.independent) { %>
+                                        <span class="status-badge independent">Independent</span>
+                                    <% } %>
+                                    <% if (examRecord.ambulation && examRecord.ambulation.dependent) { %>
+                                        <span class="status-badge dependent">Dependent</span>
+                                        <% if (examRecord.ambulation.notes) { %>
+                                            <span class="notes"> - <%= examRecord.ambulation.notes %></span>
+                                        <% } %>
+                                    <% } %>
+                                    <% if (!examRecord.ambulation || (!examRecord.ambulation.independent && !examRecord.ambulation.dependent)) { %>
+                                        <span class="no-data">ไม่ระบุ</span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <% if (examRecord.notes) { %>
+                            <div class="form-section">
+                                <h4><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</h4>
+                                <div class="form-group">
+                                    <div class="readonly-field">
+                                        <%= examRecord.notes %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <!-- กรอบประวัติการวินิจฉัย -->
+        <% if (diagnosisHistory && diagnosisHistory.length > 0 && user.role !== 'staff') { %>
+            <div class="diagnosis-section">
+                <h4>
+                    <i class="fas fa-clipboard-check"></i> ประวัติการวินิจฉัย
+                </h4>
+                <% diagnosisHistory.forEach(function(diagRecord) { %>
+                    <div class="diagnosis-item">
+                        <div class="patient-row">
+                            <div>
+                                <div class="patient-label">รหัส ICD-10:</div>
+                                <div class="patient-value"><%= diagRecord.icd10_code || "-" %></div>
+                            </div>
+                            <div>
+                                <div class="patient-label">ชื่อโรค:</div>
+                                <div class="patient-value"><%= diagRecord.icd10_description || "-" %></div>
+                            </div>
+                        </div>
+                        
+                        <% if (diagRecord.prognosis) { %>
+                            <div class="patient-row2">
+                                <div>
+                                    <div class="patient-label2">การพยากรณ์โรค:</div>
+                                    <div class="patient-value2"><%= diagRecord.prognosis %></div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <% if (diagRecord.treatment_plan) { %>
+                            <div class="patient-row2">
+                                <div>
+                                    <div class="patient-label2">แผนการรักษา:</div>
+                                    <div class="patient-value2"><%= diagRecord.treatment_plan %></div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <% if (diagRecord.notes) { %>
+                            <div class="patient-row2">
+                                <div>
+                                    <div class="patient-label2">หมายเหตุ:</div>
+                                    <div class="patient-value2"><%= diagRecord.notes %></div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <!-- กรอบหัตถการ -->
+        <% if (procedureHistory && procedureHistory.length > 0 && user.role !== 'staff') { %>
+            <div class="procedure-section">
+                <h4>
+                    <i class="fas fa-tools"></i> หัตถการ
+                </h4>
+                <% procedureHistory.forEach(function(procRecord) { %>
+                    <div class="procedure-item">
+                        <div class="patient-row">
+                            <div>
+                                <div class="patient-label">ชื่อหัตถการ:</div>
+                                <div class="patient-value"><%= procRecord.procedure_name || "-" %></div>
+                            </div>
+                            <div>
+                                <div class="patient-label">รหัสหัตถการ:</div>
+                                <div class="patient-value"><%= procRecord.procedure_code || "-" %></div>
+                            </div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div>
+                                <div class="patient-label">เทคนิค:</div>
+                                <div class="patient-value"><%= procRecord.technique || "-" %></div>
+                            </div>
+                            <div>
+                                <div class="patient-label">ระยะเวลา:</div>
+                                <div class="patient-value"><%= procRecord.duration_minutes ? procRecord.duration_minutes + ' นาที' : "-" %></div>
+                            </div>
+                        </div>
+
+                        <% if (procRecord.therapist_name) { %>
+                            <div class="patient-row">
+                                <div>
+                                    <div class="patient-label">นักกายภาพบำบัด:</div>
+                                    <div class="patient-value"><%= procRecord.therapist_name %></div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <% if (procRecord.effectiveness) { %>
+                            <div class="patient-row">
+                                <div>
+                                    <div class="patient-label">ประสิทธิผล:</div>
+                                    <div class="patient-value">
+                                        <% if (procRecord.effectiveness === 'good') { %>
+                                            <span class="effectiveness-badge good">ดีขึ้น</span>
+                                        <% } else if (procRecord.effectiveness === 'fair') { %>
+                                            <span class="effectiveness-badge fair">แย่ลง</span>
+                                        <% } else if (procRecord.effectiveness === 'poor') { %>
+                                            <span class="effectiveness-badge poor">คงเดิม</span>
+                                        <% } else if (procRecord.effectiveness === 'unknown') { %>
+                                            <span class="effectiveness-badge unknown">ยังประเมินไม่ได้</span>
+                                        <% } else { %>
+                                            <span class="effectiveness-badge"><%= procRecord.effectiveness %></span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <% if (procRecord.notes) { %>
+                            <div class="patient-row2">
+                                <div>
+                                    <div class="patient-label2">หมายเหตุ:</div>
+                                    <div class="patient-value2"><%= procRecord.notes %></div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <% if (procRecord.session_count && procRecord.session_count > 1) { %>
+                            <div class="patient-row">
+                                <div>
+                                    <div class="patient-label">ครั้งที่:</div>
+                                    <div class="patient-value">
+                                        <span class="session-count">ครั้งที่ <%= procRecord.session_count %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <!-- กรอบข้อมูลสรุปผลการรักษา (PT Data) -->
+        <% if (ptDataHistory && ptDataHistory.length > 0 && user.role !== 'staff') { %>
+            <div class="pt-data-section">
+                <h4>
+                    <i class="fas fa-clipboard-medical"></i> สรุปผลการรักษา (กายภาพบำบัด)
+                </h4>
+                <% ptDataHistory.forEach(function(ptRecord) { %>
+                    <div class="pt-data-item">
+                        <div class="patient-row">
+                            <div>
+                                <div class="patient-label">ประเภทการประเมิน:</div>
+                                <div class="patient-value"><%= ptRecord.assessment_type || "-" %></div>
+                            </div>
+                            <div>
+                                <div class="patient-label">ผู้ประเมิน:</div>
+                                <div class="patient-value"><%= ptRecord.assessor || "-" %></div>
+                            </div>
+                        </div>
+
+                        <div class="patient-row">
+                            <div>
+                                <div class="patient-label">วันที่ประเมิน:</div>
+                                <div class="patient-value">
+                                    <% 
+                                        if (ptRecord.assessment_date && 
+                                            ptRecord.assessment_date !== null && 
+                                            ptRecord.assessment_date !== undefined && 
+                                            ptRecord.assessment_date !== 'null' && 
+                                            ptRecord.assessment_date !== 'undefined') {
+                                            try {
+                                                let assessDate;
+                                                // ลองแปลงวันที่หลายรูปแบบ
+                                                const dateStr = String(ptRecord.assessment_date);
+                                                if (dateStr.indexOf('-') !== -1) {
+                                                    assessDate = new Date(dateStr + 'T00:00:00');
+                                                } else if (dateStr.indexOf('/') !== -1) {
+                                                    assessDate = new Date(dateStr);
+                                                } else {
+                                                    assessDate = new Date(dateStr);
+                                                }
+                                                
+                                                // ตรวจสอบว่าวันที่ถูกต้องหรือไม่
+                                                if (!isNaN(assessDate.getTime()) && assessDate.getFullYear() > 1900) {
+                                                    const assessDay = assessDate.getDate();
+                                                    const assessMonth = assessDate.getMonth() + 1;
+                                                    const assessYear = assessDate.getFullYear() + 543;
+                                    %>
+                                                    <%= assessDay %>/<%= assessMonth %>/<%= assessYear %>
+                                                <% } else { %>
+                                                    <%= dateStr %>
+                                                <% } %>
+                                            <% } catch (error) { %>
+                                                <%= String(ptRecord.assessment_date) %>
+                                            <% } %>
+                                        <% } else { %>
+                                            -
+                                        <% } %>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="patient-label">ครั้งที่:</div>
+                                <div class="patient-value">
+                                    <% if (ptRecord.session_number && ptRecord.session_number > 1) { %>
+                                        <span class="session-count">ครั้งที่ <%= ptRecord.session_number %></span>
+                                    <% } else { %>
+                                        ครั้งที่ 1
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if (ptRecord.observations) { %>
+                            <div class="patient-row2">
+                                <div>
+                                    <div class="patient-label2">ผลการประเมิน/สังเกตการณ์:</div>
+                                    <div class="patient-value2"><%= ptRecord.observations %></div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+
+        <% if (!medicalHistory || medicalHistory.length === 0) { %>
+            <% if (patient) { %>
             <div class="notice warning">
                 <i class="fas fa-exclamation-triangle"></i> ไม่พบข้อมูลประวัติในช่วงวันที่เลือก
             </div>
+            <% } %>
         <% } %>
     </div>
 
@@ -176,6 +612,24 @@
             if (hnInput.value.trim() !== '') {
                 this.form.submit();
             }
+        });
+
+        // Examination items functionality (from examinationHistory.ejs)
+        document.addEventListener('DOMContentLoaded', function() {
+            const examinationItems = document.querySelectorAll('.examination-item');
+            examinationItems.forEach((item, index) => {
+                // Add click handler to header for collapsing
+                const header = item.querySelector('.examination-header');
+                if (header) {
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', function() {
+                        const content = item.querySelector('.form-section');
+                        if (content) {
+                            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                        }
+                    });
+                }
+            });
         });
     </script>
 </body>

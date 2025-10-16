@@ -200,6 +200,7 @@ nav {
     display: flex;
     gap: 0;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 nav a {
@@ -533,12 +534,12 @@ nav a.active {
 }
 
 .btn-procedure.primary {
-    background: linear-gradient(135deg, var(--success-color) 0%, #388E3C 100%);
+    background: var(--primary-color);
     color: white;
 }
 
 .btn-procedure.secondary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: #EF5350;
     color: white;
 }
 

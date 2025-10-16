@@ -6,23 +6,35 @@ class PTDataController {
     const HN = req.params.HN;
 
     if (HN) {
-      PTDataModel.getPatientPTData(HN, (err, ptData) => {
+      // ดึงข้อมูลผู้ป่วยและข้อมูล PT Data พร้อมกัน
+      PTDataModel.getPatientInfo(HN, (err, patientInfo) => {
         if (err) {
           return res.status(500).render('error', {
             title: "Error",
             statusCode: 500,
-            message: "ไม่สามารถดึงข้อมูลได้",
+            message: "ไม่สามารถดึงข้อมูลผู้ป่วยได้",
             error: err
           });
         }
 
-        res.render("ptData", {
-          title: "สรุปผลการรักษา",
-          HN: HN,
-          patient: { HN: HN },
-          ptData: ptData || [],
-          success: req.query.success,
-          error: req.query.error
+        PTDataModel.getPatientPTData(HN, (err, ptData) => {
+          if (err) {
+            return res.status(500).render('error', {
+              title: "Error",
+              statusCode: 500,
+              message: "ไม่สามารถดึงข้อมูลได้",
+              error: err
+            });
+          }
+
+          res.render("ptData", {
+            title: "สรุปผลการรักษา",
+            HN: HN,
+            patient: patientInfo,
+            ptData: ptData || [],
+            success: req.query.success,
+            error: req.query.error
+          });
         });
       });
     } else {
@@ -41,8 +53,9 @@ class PTDataController {
   static savePTData(req, res) {
     const HN = req.params.HN;
     const ptData = req.body;
+    const createdBy = req.user ? req.user.fullname || req.user.username : null;
 
-    PTDataModel.createPTData(HN, ptData, (err, result) => {
+    PTDataModel.createPTData(HN, ptData, createdBy, (err, result) => {
       if (err) {
         return res.redirect(`/ptData/${HN}?error=${encodeURIComponent(err.message)}`);
       }
@@ -125,77 +138,6 @@ class PTDataController {
     });
   }
 
-  // ติดตามความก้าวหน้า
-  static getProgressTracking(req, res) {
-    const HN = req.params.HN;
-
-    PTDataModel.getProgressTracking(HN, (err, progress) => {
-      if (err) {
-        return res.redirect(`/ptData/${HN}?error=${encodeURIComponent(err.message)}`);
-      }
-      res.redirect(`/ptData/${HN}?success=ดึงข้อมูลความก้าวหน้าเรียบร้อย&progress=${JSON.stringify(progress)}`);
-    });
-  }
-
-  // เปรียบเทียบผลลัพธ์
-  static compareResults(req, res) {
-    const { dataId1, dataId2 } = req.body;
-
-    PTDataModel.compareResults(dataId1, dataId2, (err, comparison) => {
-      if (err) {
-        return res.redirect(`/ptData?error=${encodeURIComponent(err.message)}`);
-      }
-      res.redirect(`/ptData?success=เปรียบเทียบผลลัพธ์เรียบร้อย&comparison=${JSON.stringify(comparison)}`);
-    });
-  }
-
-  // บันทึกเป้าหมาย
-  static saveGoals(req, res) {
-    const HN = req.params.HN;
-    const goalsData = req.body;
-
-    PTDataModel.saveGoals(HN, goalsData, (err, result) => {
-      if (err) {
-        return res.redirect(`/ptData/${HN}?error=${encodeURIComponent(err.message)}`);
-      }
-      res.redirect(`/ptData/${HN}?success=บันทึกเป้าหมายเรียบร้อย`);
-    });
-  }
-
-  // ดูเป้าหมาย
-  static getGoals(req, res) {
-    const HN = req.params.HN;
-    
-    PTDataModel.getGoals(HN, (err, goals) => {
-      if (err) {
-        return res.status(500).render('error', { 
-          message: "ไม่สามารถดึงข้อมูลได้",
-          error: err 
-        });
-      }
-      
-      res.render("ptDataGoals", {
-        title: "เป้าหมายการรักษา",
-        HN: HN,
-        goals: goals || [],
-        success: req.query.success,
-        error: req.query.error
-      });
-    });
-  }
-
-  // อัปเดตความก้าวหน้าเป้าหมาย
-  static updateGoalProgress(req, res) {
-    const goalId = req.params.goalId;
-    const { progress } = req.body;
-
-    PTDataModel.updateGoalProgress(goalId, progress, (err, result) => {
-      if (err) {
-        return res.redirect(`/ptDataGoals/${req.params.HN}?error=${encodeURIComponent(err.message)}`);
-      }
-      res.redirect(`/ptDataGoals/${req.params.HN}?success=อัปเดตความก้าวหน้าเรียบร้อย`);
-    });
-  }
 }
 
 module.exports = PTDataController;

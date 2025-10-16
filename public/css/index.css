@@ -449,19 +449,18 @@ body {
 }
 
 .revenue-stat {
-    background: linear-gradient(135deg, var(--secondary-color), #FF7043);
-    box-shadow: 0 4px 12px rgba(255, 138, 101, 0.3);
+    background: linear-gradient(135deg, #00BCD4, #0097A7);
+    box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
 }
 
-
 .billing-stat {
-    background: linear-gradient(135deg, #4CAF50, #45A049);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
 }
 
 .new-patients-stat {
-    background: linear-gradient(135deg, #FF5722, #E64A19);
-    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+    background: linear-gradient(135deg, #E91E63, #C2185B);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
 }
 
 .stat-details {
@@ -610,25 +609,25 @@ body {
 }
 
 .appointments-card:hover {
-    border-color: var(--primary-color);
+    border-color: #7F8CAA;
 }
 
 .appointments-card .icon-wrapper {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    box-shadow: 0 6px 20px rgba(0, 137, 123, 0.35);
+    background: linear-gradient(135deg, #7F8CAA, #6A7895);
+    box-shadow: 0 6px 20px rgba(127, 140, 170, 0.35);
 }
 
 .appointments-card:hover .icon-wrapper {
-    box-shadow: 0 8px 30px rgba(0, 137, 123, 0.5);
+    box-shadow: 0 8px 30px rgba(127, 140, 170, 0.5);
 }
 
 .appointments-card .btn-action {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    box-shadow: 0 4px 12px rgba(0, 137, 123, 0.3);
+    background: linear-gradient(135deg, #7F8CAA, #6A7895);
+    box-shadow: 0 4px 12px rgba(127, 140, 170, 0.3);
 }
 
 .appointments-card .btn-action:hover {
-    box-shadow: 0 6px 20px rgba(0, 137, 123, 0.45);
+    box-shadow: 0 6px 20px rgba(127, 140, 170, 0.45);
 }
 
 .coming-soon-card {
@@ -700,6 +699,52 @@ body {
 
 .coming-soon-card:hover .icon-wrapper {
     box-shadow: 0 8px 30px rgba(255,138,101,0.4);
+}
+
+/* Admin Cards */
+.admin-card .icon-wrapper {
+    background: linear-gradient(135deg, #F5BABB, #E89A9B);
+    box-shadow: 0 6px 20px rgba(245, 186, 187, 0.35);
+}
+
+.admin-card:hover {
+    border-color: #F5BABB;
+}
+
+.admin-card:hover .icon-wrapper {
+    box-shadow: 0 8px 30px rgba(245, 186, 187, 0.5);
+}
+
+.admin-card .btn-action {
+    background: linear-gradient(135deg, #F5BABB, #E89A9B);
+    box-shadow: 0 4px 12px rgba(245, 186, 187, 0.3);
+}
+
+.admin-card .btn-action:hover {
+    box-shadow: 0 6px 20px rgba(245, 186, 187, 0.45);
+}
+
+/* Reports Cards */
+.reports-card .icon-wrapper {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.35);
+}
+
+.reports-card:hover {
+    border-color: #9C27B0;
+}
+
+.reports-card:hover .icon-wrapper {
+    box-shadow: 0 8px 30px rgba(156, 39, 176, 0.5);
+}
+
+.reports-card .btn-action {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.reports-card .btn-action:hover {
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.45);
 }
 
 /* ========== Card Content ========== */
@@ -1284,4 +1329,29 @@ body {
     .year-name {
         font-size: 0.55rem;
     }
+}
+
+/* ========== No Revenue Message ========== */
+.no-revenue-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.no-revenue-icon {
+    font-size: 4rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.no-revenue-message h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.no-revenue-message p {
+    font-size: 1rem;
+    line-height: 1.6;
 }

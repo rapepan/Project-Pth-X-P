@@ -28,24 +28,6 @@
     <nav>
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <a href="#" class="active"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
-        <% if (patient) { %>
-            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
-            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
-                <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-                <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-                <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-                <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
-            <% } %>
-            <!-- เมนูสำหรับทุกคน -->
-            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
-        <% } else { %>
-            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
-            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
-                <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-            <% } %>
-            <!-- เมนูสำหรับทุกคน -->
-            <a href="/patients"><i class="fas fa-search"></i> ค้นหาผู้ป่วย</a>
-        <% } %>
     </nav>
 
     <div class="container">
@@ -101,7 +83,7 @@
             <!-- Quick Actions -->
             <div class="section-header fade-in" style="animation-delay: 0.2s;">
                 <i class="fas fa-tasks"></i>
-                <h2>การดำเนินการ</h2>
+                <h2>เมนู</h2>
             </div>
 
             <div class="action-grid fade-in" style="animation-delay: 0.3s;">
@@ -118,22 +100,38 @@
                     <span>ตรวจร่างกาย</span>
                     <small>การตรวจทางกายภาพ</small>
                 </button>
-                <% } %>
                 
-                <button class="action-btn info" onclick="window.location.href='/medicalHistory/<%= patient.HN %>'">
+                <button class="action-btn warning" onclick="window.location.href='/diagnosis/<%= patient.HN %>'">
+                    <i class="fas fa-diagnoses"></i>
+                    <span>การวินิจฉัย</span>
+                    <small>วินิจฉัยโรคและอาการ</small>
+                </button>
+                
+                <button class="action-btn info" onclick="window.location.href='/procedure/<%= patient.HN %>'">
+                    <i class="fas fa-hand-holding-medical"></i>
+                    <span>หัตถการ</span>
+                    <small>การรักษาและหัตถการ</small>
+                </button>
+                
+                <button class="action-btn secondary" onclick="window.location.href='/ptdata/<%= patient.HN %>'">
+                    <i class="fas fa-chart-line"></i>
+                    <span>สรุปผลการรักษา</span>
+                    <small>สรุปผลการรักษา PT</small>
+                </button>
+                
+                <button class="action-btn danger" onclick="window.location.href='/billing/<%= patient.HN %>'">
+                    <i class="fas fa-calculator"></i>
+                    <span>สรุปค่าใช้จ่าย</span>
+                    <small>คำนวณค่าใช้จ่าย</small>
+                </button>
+                
+                <button class="action-btn light" onclick="window.location.href='/medicaHistorydate/<%= patient.HN %>'">
                     <i class="fas fa-history"></i>
-                    <span>ประวัติการรักษา</span>
-                    <small>ดูข้อมูลย้อนหลัง</small>
-                </button>
-                
-                <!-- ปุ่มสำหรับ Physical Therapist และ Admin เท่านั้น -->
-                <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
-                <button class="action-btn warning" onclick="window.location.href='/examinationHistory/<%= patient.HN %>'">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>ประวัติการตรวจ</span>
-                    <small>ผลการตรวจร่างกาย</small>
+                    <span>ดูประวัติ</span>
+                    <small>ประวัติการรักษา</small>
                 </button>
                 <% } %>
+                
             </div>
             
         <% } else { %>

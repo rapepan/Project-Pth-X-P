@@ -77,17 +77,6 @@
                     <p class="stat-label">นัดหมายวันนี้</p>
                 </div>
             </div>
-            <% if (userRole === 'admin') { %>
-            <div class="stat-card" data-delay="0.4">
-                <div class="stat-icon treatments-stat">
-                    <i class="fas fa-heartbeat"></i>
-                </div>
-                <div class="stat-details">
-                    <h3 class="stat-number"><%= stats.thisMonthExaminations || 0 %></h3>
-                    <p class="stat-label">การรักษาเดือนนี้</p>
-                </div>
-            </div>
-            <% } %>
         </div>
 
         <!-- Additional Stats Section - แสดงเฉพาะ Admin -->
@@ -112,19 +101,19 @@
                 </div>
             </div>
             <div class="stat-card" data-delay="0.6">
-                <div class="stat-icon new-patients-stat">
-                    <i class="fas fa-user-plus"></i>
+                <div class="stat-icon treatments-stat">
+                    <i class="fas fa-heartbeat"></i>
                 </div>
                 <div class="stat-details">
-                    <h3 class="stat-number"><%= stats.thisMonthNewPatientsDuplicate || 0 %></h3>
-                    <p class="stat-label">ผู้ป่วยใหม่เดือนนี้</p>
+                    <h3 class="stat-number"><%= stats.thisMonthExaminations || 0 %></h3>
+                    <p class="stat-label">การรักษาเดือนนี้</p>
                 </div>
             </div>
         </div>
         <% } %>
 
         <!-- Monthly Revenue Chart Section - แสดงเฉพาะ Admin -->
-        <% if (userRole === 'admin' && stats.monthlyRevenue && stats.monthlyRevenue.length > 0) { %>
+        <% if (userRole === 'admin') { %>
         <div class="monthly-revenue-section">
             <div class="section-header">
                 <h2 class="section-title">
@@ -176,6 +165,7 @@
                     <% }); %>
                 </div>
                 
+                <% if (monthlyData.some(data => data.revenue > 0)) { %>
                 <div class="revenue-summary">
                     <div class="summary-item">
                         <i class="fas fa-calculator"></i>
@@ -192,6 +182,15 @@
                         </span>
                     </div>
                 </div>
+                <% } else { %>
+                <div class="no-revenue-message">
+                    <div class="no-revenue-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>ยังไม่มีข้อมูลรายได้</h3>
+                    <p>เมื่อมีการชำระบิลแล้ว ข้อมูลรายได้จะแสดงที่นี่</p>
+                </div>
+                <% } %>
             </div>
         </div>
         <% } %>
@@ -235,22 +234,6 @@
                 </div>
                 <a href="/patients" class="btn-action">
                     <span>ค้นหาผู้ป่วย</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <!-- ประวัติการรักษา -->
-            <div class="menu-card history-card" data-delay="0.3" onclick="window.location.href='/medicaHistorydate'">
-                <div class="card-decoration"></div>
-                <div class="icon-wrapper">
-                    <i class="fas fa-file-medical"></i>
-                </div>
-                <div class="card-content">
-                    <h3>ประวัติการรักษา</h3>
-                    <p>ดูประวัติการรักษาของผู้ป่วย ตรวจสอบการรักษาย้อนหลัง และดาวน์โหลดรายงาน</p>
-                </div>
-                <a href="/medicaHistorydate" class="btn-action">
-                    <span>ดูประวัติ</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>

@@ -31,16 +31,7 @@
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <a href="/examinationroom/<%= patient ? patient.HN : '' %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (patient) { %>
-            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
             <a href="/diagnosis/<%= patient.HN %>" class="active"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
-            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
-                <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-                <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
-            <% } %>
-            <!-- เมนูสำหรับทุกคน -->
-            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
-        <% } else { %>
         <% } %>
     </nav>
 

@@ -38,6 +38,11 @@ class ExaminationModel {
       notes: data.sensory_test || ''
     };
 
+    // Debug: ตรวจสอบข้อมูล sensory
+    console.log('=== DEBUG: Sensory Data ===');
+    console.log('sensoryData:', JSON.stringify(sensoryData, null, 2));
+    console.log('==========================');
+
     const reflexData = {
       normal: data.normal_reflex || 0,
       abnormal: data.abnormal_reflex || 0,

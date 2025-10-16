@@ -201,6 +201,8 @@ nav {
     display: flex;
     gap: 0;
     flex-wrap: wrap;
+    justify-content: center !important;
+    text-align: center;
 }
 
 nav a {
@@ -491,6 +493,64 @@ nav a .fas {
 .action-btn.warning:hover .fas,
 .action-btn.warning:hover span,
 .action-btn.warning:hover small {
+    color: white;
+}
+
+.action-btn.secondary {
+    border-color: #6c757d;
+}
+
+.action-btn.secondary:hover {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border-color: #6c757d;
+}
+
+.action-btn.secondary .fas {
+    color: #6c757d;
+}
+
+.action-btn.secondary:hover .fas,
+.action-btn.secondary:hover span,
+.action-btn.secondary:hover small {
+    color: white;
+}
+
+.action-btn.danger {
+    border-color: var(--danger-color);
+}
+
+.action-btn.danger:hover {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #C62828 100%);
+    border-color: var(--danger-color);
+}
+
+.action-btn.danger .fas {
+    color: var(--danger-color);
+}
+
+.action-btn.danger:hover .fas,
+.action-btn.danger:hover span,
+.action-btn.danger:hover small {
+    color: white;
+}
+
+.action-btn.light {
+    border-color: #9C27B0;
+    background: white;
+}
+
+.action-btn.light:hover {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+    border-color: #9C27B0;
+}
+
+.action-btn.light .fas {
+    color: #9C27B0;
+}
+
+.action-btn.light:hover .fas,
+.action-btn.light:hover span,
+.action-btn.light:hover small {
     color: white;
 }
 

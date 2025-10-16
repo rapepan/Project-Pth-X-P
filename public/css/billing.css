@@ -1047,7 +1047,7 @@ nav a .fas {
 }
 
 .no-procedures-actions .btn-create-procedure {
-    background: linear-gradient(135deg, var(--success-color), #4CAF50);
+    background: var(--primary-color);
     color: white;
     border: none;
     font-size: 1rem;

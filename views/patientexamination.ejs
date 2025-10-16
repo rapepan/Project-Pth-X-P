@@ -32,14 +32,6 @@
         <% if (typeof patient !== 'undefined' && patient) { %>
             <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
             <a href="/patientexamination/<%= patient.HN %>" class="active"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
-            <!-- เมนูสำหรับ Physical Therapist และ Admin เท่านั้น -->
-            <% if (user.role === 'physical_therapist' || user.role === 'admin') { %>
-                <a href="/diagnosis/<%= patient.HN %>"><i class="fas fa-diagnoses"></i> การวินิจฉัย</a>
-                <a href="/procedure/<%= patient.HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
-                <a href="/ptdata/<%= patient.HN %>"><i class="fas fa-chart-line"></i> สรุปผลการรักษา</a>
-            <% } %>
-            <!-- เมนูสำหรับทุกคน -->
-            <a href="/billing/<%= patient.HN %>"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
             <a href="/examinationroom"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% } %>
@@ -206,19 +198,22 @@
                                 <input type="checkbox" name="lightTouchIntact" id="light-touch-intact" value="1">
                                 <label for="light-touch-intact">Intact</label>
                             </div>
+                            <div class="detail-input-container">
+                                <input type="text" name="lightTouchNotes1" class="detail-input" data-toggle="light-touch-intact" placeholder="ระบุบริเวณที่ตรวจพบ">
+                            </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="lightTouchImpair" id="light-touch-impair" value="1">
                                 <label for="light-touch-impair">Impair</label>
                             </div>
                             <div class="detail-input-container">
-                                <input type="text" name="lightTouchNotes1" class="detail-input" data-toggle="light-touch-impair" placeholder="ระบุบริเวณที่มีความรู้สึกลดลง">
+                                <input type="text" name="lightTouchNotes2" class="detail-input" data-toggle="light-touch-impair" placeholder="ระบุบริเวณที่มีความรู้สึกลดลง">
                             </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="lightTouchLoss" id="light-touch-loss" value="1">
                                 <label for="light-touch-loss">Loss</label>
                             </div>
                             <div class="detail-input-container">
-                                <input type="text" name="lightTouchNotes2" class="detail-input" data-toggle="light-touch-loss" placeholder="ระบุบริเวณที่สูญเสียความรู้สึก">
+                                <input type="text" name="lightTouchNotes3" class="detail-input" data-toggle="light-touch-loss" placeholder="ระบุบริเวณที่สูญเสียความรู้สึก">
                             </div>
                         </div>
                     </div>
@@ -261,29 +256,36 @@
                     <!-- Ambulation -->
                     <div class="form-group">
                         <label><i class="fas fa-walking"></i> Ambulation</label>
+
+                        <!-- Independent -->
                         <div class="radio-option">
                             <input type="checkbox" name="ambulationIndependent" id="ambulation-independent" value="1">
                             <label for="ambulation-independent"><strong>Independent</strong></label>
                         </div>
-                        <div style="margin-left: 30px;">
+                        <div class="sub-options-container" data-parent="ambulation-independent" style="margin-left: 30px;">
                             <div class="radio-option">
                                 <input type="checkbox" name="ambulationHandFree" id="ambulation-hand-free" value="1">
                                 <label for="ambulation-hand-free">Hand-Free</label>
+                            </div>
+                            <div class="detail-input-container">
+                                <input type="text" name="ambulationNotes1" class="detail-input" data-toggle="ambulation-hand-free" placeholder="ระบุบริเวณที่ตรวจพบ">
                             </div>
                             <div class="radio-option">
                                 <input type="checkbox" name="ambulationWith" id="ambulation-with" value="1">
                                 <label for="ambulation-with">With</label>
                             </div>
                             <div class="detail-input-container">
-                                <input type="text" name="ambulationNotes1" class="detail-input" data-toggle="ambulation-with" placeholder="ระบุอุปกรณ์ช่วยเดิน เช่น Walker, Cane, Crutches">
+                                <input type="text" name="ambulationNotes2" class="detail-input" data-toggle="ambulation-with" placeholder="ระบุอุปกรณ์ช่วยเดิน เช่น Walker, Cane, Crutches">
                             </div>
                         </div>
+
+                        <!-- Dependent -->
                         <div class="radio-option" style="margin-top: 10px;">
                             <input type="checkbox" name="ambulationDependent" id="ambulation-dependent" value="1">
                             <label for="ambulation-dependent"><strong>Dependent</strong></label>
                         </div>
                         <div class="detail-input-container">
-                            <input type="text" name="ambulationNotes2" class="detail-input" data-toggle="ambulation-dependent" placeholder="ระบุระดับการพึ่งพาในการเดิน">
+                            <input type="text" name="ambulationNotes3" class="detail-input" data-toggle="ambulation-dependent" placeholder="ระบุระดับการพึ่งพาในการเดิน">
                         </div>
                     </div>
                 </div>
@@ -299,11 +301,11 @@
 
                 <!-- Submit Buttons -->
                 <div class="btn-group fade-in" style="animation-delay: 0.9s;">
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> บันทึกข้อมูล
-                    </button>
                     <button type="button" class="btn-secondary" onclick="window.history.back()">
                         <i class="fas fa-times"></i> ยกเลิก
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> บันทึกข้อมูล
                     </button>
                 </div>
             </form>

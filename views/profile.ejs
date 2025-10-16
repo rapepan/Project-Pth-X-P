@@ -199,29 +199,52 @@
         }
         
         .btn-secondary {
-            background: #f5f5f5;
-            color: #666;
-            border: 1px solid #ddd;
+            background: white;
+            color: #546e7a;
+            border: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        
+
         .btn-secondary:hover {
-            background: #e0e0e0;
+            background: #f5f5f5;
+            border-color: #bdbdbd;
+            color: #2c3e50;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
         
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: #00897B;
+            gap: 10px;
+            color: #2c3e50;
             text-decoration: none;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
-            transition: color 0.3s ease;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        
+
         .back-btn:hover {
-            color: #00695C;
+            color: #00897B;
+            border-color: #00897B;
+            background: rgba(0, 137, 123, 0.05);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .back-btn i {
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .back-btn:hover i {
+            transform: translateX(-2px);
         }
         
         /* Password Strength Bar */

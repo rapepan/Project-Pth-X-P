@@ -51,6 +51,8 @@ class AppointmentController {
         stats: stats,
         appointmentDates: appointmentDates,
         searchTerm: search || '',
+        success: req.query.success || null,
+        error: req.query.error || null,
         user: req.user,
         userRole: req.user.role
       });
@@ -203,8 +205,13 @@ class AppointmentController {
           appointmentData.appointment_time,
           null,
           (err, results) => {
-            if (err) reject(err);
-            else resolve(results[0].conflict_count > 0);
+            if (err) {
+              console.error('Error checking time conflict:', err);
+              // ถ้าเกิด error ในการตรวจสอบ time conflict ให้อนุญาตให้สร้างได้
+              resolve(false);
+            } else {
+              resolve(results && results[0] && results[0].conflict_count > 0);
+            }
           }
         );
       });
@@ -228,22 +235,40 @@ class AppointmentController {
         appointmentData.patient_name = appointmentData.patient_name.trim();
       }
 
+      // ตั้งค่า status เป็น scheduled ถ้าไม่ได้ระบุ
+      if (!appointmentData.status) {
+        appointmentData.status = 'scheduled';
+      }
+
       // บันทึกนัดหมาย
       await new Promise((resolve, reject) => {
         AppointmentModel.createAppointment(appointmentData, (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
+          if (err) {
+            console.error('Error creating appointment:', err);
+            reject(err);
+          } else {
+            resolve(result);
+          }
         });
       });
 
       res.redirect(`/appointments?success=${encodeURIComponent('สร้างนัดหมายสำเร็จ')}`);
     } catch (error) {
       console.error('Error in createAppointment:', error);
+      
+      // แสดง error message ที่เฉพาะเจาะจง
+      let errorMessage = 'เกิดข้อผิดพลาดในการสร้างนัดหมาย';
+      if (error.code === 'ER_DUP_ENTRY') {
+        errorMessage = 'มีนัดหมายในเวลานี้อยู่แล้ว กรุณาเลือกเวลาอื่น';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       res.render('appointmentForm', {
         title: 'สร้างนัดหมายใหม่',
         appointment: null,
         patientData: null,
-        error: 'เกิดข้อผิดพลาดในการสร้างนัดหมาย',
+        error: errorMessage,
         user: req.user,
         userRole: req.user.role
       });

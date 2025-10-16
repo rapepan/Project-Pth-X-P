@@ -75,6 +75,18 @@ class ExaminationController {
 
     const examinationData = req.body;
 
+    // Debug: ตรวจสอบข้อมูล Light Touch
+    console.log('=== DEBUG: Patient Examination Data ===');
+    console.log('Light Touch Data:');
+    console.log('- sensoryLightTouch:', examinationData.sensoryLightTouch);
+    console.log('- lightTouchIntact:', examinationData.lightTouchIntact);
+    console.log('- lightTouchImpair:', examinationData.lightTouchImpair);
+    console.log('- lightTouchLoss:', examinationData.lightTouchLoss);
+    console.log('- lightTouchNotes1:', examinationData.lightTouchNotes1);
+    console.log('- lightTouchNotes2:', examinationData.lightTouchNotes2);
+    console.log('- lightTouchNotes3:', examinationData.lightTouchNotes3);
+    console.log('=====================================');
+
     // สร้างข้อมูลการตรวจตามโครงสร้างที่ถูกต้อง
     const saveData = {
       HN: HN,
@@ -107,9 +119,9 @@ class ExaminationController {
         examinationData.pinprickIntact ? 'Pinprick Intact: ' + (examinationData.pinprickNotes1 || '') : '',
         examinationData.pinprickImpair ? 'Pinprick Impair: ' + (examinationData.pinprickNotes2 || '') : '',
         examinationData.pinprickLoss ? 'Pinprick Loss: ' + (examinationData.pinprickNotes3 || '') : '',
-        examinationData.lightTouchIntact ? 'Light Touch Intact' : '',
-        examinationData.lightTouchImpair ? 'Light Touch Impair: ' + (examinationData.lightTouchNotes1 || '') : '',
-        examinationData.lightTouchLoss ? 'Light Touch Loss: ' + (examinationData.lightTouchNotes2 || '') : ''
+        examinationData.lightTouchIntact ? 'Light Touch Intact: ' + (examinationData.lightTouchNotes1 || '') : '',
+        examinationData.lightTouchImpair ? 'Light Touch Impair: ' + (examinationData.lightTouchNotes2 || '') : '',
+        examinationData.lightTouchLoss ? 'Light Touch Loss: ' + (examinationData.lightTouchNotes3 || '') : ''
       ].filter(item => item !== '').join('; ') || '',
       
       // Reflex Data
@@ -227,6 +239,7 @@ class ExaminationController {
           title: "ประวัติการตรวจร่างกาย",
           HN: HN,
           patient: patient,
+          user: req.user,
           examinations: examinationList || [],
           examinationList: examinationList || [],
           success: req.query.success,

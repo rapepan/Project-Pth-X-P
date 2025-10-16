@@ -56,9 +56,9 @@ class StatsModel {
     db.query(query, callback);
   }
 
-  // ดึงจำนวนการนัดหมายในวันนี้
+  // ดึงจำนวนการนัดหมายในวันนี้ (เฉพาะที่ยังไม่เสร็จสิ้นหรือยังไม่ถูกยกเลิก)
   static getTodayAppointmentsCount(callback) {
-    const query = "SELECT COUNT(*) as today FROM appointments WHERE DATE(appointment_date) = CURDATE()";
+    const query = "SELECT COUNT(*) as today FROM appointments WHERE DATE(appointment_date) = CURDATE() AND status NOT IN ('completed', 'cancelled')";
     db.query(query, callback);
   }
 

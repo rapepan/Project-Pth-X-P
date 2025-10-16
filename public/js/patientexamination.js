@@ -53,16 +53,14 @@ function setupCheckboxBehaviors() {
 function toggleRadioOption(option, checkbox) {
     if (checkbox.checked) {
         option.classList.add('checked');
-        option.style.backgroundColor = 'rgba(0, 137, 123, 0.08)';
-        option.style.borderColor = 'var(--primary-color)';
-        option.style.transform = 'translateY(-2px)';
-        option.style.boxShadow = 'var(--shadow-sm)';
+        // ใช้ CSS class แทนการตั้งค่า inline
     } else {
         option.classList.remove('checked');
-        option.style.backgroundColor = 'var(--bg-light)';
-        option.style.borderColor = 'var(--border-color)';
-        option.style.transform = 'translateY(0)';
-        option.style.boxShadow = 'none';
+        // ล้าง inline styles เพื่อให้กลับไปใช้ CSS default
+        option.style.backgroundColor = '';
+        option.style.borderColor = '';
+        option.style.transform = '';
+        option.style.boxShadow = '';
     }
 }
 
@@ -109,9 +107,9 @@ function setupDetailInputToggle() {
 
         if (relatedInputs.length > 0) {
             console.log(`Found ${relatedInputs.length} related inputs for ${checkboxId}`);
-            // เริ่มต้น: ซ่อน input ถ้า checkbox ยังไม่ถูกเลือก
+            // เริ่มต้น: แสดง input ถ้า checkbox ถูกเลือก หรือมีข้อมูลอยู่แล้ว
             relatedInputs.forEach(input => {
-                if (checkbox.checked) {
+                if (checkbox.checked || input.value.trim() !== '') {
                     input.classList.add('show');
                 } else {
                     input.classList.remove('show');
@@ -124,17 +122,16 @@ function setupDetailInputToggle() {
                     if (this.checked) {
                         // แสดง input พร้อม animation
                         input.classList.add('show');
-                        // โฟกัสที่ input เมื่อแสดง
-                        setTimeout(() => {
-                            input.focus();
-                        }, 300);
+                        // โฟกัสที่ input เมื่อแสดง (เฉพาะเมื่อไม่มีข้อมูลอยู่แล้ว)
+                        if (input.value.trim() === '') {
+                            setTimeout(() => {
+                                input.focus();
+                            }, 300);
+                        }
                     } else {
-                        // ซ่อน input
+                        // ซ่อน input แต่เก็บค่าข้อมูลไว้
                         input.classList.remove('show');
-                        // ล้างค่าเมื่อยกเลิกเลือก
-                        setTimeout(() => {
-                            input.value = '';
-                        }, 300);
+                        // ไม่ล้างค่าเมื่อยกเลิกเลือก - เก็บข้อมูลไว้
                     }
                 });
             });
@@ -154,8 +151,13 @@ function setupSubOptionsToggle() {
         const subOptionsContainer = document.querySelector(`.sub-options-container[data-parent="${checkboxId}"]`);
         
         if (subOptionsContainer) {
-            // เริ่มต้น: ซ่อน sub-options ถ้า checkbox ยังไม่ถูกเลือก
-            if (checkbox.checked) {
+            // ตรวจสอบว่ามีข้อมูลใน sub-options หรือไม่
+            const checkedBoxes = subOptionsContainer.querySelectorAll('input[type="checkbox"]:checked');
+            const filledInputs = Array.from(subOptionsContainer.querySelectorAll('input[type="text"]')).filter(input => input.value.trim() !== '');
+            const hasData = checkedBoxes.length > 0 || filledInputs.length > 0;
+            
+            // เริ่มต้น: แสดง sub-options ถ้า checkbox ถูกเลือก หรือมีข้อมูลอยู่แล้ว
+            if (checkbox.checked || hasData) {
                 subOptionsContainer.style.display = 'block';
                 subOptionsContainer.style.opacity = '1';
             } else {
@@ -170,6 +172,14 @@ function setupSubOptionsToggle() {
                     subOptionsContainer.style.display = 'block';
                     subOptionsContainer.classList.add('slide-down');
                     subOptionsContainer.classList.remove('slide-up');
+                    
+                    // แสดง detail inputs ที่มีข้อมูลอยู่แล้ว
+                    const subDetailInputs = subOptionsContainer.querySelectorAll('.detail-input');
+                    subDetailInputs.forEach(input => {
+                        if (input.value.trim() !== '') {
+                            input.classList.add('show');
+                        }
+                    });
                 } else {
                     // ซ่อน sub-options พร้อม animation
                     subOptionsContainer.classList.add('slide-up');
@@ -179,19 +189,8 @@ function setupSubOptionsToggle() {
                         subOptionsContainer.style.display = 'none';
                     }, 300);
                     
-                    // ล้างค่าทุก checkbox และ input ใน sub-options
-                    const subCheckboxes = subOptionsContainer.querySelectorAll('input[type="checkbox"]');
-                    const subInputs = subOptionsContainer.querySelectorAll('input[type="text"]');
-                    
-                    subCheckboxes.forEach(subCheckbox => {
-                        subCheckbox.checked = false;
-                        // Trigger change event เพื่อซ่อน detail inputs
-                        subCheckbox.dispatchEvent(new Event('change'));
-                    });
-                    
-                    subInputs.forEach(subInput => {
-                        subInput.value = '';
-                    });
+                    // ไม่ล้างค่า checkbox และ input ใน sub-options - เก็บข้อมูลไว้
+                    // เพียงแค่ซ่อน sub-options container
                 }
             });
         }

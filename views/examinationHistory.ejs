@@ -5,11 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/examinationroom.css">
+    <link rel="stylesheet" href="/css/patientexamination.css">
     <link rel="stylesheet" href="/css/examinationHistory.css">
 </head>
 <body>
-    <div class="container">
+    <!-- Sticky Header - ใช้ธีมเดียวกับ index.css -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>
+                    <i class="fas fa-history"></i>
+                    <%= title %>
+                </h1>
+            </div>
+            <div class="user-info">
+                <span><%= user.fullname || user.username %></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <% if (typeof patient !== 'undefined' && patient) { %>
+            <a href="/examinationroom/<%= patient.HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+            <a href="/patientexamination/<%= patient.HN %>"><i class="fas fa-user-md"></i> ตรวจร่างกาย</a>
+            <a href="/examinationHistory/<%= patient.HN %>" class="active"><i class="fas fa-history"></i> ประวัติการตรวจ</a>
+        <% } else { %>
+            <a href="/examinationroom"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
+        <% } %>
+    </nav>
+
+    <div class="main-container">
         <% if (success) { %>
             <div class="success-message fade-in">
                 <i class="fas fa-check-circle"></i>
@@ -24,40 +53,311 @@
             </div>
         <% } %>
         
-        <h1>ประวัติการตรวจร่างกาย</h1>
-        
         <% if (patient) { %>
-        <div class="patient-info">
-            <h2><%= patient.fname %> <%= patient.lname %> (HN: <%= patient.HN %>)</h2>
-        </div>
+
         
         <% if (examinations && examinations.length > 0) { %>
         <div class="examination-list">
             <% examinations.forEach((exam, index) => { %>
-            <div class="examination-item">
-                <h3>การตรวจครั้งที่ <%= index + 1 %></h3>
-                <p><strong>วันที่:</strong> <%= new Date(exam.created_at).toLocaleDateString('th-TH') %></p>
-                <p><strong>Observation:</strong> <%= exam.observation %></p>
-                <p><strong>Palpation:</strong> <%= exam.palpation %></p>
+            <div class="examination-item fade-in" data-animation-delay="<%= (index * 0.1) + 0.2 %>">
+                <div class="examination-header">
+                    <h3><i class="fas fa-clipboard-list"></i> การตรวจครั้งที่ <%= index + 1 %></h3>
+                    <div class="examination-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        <%= new Date(exam.created_at).toLocaleDateString('th-TH', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) %>
+                    </div>
+                </div>
+
+                <!-- Observation & Palpation -->
+                <div class="form-section">
+                    <h4><i class="fas fa-eye"></i> การสังเกต (Observation) และการคลำ (Palpation)</h4>
+                    <div class="form-group">
+                        <label><i class="fas fa-eye"></i> การสังเกต (Observation)</label>
+                        <div class="readonly-field">
+                            <%= exam.observation || 'ไม่ระบุ' %>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-paper"></i> การคลำ (Palpation)</label>
+                        <div class="readonly-field">
+                            <%= exam.palpation || 'ไม่ระบุ' %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Range of Motion & Movement Tests -->
+                <div class="form-section">
+                    <h4><i class="fas fa-running"></i> การทดสอบการเคลื่อนไหว</h4>
+                    
+                    <!-- ROM Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-arrows-alt"></i> ROM (Range of Motion)</label>
+                        <div class="readonly-field">
+                            <% if (exam.rom && exam.rom.wnl) { %>
+                                <span class="status-badge success">WNL (Within Normal Limits)</span>
+                            <% } %>
+                            <% if (exam.rom && exam.rom.weakness) { %>
+                                <span class="status-badge warning">Limited</span>
+                                <% if (exam.rom.notes) { %>
+                                    <span class="notes"> - <%= exam.rom.notes %></span>
+                                <% } %>
+                            <% } %>
+                            <% if (!exam.rom || (!exam.rom.wnl && !exam.rom.weakness)) { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- MMT Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-dumbbell"></i> MMT (Manual Muscle Testing)</label>
+                        <div class="readonly-field">
+                            <% if (exam.mmt && exam.mmt.normal) { %>
+                                <span class="status-badge success">Normal</span>
+                            <% } %>
+                            <% if (exam.mmt && exam.mmt.limited) { %>
+                                <span class="status-badge warning">Weakness</span>
+                                <% if (exam.mmt.notes) { %>
+                                    <span class="notes"> - <%= exam.mmt.notes %></span>
+                                <% } %>
+                            <% } %>
+                            <% if (!exam.mmt || (!exam.mmt.normal && !exam.mmt.limited)) { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Accessory Movement -->
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-holding-heart"></i> Accessory Movement</label>
+                        <div class="readonly-field">
+                            <% if (exam.accessory && exam.accessory.normal) { %>
+                                <span class="status-badge success">Normal</span>
+                            <% } %>
+                            <% if (exam.accessory && exam.accessory.hypermobility) { %>
+                                <span class="status-badge warning">Hypermobility</span>
+                            <% } %>
+                            <% if (exam.accessory && exam.accessory.notes) { %>
+                                <span class="notes"> - <%= exam.accessory.notes %></span>
+                            <% } %>
+                            <% if (!exam.accessory || (!exam.accessory.normal && !exam.accessory.hypermobility)) { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Tests -->
+                <div class="form-section">
+                    <h4><i class="fas fa-clipboard-check"></i> การทดสอบพิเศษ</h4>
+                    
+                    <!-- Sensory Test -->
+                    <div class="form-group">
+                        <label><i class="fas fa-hand-paper"></i> Sensory Test</label>
+                        <div class="readonly-field">
+                            <% if (exam.sensory && (exam.sensory.pinprick || exam.sensory.light_touch)) { %>
+                                <% if (exam.sensory.pinprick) { %>
+                                    <div><strong>Pinprick:</strong> ตรวจแล้ว</div>
+                                <% } %>
+                                <% if (exam.sensory.light_touch) { %>
+                                    <div><strong>Light Touch:</strong> ตรวจแล้ว</div>
+                                <% } %>
+                                <% if (exam.sensory.notes) { %>
+                                    <div class="notes"><%= exam.sensory.notes %></div>
+                                <% } %>
+                            <% } else { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Deep Tendon Reflex -->
+                    <div class="form-group">
+                        <label><i class="fas fa-heartbeat"></i> Deep Tendon Reflex</label>
+                        <div class="readonly-field">
+                            <% if (exam.reflex && (exam.reflex.normal || exam.reflex.abnormal)) { %>
+                                <% if (exam.reflex.normal) { %>
+                                    <span class="status-badge success">Normal</span>
+                                <% } %>
+                                <% if (exam.reflex.abnormal) { %>
+                                    <span class="status-badge warning">Abnormal</span>
+                                <% } %>
+                                <% if (exam.reflex.notes) { %>
+                                    <span class="notes"> - <%= exam.reflex.notes %></span>
+                                <% } %>
+                            <% } else { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Transfer -->
+                    <div class="form-group">
+                        <label><i class="fas fa-exchange-alt"></i> Transfer</label>
+                        <div class="readonly-field">
+                            <% if (exam.transfer && exam.transfer.independent) { %>
+                                <span class="status-badge success">Independent</span>
+                            <% } %>
+                            <% if (exam.transfer && exam.transfer.dependent) { %>
+                                <span class="status-badge warning">Dependent</span>
+                                <% if (exam.transfer.notes) { %>
+                                    <span class="notes"> - <%= exam.transfer.notes %></span>
+                                <% } %>
+                            <% } %>
+                            <% if (!exam.transfer || (!exam.transfer.independent && !exam.transfer.dependent)) { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Ambulation -->
+                    <div class="form-group">
+                        <label><i class="fas fa-walking"></i> Ambulation</label>
+                        <div class="readonly-field">
+                            <% if (exam.ambulation && exam.ambulation.independent) { %>
+                                <span class="status-badge success">Independent</span>
+                            <% } %>
+                            <% if (exam.ambulation && exam.ambulation.dependent) { %>
+                                <span class="status-badge warning">Dependent</span>
+                                <% if (exam.ambulation.notes) { %>
+                                    <span class="notes"> - <%= exam.ambulation.notes %></span>
+                                <% } %>
+                            <% } %>
+                            <% if (!exam.ambulation || (!exam.ambulation.independent && !exam.ambulation.dependent)) { %>
+                                <span class="no-data">ไม่ระบุ</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <% if (exam.notes) { %>
+                <div class="form-section">
+                    <h4><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</h4>
+                    <div class="form-group">
+                        <div class="readonly-field">
+                            <%= exam.notes %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
                 
                 <div class="actions">
-                    <a href="/examinationDetail/<%= patient.HN %>/<%= exam.id %>" class="btn btn-primary">ดูรายละเอียด</a>
-                    <a href="/examinationPrint/<%= exam.id %>" class="btn btn-secondary">พิมพ์รายงาน</a>
+                    <a href="/examinationDetail/<%= patient.HN %>/<%= exam.id %>" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> ดูรายละเอียด
+                    </a>
+                    <a href="/examinationPrint/<%= exam.id %>" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> พิมพ์รายงาน
+                    </a>
                 </div>
             </div>
             <% }); %>
         </div>
         <% } else { %>
-        <p>ยังไม่มีประวัติการตรวจร่างกาย</p>
+        <div class="no-data-section fade-in">
+            <div class="no-data-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <h3>ยังไม่มีประวัติการตรวจร่างกาย</h3>
+            <p>เริ่มต้นการตรวจร่างกายครั้งแรกสำหรับผู้ป่วยคนนี้</p>
+        </div>
         <% } %>
         
-        <div class="actions">
-            <a href="/patientexamination/<%= patient.HN %>" class="btn btn-primary">ตรวจร่างกายใหม่</a>
-            <a href="/examinationroom/<%= patient.HN %>" class="btn btn-back">กลับ</a>
+        <div class="actions fade-in" style="animation-delay: 0.9s;">
+            <a href="/patientexamination/<%= patient.HN %>" class="btn btn-primary">
+                <i class="fas fa-plus"></i> ตรวจร่างกายใหม่
+            </a>
+            <a href="/examinationroom/<%= patient.HN %>" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> กลับ
+            </a>
         </div>
         <% } else { %>
-        <p>ไม่พบข้อมูลผู้ป่วย</p>
+        <div class="no-patient-section fade-in">
+            <div class="no-patient-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>ไม่พบข้อมูลผู้ป่วย</h2>
+            <p>กรุณาเลือกผู้ป่วยเพื่อดูประวัติการตรวจร่างกาย</p>
+            <div class="no-patient-actions">
+                <button class="action-btn primary" onclick="window.location.href='/patients'">
+                    <i class="fas fa-search"></i>
+                    <span>ค้นหาผู้ป่วย</span>
+                </button>
+            </div>
+        </div>
         <% } %>
     </div>
+
+    <!-- JavaScript for interactive features -->
+    <script>
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            
+            // Apply animation delay from data attribute
+            const delay = el.getAttribute('data-animation-delay');
+            if (delay) {
+                el.style.animationDelay = delay + 's';
+            }
+            
+            observer.observe(el);
+        });
+
+        // Collapsible examination items
+        document.addEventListener('DOMContentLoaded', function() {
+            const examinationItems = document.querySelectorAll('.examination-item');
+            
+            examinationItems.forEach((item, index) => {
+                // Add click handler to header for collapsing
+                const header = item.querySelector('.examination-header');
+                if (header) {
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', function() {
+                        const content = item.querySelector('.form-section');
+                        if (content) {
+                            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

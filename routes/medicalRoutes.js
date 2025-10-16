@@ -13,5 +13,6 @@ router.post("/medicalFrom/:HN", checkStaff, MedicalController.saveMedicalForm);
 // Medical history routes - Staff เข้าถึงได้
 router.get("/medicalHistory/:HN", checkStaff, MedicalController.showMedicalHistory);
 router.get("/medicaHistorydate", checkStaff, MedicalController.showMedicalHistoryByDate);
+router.get("/medicaHistorydate/:HN", checkStaff, MedicalController.showMedicalHistoryByDate);
 
 module.exports = router;  

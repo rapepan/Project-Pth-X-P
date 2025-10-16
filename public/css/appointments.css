@@ -602,13 +602,13 @@ body {
 }
 
 .stat-card .stat-icon.confirmed {
-    background: linear-gradient(135deg, var(--success-color), #4CAF50);
-    box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
+    background: linear-gradient(135deg, var(--info-color), #2196F3);
+    box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
 }
 
 .stat-card .stat-icon.completed {
-    background: linear-gradient(135deg, var(--info-color), #2196F3);
-    box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+    background: linear-gradient(135deg, var(--success-color), #4CAF50);
+    box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
 }
 
 .stat-card .stat-icon.cancelled {
@@ -1075,8 +1075,10 @@ textarea.form-control {
 /* ========== Form Actions ========== */
 .form-actions {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
     justify-content: center;
+    align-items: stretch;
     margin-top: 2rem;
     padding-top: 2rem;
     border-top: 2px solid var(--border-light);
@@ -1095,14 +1097,17 @@ textarea.form-control {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-cancel:hover {
-    background: var(--border-light);
-    border-color: var(--text-secondary);
+    background: #f5f5f5;
+    border-color: #bdbdbd;
+    color: var(--text-primary);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {

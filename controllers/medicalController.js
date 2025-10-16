@@ -1,6 +1,10 @@
 const db = require('../config/db');
 const MedicalModel = require('../models/medicalModel');
 const PatientModel = require('../models/patientModel');
+const ExaminationModel = require('../models/examinationModel');
+const DiagnosisModel = require('../models/diagnosisModel');
+const ProcedureModel = require('../models/procedureModel');
+const PTDataModel = require('../models/ptDataModel');
 
 class MedicalController {
   // แสดงห้องตรวจ
@@ -203,13 +207,18 @@ class MedicalController {
 
   // แสดงประวัติการรักษาตามวันที่
   static showMedicalHistoryByDate(req, res) {
-    const { hn, date } = req.query;
+    const hn = req.params.HN || req.query.hn;
+    const date = req.query.date;
 
     if (!hn) {
       return res.render("medicaHistorydate", {
         title: "ค้นหาประวัติผู้ป่วย",
         patient: null,
         medicalHistory: [],
+        examinationHistory: [],
+        diagnosisHistory: [],
+        procedureHistory: [],
+        ptDataHistory: [],
         availableDates: [],
         filters: {}
       });
@@ -226,6 +235,10 @@ class MedicalController {
           title: "ค้นหาประวัติผู้ป่วย",
           patient: null,
           medicalHistory: [],
+          examinationHistory: [],
+          diagnosisHistory: [],
+          procedureHistory: [],
+          ptDataHistory: [],
           availableDates: [],
           filters: { hn, date },
           message: "ไม่พบผู้ป่วยที่ HN นี้"
@@ -244,18 +257,58 @@ class MedicalController {
         let selectedDate = date || (availableDates.length > 0 ? availableDates[0] : "");
 
         if (selectedDate) {
+          // ดึงข้อมูลการซักประวัติ
           MedicalModel.getMedicalHistoryByDate(hn, selectedDate, (err, medicalResults) => {
             if (err) {
               console.error("Error fetching medical history:", err);
               return res.status(500).send("ไม่สามารถดึงข้อมูลการรักษาได้");
             }
 
-            res.render("medicaHistorydate", {
-              title: "ค้นหาประวัติผู้ป่วย",
-              patient,
-              medicalHistory: medicalResults,
-              availableDates,
-              filters: { hn, date: selectedDate }
+            // ดึงข้อมูลการตรวจร่างกาย
+            ExaminationModel.getExaminationByDate(hn, selectedDate, (err, examinationResults) => {
+              if (err) {
+                console.error("Error fetching examination data:", err);
+                return res.status(500).send("ไม่สามารถดึงข้อมูลการตรวจร่างกายได้");
+              }
+
+              // ดึงข้อมูลการวินิจฉัย
+              DiagnosisModel.getAllDiagnosisHistory(hn, (err, diagnosisResults) => {
+                if (err) {
+                  console.error("Error fetching diagnosis data:", err);
+                  return res.status(500).send("ไม่สามารถดึงข้อมูลการวินิจฉัยได้");
+                }
+
+                // ดึงข้อมูลหัตถการ
+                ProcedureModel.getProceduresByDate(hn, selectedDate, (err, procedureResults) => {
+                  if (err) {
+                    console.error("Error fetching procedure data:", err);
+                    return res.status(500).send("ไม่สามารถดึงข้อมูลหัตถการได้");
+                  }
+
+                  // ดึงข้อมูล PT Data (สรุปผลการรักษา)
+                  PTDataModel.getPatientPTData(hn, (err, ptDataResults) => {
+                    if (err) {
+                      console.error("Error fetching PT data:", err);
+                      // ไม่ส่ง error แต่ให้ ptData เป็น array ว่าง
+                      ptDataResults = [];
+                    }
+
+
+                    // ส่งข้อมูลทั้งหมดไป (จะกรองในหน้า view)
+                    res.render("medicaHistorydate", {
+                      title: "ค้นหาประวัติผู้ป่วย",
+                      patient,
+                      medicalHistory: medicalResults,
+                      examinationHistory: examinationResults,
+                      diagnosisHistory: diagnosisResults,
+                      procedureHistory: procedureResults,
+                      ptDataHistory: ptDataResults || [],
+                      availableDates,
+                      filters: { hn, date: selectedDate }
+                    });
+                  });
+                });
+              });
             });
           });
         } else {
@@ -263,6 +316,10 @@ class MedicalController {
             title: "ค้นหาประวัติผู้ป่วย",
             patient,
             medicalHistory: [],
+            examinationHistory: [],
+            diagnosisHistory: [],
+            procedureHistory: [],
+            ptDataHistory: [],
             availableDates,
             filters: { hn, date: selectedDate }
           });

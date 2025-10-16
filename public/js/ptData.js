@@ -12,9 +12,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize PT Data page
 function initializePTData() {
-    // Load measurement templates
-    loadMeasurementTemplates();
-    
     // Initialize form validation
     setupFormValidation();
     
@@ -50,13 +47,12 @@ function setupEventListeners() {
         }
     });
     
-    // Auto-fill measurement details based on type
-    const assessmentTypeSelect = document.querySelector('select[name="assessmentType"]');
+    // Listen for assessment type changes to update session preview
+    const assessmentTypeSelect = document.getElementById('assessmentType');
     if (assessmentTypeSelect) {
-        assessmentTypeSelect.addEventListener('change', function() {
-            autoFillMeasurementFields(this.value);
-        });
+        assessmentTypeSelect.addEventListener('change', updateSessionPreview);
     }
+    
     
     // Date validation
     const dateInput = document.querySelector('input[name="assessmentDate"]');
@@ -67,65 +63,6 @@ function setupEventListeners() {
     }
 }
 
-// Load measurement templates
-function loadMeasurementTemplates() {
-    // Mock measurement templates - ในระบบจริงจะดึงจาก API
-    const templates = {
-        'ROM': {
-            name: 'การเคลื่อนไหวของข้อต่อ',
-            defaultMeasurements: [
-                { name: 'Flexion', unit: '°', value: '' },
-                { name: 'Extension', unit: '°', value: '' },
-                { name: 'Abduction', unit: '°', value: '' },
-                { name: 'Adduction', unit: '°', value: '' }
-            ]
-        },
-        'MMT': {
-            name: 'ความแข็งแรงของกล้ามเนื้อ',
-            defaultMeasurements: [
-                { name: 'Deltoid', unit: '/5', value: '' },
-                { name: 'Biceps', unit: '/5', value: '' },
-                { name: 'Triceps', unit: '/5', value: '' },
-                { name: 'Quadriceps', unit: '/5', value: '' }
-            ]
-        },
-        'Pain': {
-            name: 'การประเมินความเจ็บปวด',
-            defaultMeasurements: [
-                { name: 'Pain Scale', unit: '/10', value: '' },
-                { name: 'Location', unit: '', value: '' },
-                { name: 'Duration', unit: 'นาที', value: '' }
-            ]
-        },
-        'Function': {
-            name: 'การประเมินการทำงาน',
-            defaultMeasurements: [
-                { name: 'ADL Score', unit: '%', value: '' },
-                { name: 'Mobility', unit: '/10', value: '' },
-                { name: 'Independence', unit: '%', value: '' }
-            ]
-        },
-        'Balance': {
-            name: 'การประเมินการทรงตัว',
-            defaultMeasurements: [
-                { name: 'Static Balance', unit: 'วินาที', value: '' },
-                { name: 'Dynamic Balance', unit: '/10', value: '' },
-                { name: 'Fall Risk', unit: 'Low/Med/High', value: '' }
-            ]
-        },
-        'Gait': {
-            name: 'การประเมินการเดิน',
-            defaultMeasurements: [
-                { name: 'Speed', unit: 'm/min', value: '' },
-                { name: 'Cadence', unit: 'steps/min', value: '' },
-                { name: 'Stride Length', unit: 'cm', value: '' }
-            ]
-        }
-    };
-    
-    // Store templates globally
-    window.measurementTemplates = templates;
-}
 
 // Show create PT Data form modal
 function showCreatePTDataForm() {
@@ -139,7 +76,85 @@ function showCreatePTDataForm() {
         if (firstInput) {
             setTimeout(() => firstInput.focus(), 100);
         }
+        
+        // Update session preview
+        updateSessionPreview();
     }
+}
+
+// Update session preview based on assessment type
+function updateSessionPreview() {
+    const assessmentTypeSelect = document.getElementById('assessmentType');
+    const sessionPreview = document.getElementById('sessionPreview');
+    
+    if (assessmentTypeSelect && sessionPreview) {
+        const selectedType = assessmentTypeSelect.value;
+        if (selectedType) {
+            // Count existing sessions of this type for current HN
+            const existingSessions = document.querySelectorAll('.ptdata-card');
+            let count = 0;
+            
+            existingSessions.forEach(card => {
+                // Find HN element in this card
+                const hnElements = card.querySelectorAll('.detail-item');
+                let cardHN = null;
+                
+                hnElements.forEach(item => {
+                    const label = item.querySelector('.detail-label');
+                    if (label && label.textContent.includes('HN:')) {
+                        const value = item.querySelector('.detail-value');
+                        if (value) {
+                            cardHN = value.textContent.trim();
+                        }
+                    }
+                });
+                
+                // Get current page HN
+                const pageHN = getCurrentHN();
+                
+                // Only count if this card belongs to current HN
+                if (cardHN && pageHN && cardHN === pageHN) {
+                    const typeElements = card.querySelectorAll('.summary-item');
+                    typeElements.forEach(item => {
+                        const label = item.querySelector('.summary-label');
+                        if (label && label.textContent.includes('ประเภทการประเมิน')) {
+                            const value = item.querySelector('.summary-value');
+                            if (value && value.textContent.trim() === selectedType) {
+                                count++;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            const nextSession = count + 1;
+            sessionPreview.textContent = `ครั้งที่ ${nextSession}`;
+        } else {
+            sessionPreview.textContent = 'ครั้งที่ 1';
+        }
+    }
+}
+
+// Get current HN from URL or page context
+function getCurrentHN() {
+    // Try to get HN from URL
+    const pathParts = window.location.pathname.split('/');
+    const hnIndex = pathParts.indexOf('ptData');
+    if (hnIndex !== -1 && pathParts[hnIndex + 1]) {
+        return pathParts[hnIndex + 1];
+    }
+    
+    // Try to get HN from page title or other elements
+    const hnElement = document.querySelector('.patient-hn');
+    if (hnElement) {
+        const hnText = hnElement.textContent;
+        const match = hnText.match(/HN:\s*(.+)/);
+        if (match) {
+            return match[1].trim();
+        }
+    }
+    
+    return null;
 }
 
 // Hide create PT Data form modal
@@ -175,74 +190,6 @@ function hideProgressChart() {
     }
 }
 
-// Auto-fill measurement fields based on assessment type
-function autoFillMeasurementFields(type) {
-    if (!window.measurementTemplates || !type) return;
-    
-    const template = window.measurementTemplates[type];
-    if (!template) return;
-    
-    // Clear existing measurements
-    const measurementsGrid = document.getElementById('measurementsGrid');
-    if (measurementsGrid) {
-        measurementsGrid.innerHTML = '';
-    }
-    
-    // Add default measurements
-    template.defaultMeasurements.forEach((measurement, index) => {
-        addMeasurement(measurement.name, measurement.unit);
-    });
-}
-
-// Add measurement field
-function addMeasurement(name = '', unit = '') {
-    const measurementsGrid = document.getElementById('measurementsGrid');
-    if (!measurementsGrid) return;
-    
-    const measurementCount = measurementsGrid.children.length;
-    const measurementItem = document.createElement('div');
-    measurementItem.className = 'measurement-item';
-    measurementItem.innerHTML = `
-        <input type="text" name="measurements[${measurementCount}][name]" class="form-control" 
-               placeholder="ชื่อการวัด" value="${name}" required>
-        <input type="number" name="measurements[${measurementCount}][value]" class="form-control" 
-               placeholder="ค่า" step="0.01" required>
-        <input type="text" name="measurements[${measurementCount}][unit]" class="form-control" 
-               placeholder="หน่วย" value="${unit}">
-        <button type="button" class="btn-remove" onclick="removeMeasurement(this)">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-    
-    measurementsGrid.appendChild(measurementItem);
-}
-
-// Remove measurement field
-function removeMeasurement(button) {
-    const measurementItem = button.closest('.measurement-item');
-    if (measurementItem) {
-        measurementItem.remove();
-        // Re-index remaining measurements
-        reindexMeasurements();
-    }
-}
-
-// Re-index measurement fields
-function reindexMeasurements() {
-    const measurementsGrid = document.getElementById('measurementsGrid');
-    if (!measurementsGrid) return;
-    
-    const measurementItems = measurementsGrid.querySelectorAll('.measurement-item');
-    measurementItems.forEach((item, index) => {
-        const nameInput = item.querySelector('input[name*="[name]"]');
-        const valueInput = item.querySelector('input[name*="[value]"]');
-        const unitInput = item.querySelector('input[name*="[unit]"]');
-        
-        if (nameInput) nameInput.name = `measurements[${index}][name]`;
-        if (valueInput) valueInput.name = `measurements[${index}][value]`;
-        if (unitInput) unitInput.name = `measurements[${index}][unit]`;
-    });
-}
 
 // Validate date input
 function validateDate(input) {
@@ -294,23 +241,6 @@ function validateForm(form) {
         }
     }
     
-    // Validate measurements
-    const measurements = form.querySelectorAll('.measurement-item');
-    if (measurements.length === 0) {
-        showAlert('กรุณาเพิ่มการวัดอย่างน้อย 1 รายการ', 'error');
-        isValid = false;
-    }
-    
-    // Validate measurement values
-    measurements.forEach(measurement => {
-        const nameInput = measurement.querySelector('input[name*="[name]"]');
-        const valueInput = measurement.querySelector('input[name*="[value]"]');
-        
-        if (nameInput && nameInput.value.trim() && valueInput && !valueInput.value.trim()) {
-            showFieldError(valueInput, 'กรุณากรอกค่าการวัด');
-            isValid = false;
-        }
-    });
     
     return isValid;
 }
@@ -344,12 +274,6 @@ function clearCreatePTDataForm() {
     const form = document.querySelector('#createPTDataModal form');
     if (form) {
         form.reset();
-        
-        // Clear measurements grid
-        const measurementsGrid = document.getElementById('measurementsGrid');
-        if (measurementsGrid) {
-            measurementsGrid.innerHTML = '';
-        }
         
         // Clear any field errors
         const fieldErrors = form.querySelectorAll('.field-error');
@@ -537,6 +461,4 @@ window.showCreatePTDataForm = showCreatePTDataForm;
 window.hideCreatePTDataForm = hideCreatePTDataForm;
 window.showProgressChart = showProgressChart;
 window.hideProgressChart = hideProgressChart;
-window.addMeasurement = addMeasurement;
-window.removeMeasurement = removeMeasurement;
 window.getProgressTracking = getProgressTracking;

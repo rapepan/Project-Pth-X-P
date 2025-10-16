@@ -16,16 +16,24 @@ class AppointmentModel {
     const values = [
       appointmentData.HN,
       appointmentData.patient_name,
-      appointmentData.patient_phone,
+      appointmentData.patient_phone || null,
       appointmentData.patient_address || null,
       appointmentData.appointment_date,
       appointmentData.appointment_time,
       appointmentData.status || 'scheduled',
-      appointmentData.notes,
+      appointmentData.notes || null,
       appointmentData.created_by
     ];
     
-    db.query(query, values, callback);
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error creating appointment:', err);
+        callback(err, null);
+      } else {
+        console.log('Appointment created successfully:', result);
+        callback(null, result);
+      }
+    });
   }
 
   /**
@@ -237,7 +245,14 @@ class AppointmentModel {
       params.push(appointmentId);
     }
     
-    db.query(query, params, callback);
+    db.query(query, params, (err, results) => {
+      if (err) {
+        console.error('Error in checkTimeConflict:', err);
+        callback(err, null);
+      } else {
+        callback(null, results);
+      }
+    });
   }
 
   /**

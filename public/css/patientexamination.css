@@ -410,10 +410,10 @@ nav a .fas {
 .form-group input,
 .form-group textarea,
 .form-group select {
-    padding: 0.875rem 1rem;
-    border: 2px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-light);
     border-radius: var(--radius-md);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-family: inherit;
     transition: var(--transition);
     background: var(--bg-white);
@@ -595,15 +595,12 @@ nav a .fas {
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: var(--transition);
-    background: var(--bg-light);
+    background: var(--bg-white);
 }
 
 .radio-option:hover {
     border-color: var(--primary-color);
     background: rgba(0, 137, 123, 0.05);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
 }
 
 .radio-option input[type="checkbox"] {
@@ -667,7 +664,7 @@ nav a .fas {
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    background: #EF5350;
     color: white;
 }
 
@@ -885,12 +882,12 @@ nav a .fas {
 .info-input2 {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--border-light);
     border-radius: var(--radius-md);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-family: inherit;
     transition: var(--transition);
-    background: white;
+    background: var(--bg-white);
     color: var(--text-primary);
 }
 
@@ -997,19 +994,21 @@ textarea.info-input2 {
 .input-with-checkbox textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--border-light);
     border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 0.95rem;
     transition: var(--transition);
     resize: vertical;
     min-height: 60px;
+    background: var(--bg-white);
 }
 
 .input-with-checkbox textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    transform: translateY(-1px);
 }
 
 /* ========== Button Group ========== */
@@ -1308,7 +1307,6 @@ textarea.info-input2 {
 /* ========== Sub Options Styling ========== */
 .sub-options-container {
     overflow: hidden;
-    transition: var(--transition);
     margin-top: 0.5rem;
     padding-left: 1rem;
     border-left: 3px solid var(--primary-light);
@@ -1334,13 +1332,11 @@ textarea.info-input2 {
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
     padding: 0.75rem;
-    transition: var(--transition);
 }
 
 .sub-options-container .radio-option:hover {
     background: rgba(255,255,255,0.9);
     border-color: var(--primary-light);
-    transform: translateX(5px);
 }
 
 .sub-options-container .radio-option.checked {
@@ -1424,8 +1420,6 @@ textarea.info-input2 {
 .radio-option.checked {
     background: linear-gradient(135deg, rgba(0,137,123,0.08) 0%, rgba(77,182,172,0.08) 100%);
     border-color: var(--primary-color);
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-3px);
 }
 
 .radio-option input[type="checkbox"] {
@@ -1435,7 +1429,6 @@ textarea.info-input2 {
     border: 2px solid var(--border-color);
     background: white;
     cursor: pointer;
-    transition: var(--transition);
     position: relative;
 }
 
@@ -1467,6 +1460,7 @@ textarea.info-input2 {
     color: var(--primary-dark);
     font-weight: 600;
 }
+
 
 /* ========== Detail Input Styling ========== */
 .detail-input-container {
@@ -1564,19 +1558,22 @@ textarea.info-input2 {
 }
 
 .underline-input {
-    border: none;
-    border-bottom: 1px solid var(--text-primary);
-    padding: 0.25rem 0.5rem;
-    background: transparent;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    background: var(--bg-white);
     font-family: inherit;
     font-size: 0.95rem;
     min-width: 300px;
     flex: 1;
     outline: none;
+    transition: var(--transition);
 }
 
 .underline-input:focus {
-    border-bottom: 2px solid var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+    transform: translateY(-1px);
 }
 
 .sub-options {

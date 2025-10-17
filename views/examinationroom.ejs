@@ -119,18 +119,19 @@
                     <small>สรุปผลการรักษา PT</small>
                 </button>
                 
-                <button class="action-btn danger" onclick="window.location.href='/billing/<%= patient.HN %>'">
-                    <i class="fas fa-calculator"></i>
-                    <span>สรุปค่าใช้จ่าย</span>
-                    <small>คำนวณค่าใช้จ่าย</small>
-                </button>
-                
                 <button class="action-btn light" onclick="window.location.href='/medicaHistorydate/<%= patient.HN %>'">
                     <i class="fas fa-history"></i>
                     <span>ดูประวัติ</span>
                     <small>ประวัติการรักษา</small>
                 </button>
                 <% } %>
+                
+                <!-- ปุ่มสรุปค่าใช้จ่ายสำหรับ Staff, Physical Therapist และ Admin -->
+                <button class="action-btn danger" onclick="window.location.href='/billing/<%= patient.HN %>'">
+                    <i class="fas fa-calculator"></i>
+                    <span>สรุปค่าใช้จ่าย</span>
+                    <small>คำนวณค่าใช้จ่าย</small>
+                </button>
                 
             </div>
             

@@ -280,6 +280,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ฟังก์ชันการชำระเงิน
 function processPayment() {
+    // เพิ่ม loading state
+    const paymentBtn = document.getElementById('paymentBtn');
+    const btnText = paymentBtn.querySelector('.btn-text');
+    const btnLoading = paymentBtn.querySelector('.btn-loading');
+    
+    // แสดง loading state
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline';
+    paymentBtn.disabled = true;
+    
     const paymentMethod = document.getElementById('paymentMethod').value;
     const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
     

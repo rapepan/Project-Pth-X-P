@@ -127,8 +127,13 @@
 
                 <!-- Submit Buttons -->
                 <div class="btn-group fade-in" style="animation-delay: 0.9s;">
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> บันทึกการวินิจฉัย
+                    <button type="submit" class="btn-primary" id="diagnosisSubmitBtn">
+                        <i class="fas fa-save"></i>
+                        <span class="btn-text">บันทึกการวินิจฉัย</span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            กำลังบันทึก...
+                        </span>
                     </button>
                     <button type="button" class="btn-secondary" onclick="window.history.back()">
                         <i class="fas fa-times"></i> ยกเลิก

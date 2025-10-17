@@ -16,6 +16,23 @@
         }
         updateTime();
         setInterval(updateTime, 1000);
+        
+        // Add form submission loading state
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('diagnosisSubmitBtn');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoading = submitBtn.querySelector('.btn-loading');
+                    
+                    // แสดง loading state
+                    btnText.style.display = 'none';
+                    btnLoading.style.display = 'inline';
+                    submitBtn.disabled = true;
+                });
+            }
+        });
 
         // ICD-10 Search with Multiple Selection
         const icd10Search = document.getElementById('icd10Search');

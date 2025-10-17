@@ -163,12 +163,18 @@
             </div>
         <% } %>
 
-        <!-- Back Button -->
+        <!-- Action Buttons -->
         <div class="fade-in" style="animation-delay: 0.3s;">
-            <button class="button3" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> 
-                ย้อนกลับ
-            </button>
+            <div class="button-group">
+                <button class="button-confirm" onclick="goToExaminationRoom()">
+                    <i class="fas fa-check-circle"></i> 
+                    ยืนยัน
+                </button>
+                <button class="button3" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> 
+                    ย้อนกลับ
+                </button>
+            </div>
         </div>
     </div>
 
@@ -200,8 +206,29 @@
                 }, 3000);
             }
             
-            // Make goBack function globally accessible
+            // Go to examination room function
+            function goToExaminationRoom() {
+                // Add loading state
+                const confirmBtn = document.querySelector('.button-confirm');
+                const originalContent = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลด...';
+                confirmBtn.disabled = true;
+                
+                // Navigate to examination room
+                setTimeout(() => {
+                    window.location.href = '/examinationroom/<%= patient ? patient.HN : "" %>';
+                }, 500);
+                
+                // Restore button after delay if still on page
+                setTimeout(() => {
+                    confirmBtn.innerHTML = originalContent;
+                    confirmBtn.disabled = false;
+                }, 3000);
+            }
+            
+            // Make functions globally accessible
             window.goBack = goBack;
+            window.goToExaminationRoom = goToExaminationRoom;
             
             // Add smooth scroll behavior
             document.documentElement.style.scrollBehavior = 'smooth';

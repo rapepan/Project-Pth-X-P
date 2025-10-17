@@ -25,4 +25,19 @@
                     });
                 }
             });
+            
+            // Add form submission loading state
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('patientSubmitBtn');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoading = submitBtn.querySelector('.btn-loading');
+                    
+                    // แสดง loading state
+                    btnText.style.display = 'none';
+                    btnLoading.style.display = 'inline';
+                    submitBtn.disabled = true;
+                });
+            }
         });

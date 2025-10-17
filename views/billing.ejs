@@ -294,7 +294,12 @@
                          <!-- Payment Action Button -->
                          <div class="payment-action">
                              <button type="button" class="btn-payment" id="paymentBtn" onclick="processPayment()">
-                                 <i class="fas fa-money-bill-wave"></i> ยืนยันการชำระเงิน
+                                 <i class="fas fa-money-bill-wave"></i>
+                                 <span class="btn-text">ยืนยันการชำระเงิน</span>
+                                 <span class="btn-loading" style="display: none;">
+                                     <i class="fas fa-spinner fa-spin"></i>
+                                     กำลังประมวลผล...
+                                 </span>
                              </button>
                          </div>
                      </div>

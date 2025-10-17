@@ -158,9 +158,13 @@
 
                 <!-- Form Actions -->
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="btn-submit" id="submitBtn">
                         <i class="fas fa-save"></i>
-                        <%= appointment ? 'บันทึกการแก้ไข' : 'สร้างนัดหมาย' %>
+                        <span class="btn-text"><%= appointment ? 'บันทึกการแก้ไข' : 'สร้างนัดหมาย' %></span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            กำลังบันทึก...
+                        </span>
                     </button>
                     
                     <a href="/appointments" class="btn-cancel">
@@ -197,6 +201,21 @@
 
             // Initialize patient search functionality
             initializePatientSearch();
+            
+            // Add form submission loading state
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('submitBtn');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnLoading = submitBtn.querySelector('.btn-loading');
+                    
+                    // แสดง loading state
+                    btnText.style.display = 'none';
+                    btnLoading.style.display = 'inline';
+                    submitBtn.disabled = true;
+                });
+            }
         });
 
         function initializePatientSearch() {

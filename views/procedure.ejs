@@ -154,8 +154,13 @@
                             <button type="button" class="btn-procedure secondary" onclick="hideCreateProcedureForm()">
                                 <i class="fas fa-times"></i> ยกเลิก
                             </button>
-                            <button type="submit" class="btn-procedure primary">
-                                <i class="fas fa-save"></i> บันทึกหัตถการ
+                            <button type="submit" class="btn-procedure primary" id="procedureSubmitBtn">
+                                <i class="fas fa-save"></i>
+                                <span class="btn-text">บันทึกหัตถการ</span>
+                                <span class="btn-loading" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    กำลังบันทึก...
+                                </span>
                             </button>
                         </div>
                     </form>
@@ -303,6 +308,15 @@
         
         // ตรวจสอบการเลือกบริการก่อนส่งฟอร์ม
         document.querySelector('form').addEventListener('submit', function(e) {
+            // เพิ่ม loading state
+            const submitBtn = document.getElementById('procedureSubmitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            
+            // แสดง loading state
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            submitBtn.disabled = true;
             if (selectedServices.length === 0) {
                 e.preventDefault();
                 alert('กรุณาเลือกบริการอย่างน้อย 1 รายการ');

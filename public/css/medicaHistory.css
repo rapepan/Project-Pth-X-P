@@ -457,3 +457,61 @@ button a {
         font-size: 13px;
     }
 }
+
+/* ========== Button Group Styles ========== */
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+}
+
+/* Confirm Button */
+.button-confirm {
+    background: linear-gradient(135deg, var(--success-color) 0%, #81C784 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.button-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #4CAF50 0%, var(--success-color) 100%);
+}
+
+.button-confirm:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.button-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive Button Group */
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .button-confirm,
+    .button3 {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -154,13 +154,16 @@ class ProcedureController {
 
       // สร้างรายการชื่อบริการจาก selectedServices
       const serviceNames = selectedServices.map(s => s.service_name).join(', ');
+      
+      // สร้างรายการ service_code จาก selectedServices
+      const serviceCodes = selectedServices.map(s => s.service_code).join(', ');
 
       // เตรียมข้อมูลหัตถการให้ครบถ้วน
       const completeProcedureData = {
         HN: HN,
         patient_name: patientName,
         procedure_date: getCurrentDate(), // YYYY-MM-DD format
-        procedure_code: procedureData.procedureCode || 'PT001',
+        procedure_code: serviceCodes || procedureData.procedureCode || 'PT001',
         procedure_name: serviceNames || 'หัตถการกายภาพบำบัด',
         technique: procedureData.techniques || serviceNames || 'การบำบัดด้วยบริการที่เลือก',
         duration_minutes: parseInt(procedureData.duration) || 30,

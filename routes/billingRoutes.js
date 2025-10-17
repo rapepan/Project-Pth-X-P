@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const BillingController = require('../controllers/billingController');
-const { isAuthenticated } = require('../middleware/authMiddleware');
+const { isAuthenticated, checkRole } = require('../middleware/authMiddleware');
 
-// ใช้ middleware สำหรับตรวจสอบการล็อกอิน
+// ใช้ middleware สำหรับตรวจสอบการล็อกอินและสิทธิ์
 router.use(isAuthenticated);
+router.use(checkRole(['admin', 'staff', 'physical_therapist']));
 
 // แสดงหน้า billing สำหรับผู้ป่วย
 router.get('/:HN', BillingController.showBillingPage);

@@ -33,7 +33,11 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
   const query = "SELECT * FROM users WHERE id = ?";
-  db.query(query, [id], (err, user) => {
-    done(err, user[0]);
+  db.query(query, [id], (err, results) => {
+    if (err) return done(err);
+    if (results.length === 0) {
+      return done(null, false);
+    }
+    done(null, results[0]);
   });
 });

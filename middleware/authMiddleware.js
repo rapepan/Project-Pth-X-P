@@ -49,66 +49,14 @@ function checkRole(requiredRole) {
       return next();
     }
 
-    // ถ้าต้องการ admin แต่ user ไม่ใช่ admin
-    if (requiredRole === 'admin' && userRole !== 'admin') {
-      if (expectsJson(req)) {
-        return res.status(403).json({
-          success: false,
-          message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็น Admin)'
-        });
-      }
-
-      return res.status(403).render('error', {
-        title: "ไม่มีสิทธิ์เข้าถึง",
-        message: "หน้านี้จำกัดเฉพาะผู้ดูแลระบบเท่านั้น",
-        error: null,
-        statusCode: 403
-      });
-    }
-
-    // Physical Therapist ทำได้ทุกอย่างยกเว้นส่วน Admin
-    if (userRole === 'physical_therapist') {
-      // ถ้าต้องการ admin ให้ปฏิเสธ
-      if (requiredRole === 'admin') {
-        if (expectsJson(req)) {
-          return res.status(403).json({
-            success: false,
-            message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็น Admin)'
-          });
-        }
-
-        return res.status(403).render('error', {
-          title: "ไม่มีสิทธิ์เข้าถึง",
-          message: "หน้านี้จำกัดเฉพาะผู้ดูแลระบบเท่านั้น",
-          error: null,
-          statusCode: 403
-        });
-      }
-      // นอกเหนือจาก admin ให้ผ่านได้
+    // จัดการ array ของ roles
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    
+    // ตรวจสอบว่า user role อยู่ใน allowed roles หรือไม่
+    if (allowedRoles.includes(userRole)) {
       return next();
     }
 
-    // ถ้าต้องการ physical_therapist แต่ user ไม่ใช่ physical_therapist หรือ admin
-    if (requiredRole === 'physical_therapist' && userRole !== 'physical_therapist' && userRole !== 'admin') {
-      if (expectsJson(req)) {
-        return res.status(403).json({
-          success: false,
-          message: 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (ต้องเป็นนักกายภาพบำบัดหรือ Admin)'
-        });
-      }
-
-      return res.status(403).render('error', {
-        title: "ไม่มีสิทธิ์เข้าถึง",
-        message: "หน้านี้จำกัดเฉพาะนักกายภาพบำบัดหรือผู้ดูแลระบบเท่านั้น",
-        error: null,
-        statusCode: 403
-      });
-    }
-
-    // ถ้าต้องการ staff และมี role เป็น staff, physical_therapist หรือ admin
-    if (requiredRole === 'staff' && (userRole === 'staff' || userRole === 'physical_therapist' || userRole === 'admin')) {
-      return next();
-    }
 
     // ถ้าไม่ตรงเงื่อนไขใดๆ
     if (expectsJson(req)) {

@@ -32,7 +32,9 @@
         <a href="/index"><i class="fas fa-home"></i> หน้าหลัก</a>
         <a href="/examinationroom/<%= HN %>"><i class="fas fa-stethoscope"></i> ห้องตรวจ</a>
         <% if (HN) { %>
-            <a href="/procedure/<%= HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+            <% if (user.role !== 'staff') { %>
+                <a href="/procedure/<%= HN %>"><i class="fas fa-hand-holding-medical"></i> หัตถการ</a>
+            <% } %>
             <a href="/billing/<%= HN %>" class="active"><i class="fas fa-file-invoice-dollar"></i> สรุปค่าใช้จ่าย</a>
         <% } else { %>
         <% } %>
@@ -103,11 +105,13 @@
                         <p class="no-procedures-message">
                             ไม่พบข้อมูลหัตถการสำหรับผู้ป่วย HN: <%= HN %> ในวันที่ <%= new Date(billingDate).toLocaleDateString('th-TH') %>
                         </p>
-                        <div class="no-procedures-actions">
-                            <a href="/procedure/<%= HN %>" class="btn-create-procedure">
-                                <i class="fas fa-plus"></i> สร้างหัตถการใหม่
-                            </a>
-                        </div>
+                        <% if (user.role !== 'staff') { %>
+                            <div class="no-procedures-actions">
+                                <a href="/procedure/<%= HN %>" class="btn-create-procedure">
+                                    <i class="fas fa-plus"></i> สร้างหัตถการใหม่
+                                </a>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -383,11 +387,13 @@
                     <p class="no-services-text">
                         กรุณาไปทำหัตถการก่อนเพื่อเลือกบริการที่ต้องการ
                     </p>
-                    <div class="no-services-actions">
-                        <a href="/procedure/<%= HN %>" class="btn-billing primary">
-                            <i class="fas fa-hand-holding-medical"></i> ไปทำหัตถการ
-                        </a>
-                    </div>
+                    <% if (user.role !== 'staff') { %>
+                        <div class="no-services-actions">
+                            <a href="/procedure/<%= HN %>" class="btn-billing primary">
+                                <i class="fas fa-hand-holding-medical"></i> ไปทำหัตถการ
+                            </a>
+                        </div>
+                    <% } %>
                 </div>
             </div>
             <% } %>

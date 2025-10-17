@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายละเอียดใบเสร็จ - <%= bill.bill_number %></title>
+    <title><%= bill.bill_number %></title>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -569,16 +569,6 @@
                         <span class="financial-label">จำนวนที่ชำระแล้ว:</span>
                         <span class="financial-value"><%= parseFloat(bill.patient_paid_amount || bill.total_amount).toLocaleString('th-TH', {minimumFractionDigits: 2}) %> บาท</span>
                     </div>
-                    
-                    <div class="financial-row remaining" style="color: #27ae60;">
-                        <span class="financial-label">คงเหลือ:</span>
-                        <span class="financial-value">0.00 บาท</span>
-                    </div>
-                <% } else { %>
-                    <div class="financial-row remaining">
-                        <span class="financial-label">คงเหลือ:</span>
-                        <span class="financial-value"><%= parseFloat(bill.total_amount).toLocaleString('th-TH', {minimumFractionDigits: 2}) %> บาท</span>
-                    </div>
                 <% } %>
                 
                 <% if (bill.payment_method) { %>
@@ -596,6 +586,17 @@
                             <%= paymentMethods[bill.payment_method] || bill.payment_method %>
                         </span>
                     </div>
+                    
+                    <% if (bill.payment_method === 'cash' && bill.cash_received) { %>
+                        <div class="financial-row">
+                            <span class="financial-label">เงินที่ได้รับ:</span>
+                            <span class="financial-value"><%= parseFloat(bill.cash_received).toLocaleString('th-TH', {minimumFractionDigits: 2}) %> บาท</span>
+                        </div>
+                        <div class="financial-row">
+                            <span class="financial-label">เงินทอน:</span>
+                            <span class="financial-value"><%= (parseFloat(bill.cash_received) - parseFloat(bill.total_amount)).toLocaleString('th-TH', {minimumFractionDigits: 2}) %> บาท</span>
+                        </div>
+                    <% } %>
                 <% } %>
             </div>
         </div>

@@ -54,7 +54,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: isProduction,
+      secure: false, // เปลี่ยนเป็น false สำหรับ Melon Cloud
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }

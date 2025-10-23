@@ -196,7 +196,7 @@ class MedicalController {
         }
 
         res.render("medicaHistory", {
-          title: "ประวัติผู้ป่วย",
+          title: "ประวัติการรักษาผู้ป่วย",
           patient: patientResults[0],
           medicalfrom: medicalResults[0] || null,
           success: req.query.success
@@ -212,7 +212,7 @@ class MedicalController {
 
     if (!hn) {
       return res.render("medicaHistorydate", {
-        title: "ค้นหาประวัติผู้ป่วย",
+        title: "ประวัติการรักษาผู้ป่วย",
         patient: null,
         medicalHistory: [],
         examinationHistory: [],
@@ -232,7 +232,7 @@ class MedicalController {
 
       if (patientResults.length === 0) {
         return res.render("medicaHistorydate", {
-          title: "ค้นหาประวัติผู้ป่วย",
+          title: "ประวัติการรักษาผู้ป่วย",
           patient: null,
           medicalHistory: [],
           examinationHistory: [],
@@ -296,7 +296,7 @@ class MedicalController {
 
                     // ส่งข้อมูลทั้งหมดไป (จะกรองในหน้า view)
                     res.render("medicaHistorydate", {
-                      title: "ค้นหาประวัติผู้ป่วย",
+                      title: "ประวัติการรักษาผู้ป่วย",
                       patient,
                       medicalHistory: medicalResults,
                       examinationHistory: examinationResults,
@@ -313,7 +313,7 @@ class MedicalController {
           });
         } else {
           res.render("medicaHistorydate", {
-            title: "ค้นหาประวัติผู้ป่วย",
+            title: "ประวัติการรักษาผู้ป่วย",
             patient,
             medicalHistory: [],
             examinationHistory: [],

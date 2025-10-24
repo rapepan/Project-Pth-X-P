@@ -42,11 +42,13 @@
                     <option value="">-- เลือกวันที่ --</option>
                     <% availableDates.forEach(function(d) { %>
                         <option value="<%= d %>" <%= (filters.date === d) ? 'selected' : '' %>>
-                            <% 
-                                const dateObj = new Date(d + 'T00:00:00');
-                                const day = dateObj.getDate();
-                                const month = dateObj.getMonth() + 1;
-                                const year = dateObj.getFullYear() + 543;
+                            <%
+                                // แปลง format YYYY-MM-DD เป็น DD/MM/YYYY+543
+                                const dateStr = String(d);
+                                const parts = dateStr.split('-');
+                                const day = parts[2] || '01';
+                                const month = parts[1] || '01';
+                                const year = (parseInt(parts[0]) || 2024) + 543;
                             %>
                             <%= day %>/<%= month %>/<%= year %>
                         </option>

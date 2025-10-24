@@ -1,5 +1,3 @@
-// appointments.js - JavaScript สำหรับระบบนัดหมาย
-
 document.addEventListener('DOMContentLoaded', function() {
     initializeAppointments();
 });

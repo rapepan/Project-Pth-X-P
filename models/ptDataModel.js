@@ -2,11 +2,6 @@ const db = require('../config/db');
 
 class PTDataModel {
 
-
-
-
-
-
   // ดึงข้อมูลทางกายภาพบำบัดของผู้ป่วย
   static getPatientPTData(HN, callback) {
     const query = `

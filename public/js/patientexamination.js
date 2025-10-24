@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
     setupCheckboxBehaviors();
     setupInputVisibility();
-    setupDetailInputToggle(); // เพิ่มฟังก์ชันใหม่
-    setupSubOptionsToggle(); // เพิ่มฟังก์ชันสำหรับ sub-options
+    setupDetailInputToggle(); 
+    setupSubOptionsToggle(); 
     setupFormValidation();
     setupAnimations();
     preventEnterSubmit();

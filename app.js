@@ -180,8 +180,6 @@ app.use((err, req, res, next) => {
 
   const statusCode = err.status || err.statusCode || 500;
 
-  // ไม่ใช้ API แล้ว
-
   // สำหรับ page requests
   res.status(statusCode).render('error', {
     title: "เกิดข้อผิดพลาด",

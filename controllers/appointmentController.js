@@ -2,9 +2,6 @@ const AppointmentModel = require('../models/appointmentModel');
 
 class AppointmentController {
 
-  /**
-   * แสดงหน้ารายการนัดหมาย
-   */
   static async showAppointments(req, res) {
     try {
       const { search } = req.query;

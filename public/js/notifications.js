@@ -1,5 +1,3 @@
-// notifications.js - Handle notification display and auto-dismiss
-
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-dismiss success messages after 5 seconds
     const successAlerts = document.querySelectorAll('.alert-success');

@@ -1,6 +1,3 @@
-// middleware/authMiddleware.js
-
-// Helper function to check if request expects JSON
 function expectsJson(req) {
   return req.url.startsWith('/api/') ||
          (req.headers.accept && req.headers.accept.includes('application/json'));

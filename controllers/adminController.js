@@ -4,7 +4,6 @@ const UserModel = require('../models/userModel');
 const PDFGenerator = require('../utils/pdfGenerator');
 
 class AdminController {
-  // แสดงหน้ารายการผู้ใช้
   static showUsers(req, res) {
     UserModel.getAllUsers((err, users) => {
       if (err) {

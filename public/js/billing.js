@@ -1,6 +1,3 @@
-// billing.js - JavaScript สำหรับหน้าจัดการค่าใช้จ่าย
-
-// ฟังก์ชันอัปเดตยอดรวมของแต่ละบริการ
 function updateServiceTotal(input) {
     const index = input.dataset.index;
     const price = parseFloat(input.dataset.price);

@@ -38,9 +38,14 @@ class MedicalModel {
   // ดึงประวัติการรักษาตามวันที่
   static getMedicalHistoryByDate(HN, date, callback) {
     const query = `
-      SELECT * FROM medicalfrom 
-      WHERE HN = ? 
-      AND DATE_FORMAT(CONVERT_TZ(created_at, @@session.time_zone, '+07:00'), '%Y-%m-%d') = ?
+      SELECT *,
+             DATE_FORMAT(created_at, '%Y-%m-%d') as visit_date,
+             DATE_FORMAT(created_at, '%d') as day,
+             DATE_FORMAT(created_at, '%m') as month,
+             DATE_FORMAT(created_at, '%Y') as year
+      FROM medicalfrom
+      WHERE HN = ?
+      AND DATE(created_at) = ?
       ORDER BY created_at DESC
     `;
     db.query(query, [HN, date], callback);
@@ -49,7 +54,7 @@ class MedicalModel {
   // ดึงวันที่ทั้งหมดที่มีประวัติการรักษา
   static getAvailableDates(HN, callback) {
     const query = `
-      SELECT DISTINCT DATE_FORMAT(CONVERT_TZ(created_at, @@session.time_zone, '+07:00'), '%Y-%m-%d') as visitDate
+      SELECT DISTINCT DATE(created_at) as visitDate
       FROM medicalfrom
       WHERE HN = ?
       ORDER BY visitDate DESC

@@ -88,11 +88,11 @@
                                 <i class="fas fa-calendar"></i> วันที่บันทึก:
                             </div>
                             <div class="patient-value">
-                                <% 
-                                    const recordDate = new Date(record.created_at || record.date || record.id);
-                                    const recordDay = recordDate.getDate();
-                                    const recordMonth = recordDate.getMonth() + 1;
-                                    const recordYear = recordDate.getFullYear() + 543;
+                                <%
+                                    // ใช้ค่าจาก SQL โดยตรง
+                                    const recordDay = record.day || '01';
+                                    const recordMonth = record.month || '01';
+                                    const recordYear = (parseInt(record.year) || 2024) + 543;
                                 %>
                                 <%= recordDay %>/<%= recordMonth %>/<%= recordYear %>
                             </div>

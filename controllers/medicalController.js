@@ -253,7 +253,18 @@ class MedicalController {
           return res.status(500).send("ไม่สามารถดึงวันที่การรักษาได้");
         }
 
-        const availableDates = datesResults.map(r => r.visitDate);
+        // แปลง Date object เป็น string format YYYY-MM-DD
+        const availableDates = datesResults.map(r => {
+          const dateValue = r.visitDate;
+          if (dateValue instanceof Date) {
+            // แปลง Date object เป็น YYYY-MM-DD โดยใช้ local time
+            const year = dateValue.getFullYear();
+            const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+            const day = String(dateValue.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          }
+          return String(dateValue);
+        });
         let selectedDate = date || (availableDates.length > 0 ? availableDates[0] : "");
 
         if (selectedDate) {

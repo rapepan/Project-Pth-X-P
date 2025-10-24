@@ -41,16 +41,16 @@
                 <select id="date" name="date">
                     <option value="">-- เลือกวันที่ --</option>
                     <% availableDates.forEach(function(d) { %>
-                        <option value="<%= d %>" <%= (filters.date === d) ? 'selected' : '' %>>
-                            <%
-                                // แปลง format YYYY-MM-DD เป็น DD/MM/YYYY+543
-                                const dateStr = String(d);
-                                const parts = dateStr.split('-');
-                                const day = parts[2] || '01';
-                                const month = parts[1] || '01';
-                                const year = (parseInt(parts[0]) || 2024) + 543;
-                            %>
-                            <%= day %>/<%= month %>/<%= year %>
+                        <%
+                            // d เป็น string format YYYY-MM-DD จาก Controller แล้ว
+                            const dateStr = String(d);
+                            const parts = dateStr.split('-');
+                            const displayDay = parts[2] || '01';
+                            const displayMonth = parts[1] || '01';
+                            const displayYear = (parseInt(parts[0]) || 2024) + 543;
+                        %>
+                        <option value="<%= dateStr %>" <%= (filters.date === dateStr) ? 'selected' : '' %>>
+                            <%= displayDay %>/<%= displayMonth %>/<%= displayYear %>
                         </option>
                     <% }); %>
                 </select>

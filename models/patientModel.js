@@ -43,7 +43,7 @@ class PatientModel {
 
   // ค้นหาผู้ป่วยตาม HN
   static getPatientByHN(HN, callback) {
-    const query = "SELECT id, HN, fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships, year (CURRENT_DATE) - year (dob) as dob FROM patientWHERE HN = ?";
+    const query = "SELECT id, HN, fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships, year (CURRENT_DATE) - year (dob) as dob FROM patient WHERE HN = ?";
     db.query(query, [HN], callback);
   }
 

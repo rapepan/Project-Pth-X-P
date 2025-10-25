@@ -344,7 +344,7 @@ class ExaminationModel {
   static getPatientExaminations(HN, callback) {
     const query = `
       SELECT * FROM patient_examination 
-      WHERE HN = ? 
+      WHERE HN = ?  
       ORDER BY created_at DESC
     `;
     db.query(query, [HN], (err, results) => {

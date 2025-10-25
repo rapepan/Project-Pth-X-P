@@ -43,7 +43,7 @@ class PatientModel {
 
   // ค้นหาผู้ป่วยตาม HN
   static getPatientByHN(HN, callback) {
-    const query = "SELECT * FROM patient WHERE HN = ?";
+    const query = "SELECT id, HN, fname, lname, national_id, gender, phone, age, dob, allergy_history, chronic_diseases, housenumber, moo, soi, subdistrict, district, province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships, year (CURRENT_DATE) - year (dob) as dob FROM patientWHERE HN = ?";
     db.query(query, [HN], callback);
   }
 
@@ -145,7 +145,7 @@ class PatientModel {
 
   // ดึงจำนวนผู้ป่วยทั้งหมด
   static getTotalPatientsCount(callback) {
-    const query = "SELECT year (CURRENT_DATE()) - year(dob) as age FROM patient";
+    const query = "SELECT COUNT(*) as total FROM patient";
     db.query(query, callback);
   }
 

@@ -145,7 +145,7 @@ class PatientModel {
 
   // ดึงจำนวนผู้ป่วยทั้งหมด
   static getTotalPatientsCount(callback) {
-    const query = "SELECT year (CURRENT_DATE) - year (dob) FROM patient";
+    const query = "SELECT year (CURRENT_DATE()) - year(dob) as age FROM patient";
     db.query(query, callback);
   }
 

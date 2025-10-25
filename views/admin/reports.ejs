@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="admin-container">
@@ -94,20 +95,8 @@
                     <i class="fas fa-chart-pie"></i>
                     สถิติการรักษา
                 </h2>
-                <div class="chart-placeholder">
-                    <i class="fas fa-chart-pie"></i>
-                    กราฟสถิติการรักษาจะแสดงที่นี่
-                </div>
-            </div>
-            
-            <div class="chart-card">
-                <h2 class="chart-title">
-                    <i class="fas fa-chart-line"></i>
-                    รายได้รายเดือน
-                </h2>
-                <div class="chart-placeholder">
-                    <i class="fas fa-chart-line"></i>
-                    กราฟรายได้รายเดือนจะแสดงที่นี่
+                <div style="position: relative; height: 300px; padding: 20px;">
+                    <canvas id="treatmentStatsChart"></canvas>
                 </div>
             </div>
         </div>
@@ -178,7 +167,7 @@
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
         };
-        
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -187,12 +176,58 @@
                 }
             });
         }, observerOptions);
-        
+
         document.querySelectorAll('.stat-card').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(card);
+        });
+
+        // สร้างกราฟสถิติการรักษา (Pie Chart)
+        const treatmentCtx = document.getElementById('treatmentStatsChart').getContext('2d');
+        const treatmentChart = new Chart(treatmentCtx, {
+            type: 'pie',
+            data: {
+                labels: ['ผู้ป่วยทั้งหมด', 'การรักษาเดือนนี้'],
+                datasets: [{
+                    data: [
+                        <%= stats.totalPatients || 0 %>,
+                        <%= stats.thisMonthExaminations || 0 %>,
+                        <%= stats.todayAppointments || 0 %>
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 206, 86, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: 'Prompt, sans-serif',
+                                size: 12
+                            },
+                            padding: 15
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
         });
 
         // ฟังก์ชันสำหรับการดาวน์โหลดรายงาน PDF

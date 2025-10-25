@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ไม่ต้อง append หน่วยเข้าไปในค่า - ให้ส่งเป็นตัวเลขล้วนๆ
 document.getElementById("historyForm").addEventListener("submit", function(event) {
     // ตรวจสอบค่าว่างก่อนส่ง
     const requiredFields = ['weight', 'height', 'bloodPressure', 'pulse', 'o2Sat', 'respiratoryRate', 'symptoms', 'currentHistory', 'pastHistory'];
@@ -37,8 +36,7 @@ document.getElementById("historyForm").addEventListener("submit", function(event
             return false;
         }
     }
-    
-    // คำนวณ BMI ก่อนส่ง
+
     calculateBMI();
     
     console.log("Submitting form with data:", {

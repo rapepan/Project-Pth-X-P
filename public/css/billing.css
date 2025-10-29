@@ -680,38 +680,7 @@ nav a .fas {
 
 .amount-received-group,
 .change-amount-group {
-    margin-top: 1rem;
-}
-
-.amount-received-label,
-.change-amount-label {
-    display: block;
-    font-weight: 600;
-    color: #7f8c8d;
-    margin-bottom: 0.5rem;
-}
-
-.amount-received-input,
-.change-amount-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #ecf0f1;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
-
-.amount-received-input:focus,
-.change-amount-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 137, 123, 0.1);
-}
-
-.change-amount-input {
-    background: #f8f9fa;
-    color: #6c757d;
-    cursor: not-allowed;
+    margin-top: 0;
 }
 
 /* Payment Status Section */
@@ -904,6 +873,7 @@ nav a .fas {
 .insurance-select,
 .amount-received-input,
 .change-amount-input {
+    width: 100%;
     padding: 0.75rem;
     border: 2px solid #ecf0f1;
     border-radius: 8px;
@@ -921,9 +891,17 @@ nav a .fas {
 }
 
 .change-amount-input {
-    background-color: #f8f9fa;
-    color: var(--success-color);
+    background-color: #fee;
+    border-color: #ffcdd2;
+    color: var(--danger-color);
     font-weight: 600;
+    cursor: not-allowed;
+}
+
+.change-amount-input:focus {
+    outline: none;
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.1);
 }
 
 

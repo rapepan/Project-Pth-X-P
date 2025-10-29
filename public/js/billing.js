@@ -275,34 +275,114 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ฟังก์ชันตรวจสอบข้อมูลการชำระเงิน
+function validatePaymentData() {
+    const errors = [];
+
+    // 1. ตรวจสอบว่ามีบริการที่เลือกหรือไม่
+    const selectedServicesInput = document.getElementById('selectedServicesInput');
+    if (!selectedServicesInput || !selectedServicesInput.value) {
+        errors.push('ไม่พบข้อมูลบริการ');
+    } else {
+        try {
+            const services = JSON.parse(selectedServicesInput.value);
+            if (!services || services.length === 0) {
+                errors.push('กรุณาเลือกบริการอย่างน้อย 1 รายการ');
+            }
+        } catch (error) {
+            errors.push('ข้อมูลบริการไม่ถูกต้อง');
+        }
+    }
+
+    // 2. ตรวจสอบยอดเงินรวม
+    const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
+    if (finalTotal <= 0) {
+        errors.push('ยอดเงินรวมต้องมากกว่า 0 บาท');
+    }
+
+    // 3. ตรวจสอบวิธีการชำระเงิน
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    if (!paymentMethod) {
+        errors.push('กรุณาเลือกวิธีการชำระเงิน');
+    }
+
+    // 3.1 ถ้าเลือกประกันสุขภาพ ต้องเลือกประเภทประกันที่ไม่ใช่ "ไม่มีประกัน"
+    if (paymentMethod === 'insurance') {
+        const insuranceType = document.querySelector('select[name="insuranceType"]').value;
+        if (!insuranceType || insuranceType === 'none') {
+            errors.push('กรุณาเลือกประเภทประกัน (ไม่สามารถเลือก "ไม่มีประกัน" เมื่อชำระด้วยประกันสุขภาพ)');
+        }
+    }
+
+    // 4. ถ้าชำระด้วยเงินสด ต้องกรอกจำนวนเงินที่รับ
+    if (paymentMethod === 'cash') {
+        const amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+        if (amountReceived === 0) {
+            errors.push('กรุณากรอกจำนวนเงินที่รับ');
+        } else if (amountReceived < finalTotal) {
+            errors.push(`จำนวนเงินที่รับ (${amountReceived.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท) ต้องไม่น้อยกว่ายอดรวม (${finalTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท)`);
+        }
+    }
+
+    // 5. ถ้าเลือกส่วนลด ต้องระบุเหตุผล
+    const discountType = document.getElementById('discountType').value;
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const discountReason = document.getElementById('discountReason').value.trim();
+
+    if (discountType !== 'none' && discountAmount > 0) {
+        if (!discountReason) {
+            errors.push('กรุณาระบุเหตุผลการให้ส่วนลด');
+        }
+
+        // ตรวจสอบส่วนลดไม่เกินยอดรวม
+        if (discountType === 'percentage' && discountAmount > 100) {
+            errors.push('ส่วนลดเปอร์เซ็นต์ต้องไม่เกิน 100%');
+        } else if (discountType === 'fixed') {
+            const subtotal = parseFloat(document.getElementById('subtotalDisplay').textContent.replace(/,/g, '')) || 0;
+            if (discountAmount > subtotal) {
+                errors.push('ส่วนลดต้องไม่เกินยอดรวมก่อนหักส่วนลด');
+            }
+        }
+    }
+
+    return errors;
+}
+
 // ฟังก์ชันการชำระเงิน
 function processPayment() {
+    // ตรวจสอบข้อมูลก่อนดำเนินการ
+    const validationErrors = validatePaymentData();
+
+    if (validationErrors.length > 0) {
+        // แสดงข้อความ error ทั้งหมด
+        let errorMessage = 'กรุณาตรวจสอบข้อมูลต่อไปนี้:\n\n';
+        validationErrors.forEach((error, index) => {
+            errorMessage += `${index + 1}. ${error}\n`;
+        });
+        alert(errorMessage);
+        return false;
+    }
+
     // เพิ่ม loading state
     const paymentBtn = document.getElementById('paymentBtn');
     const btnText = paymentBtn.querySelector('.btn-text');
     const btnLoading = paymentBtn.querySelector('.btn-loading');
-    
+
     // แสดง loading state
     btnText.style.display = 'none';
     btnLoading.style.display = 'inline';
     paymentBtn.disabled = true;
-    
+
     const paymentMethod = document.getElementById('paymentMethod').value;
     const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
-    
+
     let amountReceived = 0;
     let change = 0;
-    
+
     // สำหรับเงินสด ต้องตรวจสอบจำนวนเงินที่รับ
     if (paymentMethod === 'cash') {
         amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
-        
-        // Validation
-        if (amountReceived < finalTotal) {
-            alert('จำนวนเงินที่รับต้องไม่น้อยกว่ายอดรวม');
-            return;
-        }
-        
+
         // Calculate change
         if (amountReceived > finalTotal) {
             change = amountReceived - finalTotal;
@@ -358,7 +438,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const amountReceivedGroup = document.getElementById('amountReceivedGroup');
     const changeGroup = document.getElementById('changeGroup');
     const changeAmountInput = document.getElementById('changeAmount');
-    
+    const insuranceTypeSelect = document.querySelector('select[name="insuranceType"]');
+
     if (paymentMethodSelect) {
         paymentMethodSelect.addEventListener('change', function() {
             if (this.value === 'cash') {
@@ -375,6 +456,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 amountReceivedInput.value = 0;
                 changeGroup.style.display = 'none';
             }
+
+            // จัดการประเภทประกัน
+            if (this.value === 'insurance') {
+                // ถ้าเลือกประกันสุขภาพ ถ้าเลือก "ไม่มีประกัน" อยู่ ให้เปลี่ยนเป็น "ประกันสังคม"
+                if (insuranceTypeSelect && insuranceTypeSelect.value === 'none') {
+                    insuranceTypeSelect.value = 'social_security';
+                }
+            }
         });
     }
     
@@ -384,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (paymentMethod === 'cash') {
                 const amountReceived = parseFloat(this.value) || 0;
                 const finalTotal = parseFloat(document.getElementById('finalTotalDisplay').textContent.replace(/,/g, '')) || 0;
-                
+
                 if (amountReceived > finalTotal) {
                     const change = amountReceived - finalTotal;
                     changeGroup.style.display = 'block';
@@ -392,6 +481,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     changeGroup.style.display = 'none';
                 }
+            }
+        });
+    }
+
+    // ป้องกันการเลือก "ไม่มีประกัน" เมื่อเลือกวิธีการชำระเงินเป็น "ประกันสุขภาพ"
+    if (insuranceTypeSelect) {
+        insuranceTypeSelect.addEventListener('change', function() {
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            if (paymentMethod === 'insurance' && this.value === 'none') {
+                alert('ไม่สามารถเลือก "ไม่มีประกัน" เมื่อวิธีการชำระเงินเป็น "ประกันสุขภาพ"');
+                // เปลี่ยนกลับเป็น "ประกันสังคม"
+                this.value = 'social_security';
             }
         });
     }
@@ -428,6 +529,7 @@ window.updateDiscountCalculation = updateDiscountCalculation;
 window.updateTotalCalculation = updateTotalCalculation;
 window.updateSelectedServicesInput = updateSelectedServicesInput;
 window.validateForm = validateForm;
+window.validatePaymentData = validatePaymentData;
 window.previewBill = previewBill;
 window.printBill = printBill;
 window.emailBill = emailBill;

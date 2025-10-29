@@ -438,28 +438,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const amountReceivedGroup = document.getElementById('amountReceivedGroup');
     const changeGroup = document.getElementById('changeGroup');
     const changeAmountInput = document.getElementById('changeAmount');
-    const insuranceTypeSelect = document.querySelector('select[name="insuranceType"]');
+    const insuranceTypeSelect = document.getElementById('insuranceType');
+    const insuranceTypeGroup = document.getElementById('insuranceTypeGroup');
 
     if (paymentMethodSelect) {
         paymentMethodSelect.addEventListener('change', function() {
+            // รีเซ็ตทุกช่องก่อน
+            amountReceivedGroup.style.display = 'none';
+            amountReceivedInput.disabled = true;
+            amountReceivedInput.required = false;
+            amountReceivedInput.value = 0;
+            changeGroup.style.display = 'none';
+            insuranceTypeGroup.style.display = 'none';
+
             if (this.value === 'cash') {
                 // แสดงช่องกรอกจำนวนเงินสำหรับเงินสด
                 amountReceivedGroup.style.display = 'block';
                 amountReceivedInput.disabled = false;
                 amountReceivedInput.required = true;
                 amountReceivedInput.focus();
-            } else {
-                // ซ่อนช่องกรอกจำนวนเงินสำหรับวิธีอื่น
-                amountReceivedGroup.style.display = 'none';
-                amountReceivedInput.disabled = true;
-                amountReceivedInput.required = false;
-                amountReceivedInput.value = 0;
-                changeGroup.style.display = 'none';
-            }
-
-            // จัดการประเภทประกัน
-            if (this.value === 'insurance') {
-                // ถ้าเลือกประกันสุขภาพ ถ้าเลือก "ไม่มีประกัน" อยู่ ให้เปลี่ยนเป็น "ประกันสังคม"
+            } else if (this.value === 'insurance') {
+                // แสดงช่องประเภทประกันสำหรับประกันสุขภาพ
+                insuranceTypeGroup.style.display = 'block';
+                // ถ้าเลือก "ไม่มีประกัน" อยู่ ให้เปลี่ยนเป็น "ประกันสังคม"
                 if (insuranceTypeSelect && insuranceTypeSelect.value === 'none') {
                     insuranceTypeSelect.value = 'social_security';
                 }

@@ -891,17 +891,10 @@ nav a .fas {
 }
 
 .change-amount-input {
-    background-color: #fee;
-    border-color: #ffcdd2;
+    background-color: #f8f9fa;
     color: var(--danger-color);
     font-weight: 600;
     cursor: not-allowed;
-}
-
-.change-amount-input:focus {
-    outline: none;
-    border-color: var(--danger-color);
-    box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.1);
 }
 
 

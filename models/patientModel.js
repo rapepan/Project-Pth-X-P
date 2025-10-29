@@ -50,7 +50,7 @@ class PatientModel {
   // เพิ่มผู้ป่วยใหม่
   static createPatient(patientData, callback) {
     const {
-      HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+      HN, fname, lname, national_id, gender, phone, dob, allergy_history,
       chronic_diseases, housenumber, moo, soi, subdistrict, district,
       province, postcode, emergency_fname, emergency_lname, emergency_phone, relationships
     } = patientData;
@@ -59,17 +59,18 @@ class PatientModel {
     const checkColumnQuery = "SHOW COLUMNS FROM patient LIKE 'created_at'";
     db.query(checkColumnQuery, (err, results) => {
       if (err) return callback(err);
-      
+
       let query, values;
-      
+
       if (results.length > 0) {
         // ถ้ามี created_at ให้ใส่ field นี้ด้วย (ใช้ DEFAULT จะใส่เวลาปัจจุบันอัตโนมัติ)
+        // คำนวณ age จาก dob โดยอัตโนมัติ
         query = `
           INSERT INTO patient (
             HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
             chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
             postcode, emergency_fname, emergency_lname, emergency_phone, relationships
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, YEAR(CURDATE()) - YEAR(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
       } else {
         query = `
@@ -77,12 +78,12 @@ class PatientModel {
             HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
             chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
             postcode, emergency_fname, emergency_lname, emergency_phone, relationships
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, YEAR(CURDATE()) - YEAR(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
       }
 
       values = [
-        HN, fname, lname, national_id, gender, phone, age, dob, allergy_history,
+        HN, fname, lname, national_id, gender, phone, dob, dob, allergy_history,
         chronic_diseases, housenumber, moo, soi, subdistrict, district, province,
         postcode, emergency_fname, emergency_lname, emergency_phone, relationships
       ];

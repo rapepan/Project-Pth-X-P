@@ -178,16 +178,16 @@ class PatientController {
   // Prepare patient data - จัดการข้อมูลให้พร้อมบันทึก
   static preparePatientData(data) {
     const preparedData = { ...data };
-    
+
     // ฟิลด์ที่ถ้าไม่มีค่าให้ใส่ '-'
     const optionalTextFields = ['chronic_diseases', 'allergy_history', 'moo', 'soi'];
-    
+
     optionalTextFields.forEach(field => {
       if (!preparedData[field] || preparedData[field].trim() === '') {
         preparedData[field] = '-';
       }
     });
-    
+
     // ทำความสะอาดข้อมูลตัวเลข
     if (preparedData.national_id) {
       preparedData.national_id = preparedData.national_id.replace(/\D/g, '');
@@ -201,12 +201,11 @@ class PatientController {
     if (preparedData.postcode) {
       preparedData.postcode = preparedData.postcode.replace(/\D/g, '');
     }
-    
-    // แปลง age เป็นตัวเลข
-    if (preparedData.age) {
-      preparedData.age = parseInt(preparedData.age, 10);
-    }
-    
+
+    // ไม่ต้องส่ง age เพราะจะคำนวณจาก dob ใน database
+    // ลบฟิลด์ age ออกถ้ามี
+    delete preparedData.age;
+
     return preparedData;
   }
 
@@ -214,11 +213,11 @@ class PatientController {
   static validatePatientData(data) {
     const errors = [];
 
-    // Required fields - ฟิลด์ที่จำเป็นต้องมี
+    // Required fields - ฟิลด์ที่จำเป็นต้องมี (ลบ age ออก)
     const requiredFields = [
-      'fname', 'lname', 'national_id', 'gender', 'phone', 
-      'age', 'dob', 'housenumber', 'subdistrict', 'district', 
-      'province', 'postcode', 'emergency_fname', 'emergency_lname', 
+      'fname', 'lname', 'national_id', 'gender', 'phone',
+      'dob', 'housenumber', 'subdistrict', 'district',
+      'province', 'postcode', 'emergency_fname', 'emergency_lname',
       'emergency_phone', 'relationships'
     ];
 
@@ -251,11 +250,7 @@ class PatientController {
       }
     }
 
-    // Validate age
-    const age = parseInt(data.age, 10);
-    if (isNaN(age) || age < 0 || age > 150) {
-      errors.push('อายุต้องเป็นตัวเลขระหว่าง 0-150');
-    }
+    // ไม่ต้อง validate age เพราะจะคำนวณจาก dob อัตโนมัติ
 
     // Validate postcode (5 digits)
     if (data.postcode) {

@@ -444,23 +444,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (paymentMethodSelect) {
         paymentMethodSelect.addEventListener('change', function() {
             // รีเซ็ตทุกช่องก่อน - ซ่อนทั้งหมด
-            amountReceivedGroup.style.visibility = 'hidden';
+            amountReceivedGroup.style.display = 'none';
             amountReceivedInput.disabled = true;
             amountReceivedInput.required = false;
             amountReceivedInput.value = 0;
-            changeGroup.style.visibility = 'hidden';
-            insuranceTypeGroup.style.visibility = 'hidden';
+            changeGroup.style.display = 'none';
+            insuranceTypeGroup.style.display = 'none';
             insuranceTypeSelect.disabled = true;
 
             if (this.value === 'cash') {
                 // แสดงช่องกรอกจำนวนเงินสำหรับเงินสด
-                amountReceivedGroup.style.visibility = 'visible';
+                amountReceivedGroup.style.display = 'flex';
                 amountReceivedInput.disabled = false;
                 amountReceivedInput.required = true;
                 amountReceivedInput.focus();
             } else if (this.value === 'insurance') {
                 // แสดงช่องประเภทประกันสำหรับประกันสุขภาพ
-                insuranceTypeGroup.style.visibility = 'visible';
+                insuranceTypeGroup.style.display = 'flex';
                 insuranceTypeSelect.disabled = false;
                 // ถ้าเลือก "ไม่มีประกัน" อยู่ ให้เปลี่ยนเป็น "ประกันสังคม"
                 if (insuranceTypeSelect && insuranceTypeSelect.value === 'none') {
@@ -479,10 +479,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (amountReceived > finalTotal) {
                     const change = amountReceived - finalTotal;
-                    changeGroup.style.visibility = 'visible';
+                    changeGroup.style.display = 'flex';
                     changeAmountInput.value = change.toFixed(2);
                 } else {
-                    changeGroup.style.visibility = 'visible';
+                    changeGroup.style.display = 'flex';
                     changeAmountInput.value = '0.00';
                 }
             }

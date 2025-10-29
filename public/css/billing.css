@@ -875,38 +875,55 @@ nav a .fas {
 
 .payment-controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    min-height: 180px;
+    align-content: start;
 }
 
 .payment-method-group,
-.insurance-type-group {
+.insurance-type-group,
+.amount-received-group,
+.change-amount-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-height: 70px;
 }
 
 .payment-method-label,
-.insurance-type-label {
+.insurance-type-label,
+.amount-received-label,
+.change-amount-label {
     font-weight: 600;
     color: #7f8c8d;
     font-size: 0.9rem;
 }
 
 .payment-select,
-.insurance-select {
+.insurance-select,
+.amount-received-input,
+.change-amount-input {
     padding: 0.75rem;
     border: 2px solid #ecf0f1;
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
+    font-family: 'Sarabun', sans-serif;
 }
 
 .payment-select:focus,
-.insurance-select:focus {
+.insurance-select:focus,
+.amount-received-input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 137, 123, 0.1);
+}
+
+.change-amount-input {
+    background-color: #f8f9fa;
+    color: var(--success-color);
+    font-weight: 600;
 }
 
 

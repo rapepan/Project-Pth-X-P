@@ -95,7 +95,16 @@
                                     <% } else { %>
                                         <span class="tag tag-info"><i class="fas fa-venus"></i> หญิง</span>
                                     <% } %>
-                                    <span class="tag tag-info"><i class="fas fa-birthday-cake"></i> <%= patient.age %> ปี</span>
+                                    <%
+                                        const birthDate = new Date(patient.dob);
+                                        const today = new Date();
+                                        let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+                                        const monthDiff = today.getMonth() - birthDate.getMonth();
+                                        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                                            calculatedAge--;
+                                        }
+                                    %>
+                                    <span class="tag tag-info"><i class="fas fa-birthday-cake"></i> <%= calculatedAge %> ปี</span>
                                 </div>
                             </div>
                         </div>
@@ -119,10 +128,6 @@
                                     <div class="info-item">
                                         <span class="info-label">วันเกิด</span>
                                         <span class="info-value"><%= new Date(patient.dob).toLocaleDateString('th-TH') %></span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">อายุ</span>
-                                        <span class="info-value"><%= patient.age %> ปี</span>
                                     </div>
                                 </div>
                             </div>

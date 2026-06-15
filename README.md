@@ -164,10 +164,59 @@ GET /health
 
 ---
 
+## ⚙️ CI/CD Pipeline
+
+โปรเจกต์นี้ใช้ **GitHub Actions** สำหรับ CI/CD อัตโนมัติ ประกอบด้วย 2 workflow:
+
+### 🔍 CI — Lint & Syntax Check (`ci.yml`)
+
+ทำงานทุกครั้งที่ **push ทุก branch** หรือเปิด **Pull Request เข้า main**
+
+```
+Push / PR → ติดตั้ง dependencies → ตรวจ syntax JS ทุกไฟล์ → ✅ หรือ ❌
+```
+
+### 🚀 CD — Deploy to Render (`cd.yml`)
+
+ทำงานเฉพาะเมื่อ **push to `main`** เท่านั้น
+
+```
+Push to main → Trigger Render Deploy Hook → รอ 60s → Health Check /health → ✅ หรือ ❌
+```
+
+### 🔧 วิธีตั้งค่า
+
+**1. วางไฟล์ workflow ลงใน repo**
+
+```
+.github/
+└── workflows/
+    ├── ci.yml
+    └── cd.yml
+```
+
+**2. ตั้งค่า GitHub Secrets**
+
+ไปที่ **Settings → Secrets and variables → Actions** แล้วเพิ่ม:
+
+| Secret | ค่า |
+|--------|-----|
+| `RENDER_DEPLOY_HOOK_URL` | Deploy Hook URL จาก Render (Settings → Deploy Hook) |
+| `APP_URL` | URL ของ app เช่น `https://project-pth-x-p.onrender.com` |
+
+**3. สร้าง Web Service บน Render**
+
+- สมัคร [render.com](https://render.com) → New → Web Service → เชื่อมกับ repo นี้
+- ตั้งค่า Start Command: `node app.js`
+- เพิ่ม Environment Variables ตามหัวข้อด้านบน
+- Copy Deploy Hook URL มาใส่ใน GitHub Secrets
+
+---
+
 ## 📄 License
 
 ISC
 
 ---
 
-> พัฒนาโดย **JIM** — โปรเจกต์ปริญญาตรี สาขา Information Technology for Digital Industry มหาวิทยาลัยบูรพา
+> พัฒนาโดย **RAPEPAN** — โปรเจกต์ปริญญาตรี สาขา Information Technology for Digital Industry มหาวิทยาลัยบูรพา
